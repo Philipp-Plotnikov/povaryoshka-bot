@@ -38,18 +38,3 @@ application {
     // Define the main class for the application.
     mainClass = 'org.telegram.bot.Main'
 }
-
-// task loadEnv {
-//     group = "environment"
-//     description = "Loads environment variables from .env file"
-//     doLast {
-//         file('.env').readLines().each() {
-//             def (key, value) = it.tokenize('=')
-//             run.environment key, value
-//         }
-//     }
-// }
-
-// tasks.named('run') {
-//     dependsOn loadEnv
-// }
