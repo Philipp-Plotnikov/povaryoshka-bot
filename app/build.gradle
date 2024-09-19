@@ -8,6 +8,7 @@
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     id 'application'
+    id "io.github.taisuke-fujimoto.env-loader" version "0.0.1"
 }
 
 repositories {
@@ -22,6 +23,8 @@ dependencies {
     // This dependency is used by the application.
     implementation 'org.telegram:telegrambots-longpolling:7.10.0'
     implementation 'org.telegram:telegrambots-client:7.10.0'
+    // https://mvnrepository.com/artifact/org.postgresql/postgresql
+    implementation group: 'org.postgresql', name: 'postgresql', version: '42.1.4'
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
@@ -33,5 +36,20 @@ java {
 
 application {
     // Define the main class for the application.
-    mainClass = 'org.example.Main'
+    mainClass = 'org.telegram.bot.Main'
 }
+
+// task loadEnv {
+//     group = "environment"
+//     description = "Loads environment variables from .env file"
+//     doLast {
+//         file('.env').readLines().each() {
+//             def (key, value) = it.tokenize('=')
+//             run.environment key, value
+//         }
+//     }
+// }
+
+// tasks.named('run') {
+//     dependsOn loadEnv
+// }
