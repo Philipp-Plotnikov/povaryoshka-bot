@@ -1,4 +1,4 @@
-package org.telegram.bot;
+package telegram.bot;
 
 import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
 

@@ -1,4 +1,4 @@
-package org.telegram.bot;
+package telegram.bot;
 
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer;
