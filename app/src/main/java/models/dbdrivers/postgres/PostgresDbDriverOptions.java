@@ -1,8 +1,8 @@
 package models.dbdrivers.postgres;
 
-import models.dbdrivers.DbDriverOptions;
+import models.dbdrivers.AbstractDbDriverOptions;
 
-public class PostgresDbDriverOptions extends DbDriverOptions {
+public class PostgresDbDriverOptions extends AbstractDbDriverOptions {
     private final String DB_HOST;
     private final String DB_PORT;
     private final String DB_DATABASE;

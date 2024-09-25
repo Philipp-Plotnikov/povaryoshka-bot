@@ -1,6 +1,8 @@
-package telegram.bot;
+package core;
 
 import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
+
+import telegram.bot.PovaryoshkaBot;
 
 public class Main {
     public static void main(String[] args) {

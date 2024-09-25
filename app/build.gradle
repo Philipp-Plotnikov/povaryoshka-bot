@@ -36,5 +36,5 @@ java {
 
 application {
     // Define the main class for the application.
-    mainClass = 'telegram.bot.Main'
+    mainClass = 'core.Main'
 }
