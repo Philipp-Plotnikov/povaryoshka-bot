@@ -11,11 +11,12 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import dbdrivers.AbstractDbDriver;
 import dbdrivers.postgres.PostgresDbDriver;
+import models.EnvVars;
 import models.dbdrivers.postgres.PostgresDbDriverOptions;
-import models.sqlops.DeleteOptions;
-import models.sqlops.InsertOptions;
-import models.sqlops.SelectOptions;
-import models.sqlops.UpdateOptions;
+import models.sqlops.dish.DishDeleteOptions;
+import models.sqlops.dish.DishInsertOptions;
+import models.sqlops.dish.DishSelectOptions;
+import models.sqlops.dish.DishUpdateOptions;
 
 public class PovaryoshkaBot implements LongPollingSingleThreadUpdateConsumer {
     private final TelegramClient telegramClient;
@@ -24,12 +25,12 @@ public class PovaryoshkaBot implements LongPollingSingleThreadUpdateConsumer {
     public PovaryoshkaBot(String botToken) {
         this.telegramClient = new OkHttpTelegramClient(botToken);
         final PostgresDbDriverOptions postgresDbDriverOptions = new PostgresDbDriverOptions(
-            System.getenv("DB_HOST"),
-            System.getenv("DB_PORT"),
-            System.getenv("DB_DATABASE"),
-            System.getenv("DB_SCHEMA"),
-            System.getenv("DB_USERNAME"),
-            System.getenv("DB_PASSWORD")
+            System.getenv(EnvVars.DB_HOST.getValue()),
+            System.getenv(EnvVars.DB_PORT.getValue()),
+            System.getenv(EnvVars.DB_DATABASE.getValue()),
+            System.getenv(EnvVars.DB_SCHEMA.getValue()),
+            System.getenv(EnvVars.DB_USERNAME.getValue()),
+            System.getenv(EnvVars.DB_PASSWORD.getValue())
         );
         this.dbDriver = new PostgresDbDriver(postgresDbDriverOptions);
     }
@@ -43,7 +44,7 @@ public class PovaryoshkaBot implements LongPollingSingleThreadUpdateConsumer {
             long chat_id = update.getMessage().getChatId();
 
             // TODO: delete
-            final ArrayList<String> ingredientList = new ArrayList();
+            final ArrayList<String> ingredientList = new ArrayList<>();
             ingredientList.add("cucumber");
 
             try {
@@ -53,7 +54,7 @@ public class PovaryoshkaBot implements LongPollingSingleThreadUpdateConsumer {
                 }
                 if (message_text.contains("insertDB")) {
                     this.dbDriver.insertDish(
-                        new InsertOptions(
+                        new DishInsertOptions(
                             update.getMessage().getFrom().getId(),
                             "test-dish",
                             ingredientList,
@@ -63,7 +64,7 @@ public class PovaryoshkaBot implements LongPollingSingleThreadUpdateConsumer {
                 }
                 if (message_text.contains("deleteDB")) {
                     this.dbDriver.deleteDish(
-                        new DeleteOptions(
+                        new DishDeleteOptions(
                             update.getMessage().getFrom().getId(),
                             "test-dish"
                         )
@@ -71,7 +72,7 @@ public class PovaryoshkaBot implements LongPollingSingleThreadUpdateConsumer {
                 }
                 if (message_text.contains("updateDB")) {
                     this.dbDriver.updateDish(
-                        new UpdateOptions(
+                        new DishUpdateOptions(
                             update.getMessage().getFrom().getId(),
                             "test-dish",
                             ingredientList,
@@ -81,7 +82,7 @@ public class PovaryoshkaBot implements LongPollingSingleThreadUpdateConsumer {
                 }
                 if (message_text.contains("selectDB")) {
                     this.dbDriver.selectDish(
-                        new SelectOptions(
+                        new DishSelectOptions(
                             update.getMessage().getFrom().getId(),
                             "test-dish"
                         )

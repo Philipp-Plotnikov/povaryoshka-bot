@@ -1,10 +1,10 @@
-package models.sqlops;
+package models.sqlops.dish;
 
-public class DeleteOptions {
+public class DishSelectOptions {
     private final long userId;
     private final String dishName;
 
-    public DeleteOptions(
+    public DishSelectOptions(
         final long userId,
         final String dishName
     ) {

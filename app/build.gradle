@@ -25,6 +25,8 @@ dependencies {
     implementation 'org.telegram:telegrambots-client:7.10.0'
     // https://mvnrepository.com/artifact/org.postgresql/postgresql
     implementation group: 'org.postgresql', name: 'postgresql', version: '42.1.4'
+    // https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
+    implementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.16'
 }
 
 // Apply a specific Java toolchain to ease working on different environments.

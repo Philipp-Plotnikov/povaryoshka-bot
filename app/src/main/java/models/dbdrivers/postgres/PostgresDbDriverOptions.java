@@ -12,12 +12,12 @@ public class PostgresDbDriverOptions extends AbstractDbDriverOptions {
     private final String DB_URL;
 
     public PostgresDbDriverOptions(
-        String dbHost,
-        String dbPort,
-        String dbDatabase,
-        String dbSchema,
-        String dbUsername,
-        String dbPassword
+        final String dbHost,
+        final String dbPort,
+        final String dbDatabase,
+        final String dbSchema,
+        final String dbUsername,
+        final String dbPassword
     ) {
         this.DB_HOST = dbHost;
         this.DB_PORT = dbPort;
@@ -28,18 +28,22 @@ public class PostgresDbDriverOptions extends AbstractDbDriverOptions {
         this.DB_URL = this.constructAndGetDbUrl();
     }
 
+    @Override
     public String getDbUrl() {
         return this.DB_URL;
     }
 
+    @Override
     public String getDbSchema() {
         return this.DB_SCHEMA;
     }
 
+    @Override
     public String getDbUsername() {
         return this.DB_USERNAME;
     }
 
+    @Override
     public String getDbPassword() {
         return this.DB_PASSWORD;
     }

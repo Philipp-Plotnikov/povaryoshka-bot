@@ -13,20 +13,24 @@ import java.util.ArrayList;
 import java.util.Properties;
 
 import dbdrivers.AbstractDbDriver;
-import models.Dish;
+import models.dbdrivers.postgres.PostgresConnectionProperties;
 import models.dbdrivers.postgres.PostgresDbDriverOptions;
-import models.sqlops.DeleteOptions;
-import models.sqlops.InsertOptions;
-import models.sqlops.SelectOptions;
-import models.sqlops.UpdateOptions;
+import models.dbdrivers.postgres.PostgresSQLStatementBatch;
+import models.dtos.DishDTO;
+import models.sqlops.dish.DishDeleteOptions;
+import models.sqlops.dish.DishInsertOptions;
+import models.sqlops.dish.DishSelectOptions;
+import models.sqlops.dish.DishUpdateOptions;
+import models.sqlops.feedback.FeedbackInsertOptions;
 
+// TODO: Replace raw values
 public class PostgresDbDriver extends AbstractDbDriver {
     private final PostgresDbDriverOptions postgresDbDriverOptions;
 
     private Connection connection;
 
     public PostgresDbDriver(final PostgresDbDriverOptions options) {
-        this.postgresDbDriverOptions = options;       
+        this.postgresDbDriverOptions = options;
     }
 
     @Override
@@ -37,159 +41,202 @@ public class PostgresDbDriver extends AbstractDbDriver {
     }
 
     private void setConnectionProperties(final Properties connectionProperties) {
-        connectionProperties.setProperty("user", this.postgresDbDriverOptions.getDbUsername());
-        connectionProperties.setProperty("password", this.postgresDbDriverOptions.getDbPassword());
-        connectionProperties.setProperty("currentSchema", this.postgresDbDriverOptions.getDbSchema());
+        connectionProperties.setProperty(
+            PostgresConnectionProperties.USER.getValue(),
+            this.postgresDbDriverOptions.getDbUsername()
+        );
+        connectionProperties.setProperty(
+            PostgresConnectionProperties.PASSWORD.getValue(),
+            this.postgresDbDriverOptions.getDbPassword()
+        );
+        connectionProperties.setProperty(
+            PostgresConnectionProperties.CURRENT_SCHEMA.getValue(),
+            this.postgresDbDriverOptions.getDbSchema()
+        );
     }
 
     @Override
     public void setup() throws Exception {
-        this.runInitScripts();
-        this.runAlterScripts();
+        this.runAsTransaction(() -> {
+            this.runInitScripts();
+            this.runAlterScripts();
+        });
     }
 
-    /*
-        TODO: Think how to make optimal query
-    */
     @Override
-    public Dish selectDish(final SelectOptions selectOptions) throws SQLException {
-        Dish dish;
+    public DishDTO selectDish(final DishSelectOptions selectOptions) throws SQLException {
+        DishDTO dishDTO;
+        try (
+            final PreparedStatement selectPreparedRecipeStatement = this.getSelectPreparedRecipeStatement(selectOptions);
+            final PreparedStatement selectPreparedIngredientStatement = this.getSelectPreparedIngredientStatement(selectOptions);
+            final ResultSet recipeResultSet = selectPreparedRecipeStatement.executeQuery();
+            final ResultSet ingredientResultSet = selectPreparedIngredientStatement.executeQuery();
+        ) {
+            dishDTO = new DishDTO(recipeResultSet, ingredientResultSet);
+        }
+        return dishDTO;
+    }
+
+    private PreparedStatement getSelectPreparedRecipeStatement(final DishSelectOptions selectOptions) throws SQLException {
         final String recipeSelect = String.format(
-            "SELECT dish_name, recipe FROM %s.recipe WHERE user_id = %d AND dish_name = '%s';",
-            this.postgresDbDriverOptions.getDbSchema(),
-            selectOptions.getUserId(),
-            selectOptions.getDishName()
+            "SELECT dish_name, recipe FROM %s.recipe WHERE user_id = ? AND dish_name = ?;",
+            this.postgresDbDriverOptions.getDbSchema()
         );
+        final PreparedStatement selectPreparedRecipeStatement = this.connection.prepareStatement(recipeSelect);
+        selectPreparedRecipeStatement.setLong(1, selectOptions.getUserId());
+        selectPreparedRecipeStatement.setString(2, selectOptions.getDishName());
+        return selectPreparedRecipeStatement;
+    }
+
+    private PreparedStatement getSelectPreparedIngredientStatement(final DishSelectOptions selectOptions) throws SQLException {
         final String ingredientSelect = String.format(
-            "SELECT ingredient FROM %s.ingredient WHERE user_id = %d AND dish_name = '%s';",
-            this.postgresDbDriverOptions.getDbSchema(),
-            selectOptions.getUserId(),
-            selectOptions.getDishName()
+            "SELECT ingredient FROM %s.ingredient WHERE user_id = ? AND dish_name = ?;",
+            this.postgresDbDriverOptions.getDbSchema()
         );
-        try (
-            final Statement recipeStatement = this.connection.createStatement();
-            final Statement ingredientStatement = this.connection.createStatement();
-            final ResultSet recipeResultSet = recipeStatement.executeQuery(recipeSelect);
-            final ResultSet ingredientResultSet = ingredientStatement.executeQuery(ingredientSelect);
-        ) {
-            dish = new Dish(
-                recipeResultSet,
-                ingredientResultSet
-            );
-        }
-        return dish;
+        final PreparedStatement selectPreparedIngredientStatement = this.connection.prepareStatement(ingredientSelect);
+        selectPreparedIngredientStatement.setLong(1, selectOptions.getUserId());
+        selectPreparedIngredientStatement.setString(2, selectOptions.getDishName());
+        return selectPreparedIngredientStatement;
     }
 
     @Override
-    public void insertDish(final InsertOptions insertOptions) throws SQLException {
-        this.insertRecipe(insertOptions);
-        this.insertIngredients(insertOptions);
+    public void insertDish(final DishInsertOptions insertOptions) throws SQLException, Exception {
+        this.runAsTransaction(() -> {
+            this.internalInsertDish(insertOptions);
+        });
     }
 
-    private void insertRecipe(final InsertOptions insertOptions) throws SQLException {
-        final String recipeInsert = String.format(
-            "INSERT INTO %s.recipe VALUES (%d, '%s', '%s');",
-            this.postgresDbDriverOptions.getDbSchema(),
-            insertOptions.getUserId(),
-            insertOptions.getDishName(),
-            insertOptions.getRecipe()
-        );
+    private void internalInsertDish(final DishInsertOptions insertOptions) throws SQLException, Exception {
         try (
-            final Statement recipeStatement = this.connection.createStatement();
+            final Statement dishStatement = this.connection.createStatement();
+            final PreparedStatement insertPreparedRecipeStatement = this.getInsertPreparedRecipeStatement(insertOptions);
+            final PreparedStatement insertPreparedIngredientStatement = this.getInsertPreparedIngredientStatement(insertOptions);
         ) {
-            recipeStatement.executeUpdate(recipeInsert);
-        }
-    }
-
-    private void insertIngredients(final InsertOptions insertOptions) throws SQLException {
-        final String ingredientInsert = String.format(
-            "INSERT INTO %s.ingredient VALUES (%d, '%s', ?);",
-            this.postgresDbDriverOptions.getDbSchema(),
-            insertOptions.getUserId(),
-            insertOptions.getDishName()
-        );
-        try (
-            final PreparedStatement preparedIngredientStatement = this.connection.prepareStatement(ingredientInsert);
-        ) {
+            dishStatement.addBatch(insertPreparedRecipeStatement.toString());
             final ArrayList<String> ingredientList = insertOptions.getIngredientList();
             for (String ingredient : ingredientList) {
-                preparedIngredientStatement.setString(1, ingredient);
-                preparedIngredientStatement.addBatch();
+                insertPreparedIngredientStatement.setString(3, ingredient);
+                dishStatement.addBatch(insertPreparedIngredientStatement.toString());
             }
-            preparedIngredientStatement.executeBatch();
+            dishStatement.executeBatch();
         }
     }
 
+    private PreparedStatement getInsertPreparedRecipeStatement(final DishInsertOptions insertOptions) throws SQLException {
+        final String recipeInsert = String.format(
+            "INSERT INTO %s.recipe VALUES (?, ?, ?);",
+            this.postgresDbDriverOptions.getDbSchema()
+        );
+        final PreparedStatement insertPreparedRecipeStatement = this.connection.prepareStatement(recipeInsert);
+        insertPreparedRecipeStatement.setLong(1, insertOptions.getUserId());
+        insertPreparedRecipeStatement.setString(2, insertOptions.getDishName());
+        insertPreparedRecipeStatement.setString(3, insertOptions.getRecipe());
+        return insertPreparedRecipeStatement;
+    }
+
+    private PreparedStatement getInsertPreparedIngredientStatement(final DishInsertOptions insertOptions) throws SQLException {
+        final String ingredientInsert = String.format(
+            "INSERT INTO %s.ingredient VALUES (?, ?, ?);",
+            this.postgresDbDriverOptions.getDbSchema()
+        );
+        final PreparedStatement insertPreparedIngredientStatement = this.connection.prepareStatement(ingredientInsert);
+        insertPreparedIngredientStatement.setLong(1, insertOptions.getUserId());
+        insertPreparedIngredientStatement.setString(2, insertOptions.getDishName());
+        return insertPreparedIngredientStatement;
+    }
+
     @Override
-    public void deleteDish(final DeleteOptions deleteOptions) throws SQLException {
+    public void deleteDish(final DishDeleteOptions deleteOptions) throws SQLException {
         this.deleteRecipe(deleteOptions);
     }
 
-    private void deleteRecipe(final DeleteOptions deleteOptions) throws SQLException {
+    private void deleteRecipe(final DishDeleteOptions deleteOptions) throws SQLException {
+        try (
+            final PreparedStatement deletePreparedRecipeStatement = this.getDeletePreparedRecipeStatement(deleteOptions);
+        ) {
+            deletePreparedRecipeStatement.executeUpdate();
+        }
+    }
+
+    private PreparedStatement getDeletePreparedRecipeStatement(final DishDeleteOptions deleteOptions) throws SQLException {
         final String recipeDelete = String.format(
-            "DELETE FROM %s.recipe WHERE user_id = %d AND dish_name = '%s';",
-            this.postgresDbDriverOptions.getDbSchema(),
-            deleteOptions.getUserId(),
-            deleteOptions.getDishName()
+            "DELETE FROM %s.recipe WHERE user_id = ? AND dish_name = ?;",
+            this.postgresDbDriverOptions.getDbSchema()
         );
-        try (
-            final Statement recipeStatement = this.connection.createStatement();
-        ) {
-            recipeStatement.executeUpdate(recipeDelete);
-        }
+        final PreparedStatement deletePreparedRecipeStatement = this.connection.prepareStatement(recipeDelete);
+        deletePreparedRecipeStatement.setLong(1, deleteOptions.getUserId());
+        deletePreparedRecipeStatement.setString(2, deleteOptions.getDishName());
+        return deletePreparedRecipeStatement;
     }
 
-    private void deleteIngredients(final DeleteOptions deleteOptions) throws SQLException {
-        final String ingredientDelete = String.format(
-            "DELETE FROM %s.ingredient WHERE user_id = %d AND dish_name = '%s';",
-            this.postgresDbDriverOptions.getDbSchema(),
-            deleteOptions.getUserId(),
-            deleteOptions.getDishName()
-        );
-        try (
-            final Statement ingredientStatement = this.connection.createStatement();
-        ) {
-            ingredientStatement.executeUpdate(ingredientDelete);
-        }
-    }
-
-    // It needs to think
     @Override
-    public void updateDish(final UpdateOptions updateOptions) throws SQLException {
-        this.updateRecipe(updateOptions);
-        this.updateIngredients(updateOptions);
+    public void updateDish(final DishUpdateOptions updateOptions) throws SQLException, Exception {
+        this.runAsTransaction(() -> {
+            this.internalUpdateDish(updateOptions);
+        });
     }
 
-    private void updateRecipe(final UpdateOptions updateOptions) throws SQLException {
-        final String recipeUpdate = String.format(
-            "UPDATE %s.recipe SET recipe = '%s' WHERE user_id = %d AND dish_name = '%s';",
-            this.postgresDbDriverOptions.getDbSchema(),
-            updateOptions.getRecipe(),
-            updateOptions.getUserId(),
-            updateOptions.getDishName()
-        );
-        try (
-            final Statement recipeStatement = this.connection.createStatement();
-        ) {
-            recipeStatement.executeUpdate(recipeUpdate);
-        }
-    }
-
-    // It seems to need to delete and then insert again
-    // It needs to think about it
-    private void updateIngredients(final UpdateOptions updateOptions) throws SQLException {
-        final DeleteOptions deleteOptions = new DeleteOptions(
-            updateOptions.getUserId(),
-            updateOptions.getDishName()
-        );
-        this.deleteIngredients(deleteOptions);
-        final InsertOptions insertOptions = new InsertOptions(
+    private void internalUpdateDish(final DishUpdateOptions updateOptions) throws SQLException, Exception {
+        final DishInsertOptions insertOptions = new DishInsertOptions(
             updateOptions.getUserId(),
             updateOptions.getDishName(),
             updateOptions.getIngredientList(),
             updateOptions.getRecipe()
         );
-        this.insertIngredients(insertOptions);
+        try (
+            final Statement dishStatement = this.connection.createStatement();
+            final PreparedStatement updatePreparedRecipeStatement = this.getUpdatePreparedRecipeStatement(updateOptions);
+            final PreparedStatement deletePreparedIngredientStatement = this.getDeletePreparedIngredientStatement(updateOptions);
+            final PreparedStatement insertPreparedIngredientStatement = this.getInsertPreparedIngredientStatement(insertOptions);
+        ) {
+            dishStatement.addBatch(updatePreparedRecipeStatement.toString());
+            dishStatement.addBatch(deletePreparedIngredientStatement.toString());
+            dishStatement.addBatch(insertPreparedIngredientStatement.toString());
+            dishStatement.executeBatch();
+        }
+    }
+
+    private PreparedStatement getUpdatePreparedRecipeStatement(final DishUpdateOptions updateOptions) throws SQLException {
+        final String recipeUpdate = String.format(
+            "UPDATE %s.recipe SET recipe = ? WHERE user_id = ? AND dish_name = ?;",
+            this.postgresDbDriverOptions.getDbSchema()
+        );
+        final PreparedStatement updatePreparedRecipeStatement = this.connection.prepareStatement(recipeUpdate);
+        updatePreparedRecipeStatement.setString(1, updateOptions.getRecipe());
+        updatePreparedRecipeStatement.setLong(2, updateOptions.getUserId());
+        updatePreparedRecipeStatement.setString(3, updateOptions.getDishName());
+        return updatePreparedRecipeStatement;
+    }
+
+    private PreparedStatement getDeletePreparedIngredientStatement(final DishUpdateOptions updateOptions) throws SQLException {
+        final String ingredientDelete = String.format(
+            "DELETE FROM %s.ingredient WHERE user_id = ? AND dish_name = ?;",
+            this.postgresDbDriverOptions.getDbSchema()
+        );
+        final PreparedStatement deletePreparedIngredientStatement = this.connection.prepareStatement(ingredientDelete);
+        deletePreparedIngredientStatement.setLong(1, updateOptions.getUserId());
+        deletePreparedIngredientStatement.setString(2, updateOptions.getDishName());
+        return deletePreparedIngredientStatement;
+    }
+
+    @Override
+    public void insertFeedback(final FeedbackInsertOptions insertOptions) throws SQLException {
+        try (
+            final PreparedStatement insertPreparedFeedbackStatement = this.getInsertPreparedFeedbackStatement(insertOptions);
+        ) {
+            insertPreparedFeedbackStatement.execute();
+        }
+    }
+
+    private PreparedStatement getInsertPreparedFeedbackStatement(final FeedbackInsertOptions insertOptions) throws SQLException {
+        final String feedbackInsert = String.format(
+            "INSERT INTO %s.feedback (user_id, feedback) VALUES (?, ?);",
+            this.postgresDbDriverOptions.getDbSchema()
+        );
+        final PreparedStatement insertPreparedFeedbackStatement = this.connection.prepareStatement(feedbackInsert);
+        insertPreparedFeedbackStatement.setLong(1, insertOptions.getUserId());
+        insertPreparedFeedbackStatement.setString(2, insertOptions.getFeedback());
+        return insertPreparedFeedbackStatement;
     }
 
     @Override
@@ -205,8 +252,7 @@ public class PostgresDbDriver extends AbstractDbDriver {
         this.runScript("sql/postgres/alter.sql");
     }
 
-    // TODO: Make it more readable
-    private void runScript(final String filePath) throws Exception {
+    private void runScript(final String filePath) throws SQLException, Exception {
         try (
             final InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(filePath);
             final InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
@@ -215,16 +261,25 @@ public class PostgresDbDriver extends AbstractDbDriver {
         ) {
             final StringBuilder query = new StringBuilder();
             String line;
-            while((line = bufferedReader.readLine()) != null) {
-                if(line.trim().startsWith("-- ")) {
+            while ((line = bufferedReader.readLine()) != null) {
+                if (line.trim().startsWith("-- ")) {
                     continue;
                 }
                 query.append(line).append(" ");
-                if(line.trim().endsWith(";")) {
+                if (line.trim().endsWith(";")) {
                     statement.execute(query.toString().trim());
                     query.setLength(0);
                 }
             }
+        }
+    }
+
+    private void runAsTransaction(PostgresSQLStatementBatch sqlStatementBatch) throws SQLException, Exception {
+        try {
+            this.connection.setAutoCommit(false);
+            sqlStatementBatch.execute();
+        } finally {
+            this.connection.setAutoCommit(true);
         }
     }
 }

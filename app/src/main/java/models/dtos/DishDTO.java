@@ -1,17 +1,16 @@
-package models;
+package models.dtos;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-public class Dish {
+public class DishDTO {
     private final String name;
     private final ArrayList<String> ingredientList = new ArrayList();
     private final String recipe;
 
-    // TODO: Ged rid of repeates 
-    // TODO: Maybe change the way of initialization (really dont like it)
-    public Dish(
+    // TODO: Replace strings 
+    public DishDTO(
         final ResultSet recipeResultSet,
         final ResultSet ingredientResultSet
     ) throws SQLException {
