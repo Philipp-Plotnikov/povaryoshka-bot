@@ -1,6 +1,6 @@
 package models.dbdrivers;
 
-public abstract class AbstractDbDriverOptions {
+public interface DbDriverOptions {
     abstract public String getDbUrl();
 
     abstract public String getDbSchema();

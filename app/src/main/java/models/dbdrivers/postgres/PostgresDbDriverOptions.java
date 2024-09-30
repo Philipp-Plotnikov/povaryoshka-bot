@@ -1,8 +1,8 @@
 package models.dbdrivers.postgres;
 
-import models.dbdrivers.AbstractDbDriverOptions;
+import models.dbdrivers.DbDriverOptions;
 
-public class PostgresDbDriverOptions extends AbstractDbDriverOptions {
+public class PostgresDbDriverOptions implements DbDriverOptions {
     private final String DB_HOST;
     private final String DB_PORT;
     private final String DB_DATABASE;
@@ -49,7 +49,9 @@ public class PostgresDbDriverOptions extends AbstractDbDriverOptions {
     }
 
     private String constructAndGetDbUrl() {
-        return String.format("jdbc:postgresql://%s:%s/%s",
+        final String dbUrlTemplate = "jdbc:postgresql://%s:%s/%s";
+        return String.format(
+            dbUrlTemplate,
             this.DB_HOST,
             this.DB_PORT,
             this.DB_DATABASE

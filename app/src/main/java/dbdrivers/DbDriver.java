@@ -9,7 +9,7 @@ import models.sqlops.dish.DishSelectOptions;
 import models.sqlops.dish.DishUpdateOptions;
 import models.sqlops.feedback.FeedbackInsertOptions;
 
-public abstract class AbstractDbDriver implements AutoCloseable {
+public interface DbDriver extends AutoCloseable {
     public abstract void connect() throws SQLException;
 
     public abstract void setup() throws Exception;
@@ -23,7 +23,7 @@ public abstract class AbstractDbDriver implements AutoCloseable {
     public abstract void updateDish(final DishUpdateOptions updateOptions) throws SQLException, Exception;
 
     public abstract void insertFeedback(final FeedbackInsertOptions insertOptions) throws SQLException;
- 
+
     @Override
     public abstract void close() throws SQLException;
 }

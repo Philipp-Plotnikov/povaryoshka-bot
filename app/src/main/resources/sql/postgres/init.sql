@@ -20,6 +20,6 @@ CREATE TABLE IF NOT EXISTS public.ingredient (
 CREATE TABLE IF NOT EXISTS public.feedback (
     id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
     user_id bigint NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE AT TIME ZONE 'UTC' DEFAULT now(),
+    created_at timestamp with timezone AT TIME ZONE 'UTC' DEFAULT now(),
     feedback text
 )

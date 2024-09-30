@@ -9,11 +9,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
-import dbdrivers.AbstractDbDriver;
-import models.dbdrivers.postgres.PostgresConnectionProperties;
+import dbdrivers.DbDriver;
+import static models.dbdrivers.postgres.PostgresConnectionProperties.CURRENT_SCHEMA;
+import static models.dbdrivers.postgres.PostgresConnectionProperties.PASSWORD;
+import static models.dbdrivers.postgres.PostgresConnectionProperties.USER;
 import models.dbdrivers.postgres.PostgresDbDriverOptions;
 import models.dbdrivers.postgres.PostgresSQLStatementBatch;
 import models.dtos.DishDTO;
@@ -23,8 +25,7 @@ import models.sqlops.dish.DishSelectOptions;
 import models.sqlops.dish.DishUpdateOptions;
 import models.sqlops.feedback.FeedbackInsertOptions;
 
-// TODO: Replace raw values
-public class PostgresDbDriver extends AbstractDbDriver {
+public class PostgresDbDriver implements DbDriver {
     private final PostgresDbDriverOptions postgresDbDriverOptions;
 
     private Connection connection;
@@ -41,18 +42,9 @@ public class PostgresDbDriver extends AbstractDbDriver {
     }
 
     private void setConnectionProperties(final Properties connectionProperties) {
-        connectionProperties.setProperty(
-            PostgresConnectionProperties.USER.getValue(),
-            this.postgresDbDriverOptions.getDbUsername()
-        );
-        connectionProperties.setProperty(
-            PostgresConnectionProperties.PASSWORD.getValue(),
-            this.postgresDbDriverOptions.getDbPassword()
-        );
-        connectionProperties.setProperty(
-            PostgresConnectionProperties.CURRENT_SCHEMA.getValue(),
-            this.postgresDbDriverOptions.getDbSchema()
-        );
+        connectionProperties.setProperty(USER, this.postgresDbDriverOptions.getDbUsername());
+        connectionProperties.setProperty(PASSWORD, this.postgresDbDriverOptions.getDbPassword());
+        connectionProperties.setProperty(CURRENT_SCHEMA, this.postgresDbDriverOptions.getDbSchema());
     }
 
     @Override
@@ -106,14 +98,14 @@ public class PostgresDbDriver extends AbstractDbDriver {
         });
     }
 
-    private void internalInsertDish(final DishInsertOptions insertOptions) throws SQLException, Exception {
+    private void internalInsertDish(final DishInsertOptions insertOptions) throws SQLException {
         try (
             final Statement dishStatement = this.connection.createStatement();
             final PreparedStatement insertPreparedRecipeStatement = this.getInsertPreparedRecipeStatement(insertOptions);
             final PreparedStatement insertPreparedIngredientStatement = this.getInsertPreparedIngredientStatement(insertOptions);
         ) {
             dishStatement.addBatch(insertPreparedRecipeStatement.toString());
-            final ArrayList<String> ingredientList = insertOptions.getIngredientList();
+            final List<String> ingredientList = insertOptions.getIngredientList();
             for (String ingredient : ingredientList) {
                 insertPreparedIngredientStatement.setString(3, ingredient);
                 dishStatement.addBatch(insertPreparedIngredientStatement.toString());
@@ -176,7 +168,7 @@ public class PostgresDbDriver extends AbstractDbDriver {
         });
     }
 
-    private void internalUpdateDish(final DishUpdateOptions updateOptions) throws SQLException, Exception {
+    private void internalUpdateDish(final DishUpdateOptions updateOptions) throws SQLException {
         final DishInsertOptions insertOptions = new DishInsertOptions(
             updateOptions.getUserId(),
             updateOptions.getDishName(),
@@ -191,7 +183,11 @@ public class PostgresDbDriver extends AbstractDbDriver {
         ) {
             dishStatement.addBatch(updatePreparedRecipeStatement.toString());
             dishStatement.addBatch(deletePreparedIngredientStatement.toString());
-            dishStatement.addBatch(insertPreparedIngredientStatement.toString());
+            final List<String> ingredientList = insertOptions.getIngredientList();
+            for (String ingredient : ingredientList) {
+                insertPreparedIngredientStatement.setString(3, ingredient);
+                dishStatement.addBatch(insertPreparedIngredientStatement.toString());
+            }
             dishStatement.executeBatch();
         }
     }
@@ -260,13 +256,16 @@ public class PostgresDbDriver extends AbstractDbDriver {
             final Statement statement = connection.createStatement();
         ) {
             final StringBuilder query = new StringBuilder();
+            final String COMMENT_START_SIGN = "-- ";
+            final String SPACE = " ";
+            final String TERMINATED_STATEMENT_SIGN = ";";
             String line;
             while ((line = bufferedReader.readLine()) != null) {
-                if (line.trim().startsWith("-- ")) {
+                if (line.trim().startsWith(COMMENT_START_SIGN)) {
                     continue;
                 }
-                query.append(line).append(" ");
-                if (line.trim().endsWith(";")) {
+                query.append(line).append(SPACE);
+                if (line.trim().endsWith(TERMINATED_STATEMENT_SIGN)) {
                     statement.execute(query.toString().trim());
                     query.setLength(0);
                 }
@@ -278,6 +277,10 @@ public class PostgresDbDriver extends AbstractDbDriver {
         try {
             this.connection.setAutoCommit(false);
             sqlStatementBatch.execute();
+            this.connection.commit();
+        } catch(Exception e) {
+            this.connection.rollback();
+            throw e;
         } finally {
             this.connection.setAutoCommit(true);
         }

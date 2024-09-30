@@ -9,9 +9,14 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
-import dbdrivers.AbstractDbDriver;
+import dbdrivers.DbDriver;
 import dbdrivers.postgres.PostgresDbDriver;
-import models.EnvVars;
+import static models.EnvVars.DB_DATABASE;
+import static models.EnvVars.DB_HOST;
+import static models.EnvVars.DB_PASSWORD;
+import static models.EnvVars.DB_PORT;
+import static models.EnvVars.DB_SCHEMA;
+import static models.EnvVars.DB_USERNAME;
 import models.dbdrivers.postgres.PostgresDbDriverOptions;
 import models.sqlops.dish.DishDeleteOptions;
 import models.sqlops.dish.DishInsertOptions;
@@ -20,17 +25,17 @@ import models.sqlops.dish.DishUpdateOptions;
 
 public class PovaryoshkaBot implements LongPollingSingleThreadUpdateConsumer {
     private final TelegramClient telegramClient;
-    private final AbstractDbDriver dbDriver;
+    private final DbDriver dbDriver;
 
     public PovaryoshkaBot(String botToken) {
         this.telegramClient = new OkHttpTelegramClient(botToken);
         final PostgresDbDriverOptions postgresDbDriverOptions = new PostgresDbDriverOptions(
-            System.getenv(EnvVars.DB_HOST.getValue()),
-            System.getenv(EnvVars.DB_PORT.getValue()),
-            System.getenv(EnvVars.DB_DATABASE.getValue()),
-            System.getenv(EnvVars.DB_SCHEMA.getValue()),
-            System.getenv(EnvVars.DB_USERNAME.getValue()),
-            System.getenv(EnvVars.DB_PASSWORD.getValue())
+            System.getenv(DB_HOST),
+            System.getenv(DB_PORT),
+            System.getenv(DB_DATABASE),
+            System.getenv(DB_SCHEMA),
+            System.getenv(DB_USERNAME),
+            System.getenv(DB_PASSWORD)
         );
         this.dbDriver = new PostgresDbDriver(postgresDbDriverOptions);
     }
