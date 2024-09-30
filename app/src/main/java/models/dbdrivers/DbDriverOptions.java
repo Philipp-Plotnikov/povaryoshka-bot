@@ -1,11 +1,15 @@
 package models.dbdrivers;
 
 public interface DbDriverOptions {
-    abstract public String getDbUrl();
+    public String getDbSchema();
 
-    abstract public String getDbSchema();
+    public String getDbUsername();
 
-    abstract public String getDbUsername();
+    public String getDbPassword();
 
-    abstract public String getDbPassword();
+    public String getInitSQLScriptPath();
+
+    public String getAlterSQLScriptPath();
+
+    public String getDbUrl();
 }

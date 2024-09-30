@@ -13,10 +13,10 @@ public class DishDeleteOptions {
     }
 
     public long getUserId() {
-        return this.userId;
+        return userId;
     }
 
     public String getDishName() {
-        return this.dishName;
+        return dishName;
     }
 }

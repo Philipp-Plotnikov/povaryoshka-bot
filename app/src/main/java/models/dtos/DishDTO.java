@@ -19,25 +19,25 @@ public class DishDTO {
         final ResultSet ingredientResultSet
     ) throws SQLException {
         recipeResultSet.next();
-        this.name = recipeResultSet.getString(PostgresRecipeSchema.DISH_NAME_INDEX);
-        this.recipe = recipeResultSet.getString(PostgresRecipeSchema.RECIPE_INDEX);
+        name = recipeResultSet.getString(PostgresRecipeSchema.DISH_NAME_INDEX);
+        recipe = recipeResultSet.getString(PostgresRecipeSchema.RECIPE_INDEX);
         final ArrayList<String> ingredientListBuffer = new ArrayList<>();
         while (ingredientResultSet.next()) {
             final String ingredient = ingredientResultSet.getString(PostgresIngredientSchema.INGREDIENT_INDEX);
             ingredientListBuffer.add(ingredient);
         }
-        this.ingredientList = Collections.unmodifiableList(ingredientListBuffer);
+        ingredientList = Collections.unmodifiableList(ingredientListBuffer);
     }
 
     public String getName() {
-        return this.name;
+        return name;
     }
 
     public List<String> getIngredientList() {
-        return this.ingredientList;
+        return ingredientList;
     }
 
     public String getRecipe() {
-        return this.recipe;
+        return recipe;
     }
 }

@@ -10,6 +10,8 @@ public class PostgresDbDriverOptions implements DbDriverOptions {
     private final String DB_USERNAME;
     private final String DB_PASSWORD;
     private final String DB_URL;
+    private final String INIT_SQL_SCRIPT_PATH;
+    private final String ALTER_SQL_SCRIPT_PATH;
 
     public PostgresDbDriverOptions(
         final String dbHost,
@@ -17,44 +19,58 @@ public class PostgresDbDriverOptions implements DbDriverOptions {
         final String dbDatabase,
         final String dbSchema,
         final String dbUsername,
-        final String dbPassword
+        final String dbPassword,
+        final String initSQLScriptPath,
+        final String alterSQLScriptPath
     ) {
-        this.DB_HOST = dbHost;
-        this.DB_PORT = dbPort;
-        this.DB_DATABASE = dbDatabase;
-        this.DB_SCHEMA = dbSchema;
-        this.DB_USERNAME = dbUsername;
-        this.DB_PASSWORD = dbPassword;
-        this.DB_URL = this.constructAndGetDbUrl();
+        DB_HOST = dbHost;
+        DB_PORT = dbPort;
+        DB_DATABASE = dbDatabase;
+        DB_SCHEMA = dbSchema;
+        DB_USERNAME = dbUsername;
+        DB_PASSWORD = dbPassword;
+        INIT_SQL_SCRIPT_PATH = initSQLScriptPath;
+        ALTER_SQL_SCRIPT_PATH = alterSQLScriptPath;
+        DB_URL = constructAndGetDbUrl();
     }
 
     @Override
     public String getDbUrl() {
-        return this.DB_URL;
+        return DB_URL;
     }
 
     @Override
     public String getDbSchema() {
-        return this.DB_SCHEMA;
+        return DB_SCHEMA;
     }
 
     @Override
     public String getDbUsername() {
-        return this.DB_USERNAME;
+        return DB_USERNAME;
     }
 
     @Override
     public String getDbPassword() {
-        return this.DB_PASSWORD;
+        return DB_PASSWORD;
+    }
+
+    @Override
+    public String getInitSQLScriptPath() {
+        return INIT_SQL_SCRIPT_PATH;
+    }
+
+    @Override
+    public String getAlterSQLScriptPath() {
+        return ALTER_SQL_SCRIPT_PATH;
     }
 
     private String constructAndGetDbUrl() {
         final String dbUrlTemplate = "jdbc:postgresql://%s:%s/%s";
         return String.format(
             dbUrlTemplate,
-            this.DB_HOST,
-            this.DB_PORT,
-            this.DB_DATABASE
+            DB_HOST,
+            DB_PORT,
+            DB_DATABASE
         );
     }
 }

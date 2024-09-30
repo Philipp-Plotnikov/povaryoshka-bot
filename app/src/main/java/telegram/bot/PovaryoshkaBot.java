@@ -1,7 +1,5 @@
 package telegram.bot;
 
-import java.util.ArrayList;
-
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -11,33 +9,35 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import dbdrivers.DbDriver;
 import dbdrivers.postgres.PostgresDbDriver;
+import static models.EnvVars.ALTER_SQL_SCRIPT_PATH;
 import static models.EnvVars.DB_DATABASE;
 import static models.EnvVars.DB_HOST;
 import static models.EnvVars.DB_PASSWORD;
 import static models.EnvVars.DB_PORT;
 import static models.EnvVars.DB_SCHEMA;
 import static models.EnvVars.DB_USERNAME;
+import static models.EnvVars.INIT_SQL_SCRIPT_PATH;
 import models.dbdrivers.postgres.PostgresDbDriverOptions;
-import models.sqlops.dish.DishDeleteOptions;
-import models.sqlops.dish.DishInsertOptions;
-import models.sqlops.dish.DishSelectOptions;
-import models.sqlops.dish.DishUpdateOptions;
 
 public class PovaryoshkaBot implements LongPollingSingleThreadUpdateConsumer {
     private final TelegramClient telegramClient;
     private final DbDriver dbDriver;
 
-    public PovaryoshkaBot(String botToken) {
-        this.telegramClient = new OkHttpTelegramClient(botToken);
+    public PovaryoshkaBot(String botToken) throws Exception {
+        telegramClient = new OkHttpTelegramClient(botToken);
         final PostgresDbDriverOptions postgresDbDriverOptions = new PostgresDbDriverOptions(
             System.getenv(DB_HOST),
             System.getenv(DB_PORT),
             System.getenv(DB_DATABASE),
             System.getenv(DB_SCHEMA),
             System.getenv(DB_USERNAME),
-            System.getenv(DB_PASSWORD)
+            System.getenv(DB_PASSWORD),
+            System.getenv(INIT_SQL_SCRIPT_PATH),
+            System.getenv(ALTER_SQL_SCRIPT_PATH)
         );
-        this.dbDriver = new PostgresDbDriver(postgresDbDriverOptions);
+        dbDriver = PostgresDbDriver.getInstance(postgresDbDriverOptions);
+        dbDriver.connect();
+        dbDriver.setup();
     }
 
     @Override
@@ -47,56 +47,6 @@ public class PovaryoshkaBot implements LongPollingSingleThreadUpdateConsumer {
             // Set variables
             String message_text = update.getMessage().getText();
             long chat_id = update.getMessage().getChatId();
-
-            // TODO: delete
-            final ArrayList<String> ingredientList = new ArrayList<>();
-            ingredientList.add("cucumber");
-
-            try {
-                if (message_text.contains("testDB")) {
-                    this.dbDriver.connect();
-                    this.dbDriver.setup();
-                }
-                if (message_text.contains("insertDB")) {
-                    this.dbDriver.insertDish(
-                        new DishInsertOptions(
-                            update.getMessage().getFrom().getId(),
-                            "test-dish",
-                            ingredientList,
-                            "do something"
-                        )
-                    );
-                }
-                if (message_text.contains("deleteDB")) {
-                    this.dbDriver.deleteDish(
-                        new DishDeleteOptions(
-                            update.getMessage().getFrom().getId(),
-                            "test-dish"
-                        )
-                    );
-                }
-                if (message_text.contains("updateDB")) {
-                    this.dbDriver.updateDish(
-                        new DishUpdateOptions(
-                            update.getMessage().getFrom().getId(),
-                            "test-dish",
-                            ingredientList,
-                            "updated do something"
-                        )
-                    );
-                }
-                if (message_text.contains("selectDB")) {
-                    this.dbDriver.selectDish(
-                        new DishSelectOptions(
-                            update.getMessage().getFrom().getId(),
-                            "test-dish"
-                        )
-                    );
-                }
-            } catch (Exception e) {
-                System.out.println(e);
-            }
-
             SendMessage message = SendMessage // Create a message object
                     .builder()
                     .chatId(chat_id)

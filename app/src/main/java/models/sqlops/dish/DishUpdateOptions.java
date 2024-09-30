@@ -22,18 +22,18 @@ public class DishUpdateOptions {
     }
 
     public long getUserId() {
-        return this.userId;
+        return userId;
     }
 
     public String getDishName() {
-        return this.dishName;
+        return dishName;
     }
 
     public List<String> getIngredientList() {
-        return this.ingredientList;
+        return ingredientList;
     }
 
     public String getRecipe() {
-        return this.recipe;
+        return recipe;
     }
 }

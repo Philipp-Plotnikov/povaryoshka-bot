@@ -10,20 +10,20 @@ import models.sqlops.dish.DishUpdateOptions;
 import models.sqlops.feedback.FeedbackInsertOptions;
 
 public interface DbDriver extends AutoCloseable {
-    public abstract void connect() throws SQLException;
+    public void connect() throws SQLException;
 
-    public abstract void setup() throws Exception;
+    public void setup() throws SQLException, Exception;
 
-    public abstract DishDTO selectDish(final DishSelectOptions selectOptions) throws SQLException;
+    public DishDTO selectDish(final DishSelectOptions selectOptions) throws SQLException;
 
-    public abstract void insertDish(final DishInsertOptions insertOptions) throws SQLException, Exception;
+    public void insertDish(final DishInsertOptions insertOptions) throws SQLException, Exception;
 
-    public abstract void deleteDish(final DishDeleteOptions deleteOptions) throws SQLException;
+    public void deleteDish(final DishDeleteOptions deleteOptions) throws SQLException;
 
-    public abstract void updateDish(final DishUpdateOptions updateOptions) throws SQLException, Exception;
+    public void updateDish(final DishUpdateOptions updateOptions) throws SQLException, Exception;
 
-    public abstract void insertFeedback(final FeedbackInsertOptions insertOptions) throws SQLException;
+    public void insertFeedback(final FeedbackInsertOptions insertOptions) throws SQLException;
 
     @Override
-    public abstract void close() throws SQLException;
+    public void close() throws SQLException;
 }
