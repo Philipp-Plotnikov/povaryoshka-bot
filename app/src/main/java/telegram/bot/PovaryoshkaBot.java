@@ -1,5 +1,7 @@
 package telegram.bot;
 
+import java.sql.SQLException;
+
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -23,7 +25,7 @@ public class PovaryoshkaBot implements LongPollingSingleThreadUpdateConsumer {
     private final TelegramClient telegramClient;
     private final DbDriver dbDriver;
 
-    public PovaryoshkaBot(String botToken) throws Exception {
+    public PovaryoshkaBot(String botToken) throws SQLException, Exception {
         telegramClient = new OkHttpTelegramClient(botToken);
         final PostgresDbDriverOptions postgresDbDriverOptions = new PostgresDbDriverOptions(
             System.getenv(DB_HOST),
