@@ -1,3 +1,31 @@
+-- TODO: Add indexes
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'multi_state_command_types') THEN
+        CREATE TYPE multi_state_command_types AS ENUM (
+    		'create',
+    		'get',
+    		'update',
+    		'delete',
+    		'feedback',
+    		'help'
+		);
+    END IF;
+END
+$$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'command_states') THEN
+        CREATE TYPE command_states AS ENUM (
+            'dish_name',
+            'ingredients',
+            'recipe'
+        );
+    END IF;
+END
+$$;
+
 CREATE TABLE IF NOT EXISTS public.recipe (
     user_id bigint NOT NULL,
     dish_name text NOT NULL,
@@ -13,9 +41,16 @@ CREATE TABLE IF NOT EXISTS public.ingredient (
     FOREIGN KEY (user_id, dish_name) REFERENCES recipe (user_id, dish_name) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS public.user_context (
+    user_id bigint NOT NULL,
+    multi_state_command_type multi_state_command_types NOT NULL,
+    command_state command_states NOT NULL,
+    PRIMARY KEY (user_id)
+);
+
 CREATE TABLE IF NOT EXISTS public.feedback (
     id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
     user_id bigint NOT NULL,
-    created_at timestamp with timezone AT TIME ZONE 'UTC' DEFAULT now(),
+    created_at timestamp with time zone DEFAULT now(),
     feedback text
-)
+);

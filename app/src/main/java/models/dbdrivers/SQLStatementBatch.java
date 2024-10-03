@@ -1,8 +1,8 @@
-package models.dbdrivers.postgres; 
+package models.dbdrivers; 
 
 import java.sql.SQLException;
 
 @FunctionalInterface
-public interface PostgresSQLStatementBatch {
+public interface SQLStatementBatch {
     void execute() throws SQLException, Exception;
 }

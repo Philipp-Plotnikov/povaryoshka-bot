@@ -8,7 +8,7 @@ import telegram.bot.PovaryoshkaBot;
 public class Main {
     public static void main(String[] args) {
         try (
-            TelegramBotsLongPollingApplication botsApplication = new TelegramBotsLongPollingApplication()
+            TelegramBotsLongPollingApplication botsApplication = new TelegramBotsLongPollingApplication();
         ) {
             String botToken = System.getenv(TELEGRAM_BOT_API_TOKEN);
             botsApplication.registerBot(botToken, new PovaryoshkaBot(botToken));

@@ -6,8 +6,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import models.schemas.postgres.PostgresIngredientSchema;
-import models.schemas.postgres.PostgresRecipeSchema;
+import static models.schemas.postgres.PostgresIngredientSchema.DISH_NAME_INDEX;
+import static models.schemas.postgres.PostgresIngredientSchema.INGREDIENT_INDEX;
+import static models.schemas.postgres.PostgresRecipeSchema.RECIPE_INDEX;
 
 public class DishDTO {
     private final String name;
@@ -19,11 +20,11 @@ public class DishDTO {
         final ResultSet ingredientResultSet
     ) throws SQLException {
         recipeResultSet.next();
-        name = recipeResultSet.getString(PostgresRecipeSchema.DISH_NAME_INDEX);
-        recipe = recipeResultSet.getString(PostgresRecipeSchema.RECIPE_INDEX);
+        name = recipeResultSet.getString(DISH_NAME_INDEX);
+        recipe = recipeResultSet.getString(RECIPE_INDEX);
         final ArrayList<String> ingredientListBuffer = new ArrayList<>();
         while (ingredientResultSet.next()) {
-            final String ingredient = ingredientResultSet.getString(PostgresIngredientSchema.INGREDIENT_INDEX);
+            final String ingredient = ingredientResultSet.getString(INGREDIENT_INDEX);
             ingredientListBuffer.add(ingredient);
         }
         ingredientList = Collections.unmodifiableList(ingredientListBuffer);
