@@ -12,6 +12,7 @@ public class PostgresDbDriverOptions implements DbDriverOptions {
     private final String DB_URL;
     private final String INIT_SQL_SCRIPT_PATH;
     private final String ALTER_SQL_SCRIPT_PATH;
+    private final boolean IS_DISTRIBUTED_DATABASE;
 
     public PostgresDbDriverOptions(
         final String dbHost,
@@ -21,7 +22,8 @@ public class PostgresDbDriverOptions implements DbDriverOptions {
         final String dbUsername,
         final String dbPassword,
         final String initSQLScriptPath,
-        final String alterSQLScriptPath
+        final String alterSQLScriptPath,
+        final String isDistributedDatabase
     ) {
         DB_HOST = dbHost;
         DB_PORT = dbPort;
@@ -31,6 +33,7 @@ public class PostgresDbDriverOptions implements DbDriverOptions {
         DB_PASSWORD = dbPassword;
         INIT_SQL_SCRIPT_PATH = initSQLScriptPath;
         ALTER_SQL_SCRIPT_PATH = alterSQLScriptPath;
+        IS_DISTRIBUTED_DATABASE = Boolean.parseBoolean(isDistributedDatabase);
         DB_URL = constructAndGetDbUrl();
     }
 
@@ -62,6 +65,11 @@ public class PostgresDbDriverOptions implements DbDriverOptions {
     @Override
     public String getAlterSQLScriptPath() {
         return ALTER_SQL_SCRIPT_PATH;
+    }
+
+    @Override
+    public boolean getIsDistributedDatabase() {
+        return IS_DISTRIBUTED_DATABASE;
     }
 
     private String constructAndGetDbUrl() {

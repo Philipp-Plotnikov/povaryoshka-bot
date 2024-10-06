@@ -11,5 +11,7 @@ public interface DbDriverOptions {
 
     public String getAlterSQLScriptPath();
 
+    public boolean getIsDistributedDatabase();
+
     public String getDbUrl();
 }

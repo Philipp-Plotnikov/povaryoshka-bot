@@ -22,6 +22,10 @@ import static models.dbdrivers.postgres.PostgresConnectionProperties.USER;
 import models.dbdrivers.postgres.PostgresDbDriverOptions;
 import models.dtos.DishDTO;
 import models.dtos.UserContextDTO;
+import models.schemas.postgres.PostgresFeedbackSchema;
+import models.schemas.postgres.PostgresIngredientSchema;
+import models.schemas.postgres.PostgresRecipeSchema;
+import models.schemas.postgres.PostgresUserContextSchema;
 import models.sqlops.dish.DishDeleteOptions;
 import models.sqlops.dish.DishInsertOptions;
 import models.sqlops.dish.DishSelectOptions;
@@ -32,7 +36,6 @@ import models.sqlops.usercontext.UserContextInsertOptions;
 import models.sqlops.usercontext.UserContextSelectOptions;
 import models.sqlops.usercontext.UserContextUpdateOptions;
 
-// TODO: Not convenince with ? as I need to remember the order, it needs to make easier
 public class PostgresDbDriver implements DbDriver {
     private static PostgresDbDriver instance;
     private final PostgresDbDriverOptions postgresDbDriverOptions;
@@ -65,16 +68,26 @@ public class PostgresDbDriver implements DbDriver {
 
     @Override
     public void setup() throws SQLException, Exception {
-        runAsTransaction(() -> {
+        executeAsTransaction(() -> {
             runInitScripts();
             runAlterScripts();
         });
     }
 
-    // TODO: Check it works
-    // TODO: Think how to handle distributes transaction
     @Override
-    public void runAsTransaction(SQLStatementBatch sqlStatementBatch) throws SQLException, Exception {
+    public void executeAsTransaction(SQLStatementBatch sqlStatementBatch) throws SQLException, Exception {
+        if (postgresDbDriverOptions.getIsDistributedDatabase()) {
+            throw new Exception("Distributed database is not supported yet");
+        }
+        executeAsOnePhaseTransaction(sqlStatementBatch);
+    }
+
+    private void executeAsOnePhaseTransaction(SQLStatementBatch sqlStatementBatch) throws SQLException, Exception {
+        boolean currentAutoCommitState = connection.getAutoCommit();
+        if (!currentAutoCommitState) {
+            sqlStatementBatch.execute();
+            return;
+        }
         try {
             connection.setAutoCommit(false);
             sqlStatementBatch.execute();
@@ -87,18 +100,22 @@ public class PostgresDbDriver implements DbDriver {
         }
     }
 
-    // TODO: we can make one request and get results but do we need it ?
-    // Check we have methods for large query what is it
     @Override
-    public DishDTO selectDish(final DishSelectOptions selectOptions) throws SQLException {
+    public DishDTO selectDish(final DishSelectOptions selectOptions) throws SQLException, Exception {
         DishDTO dishDTO;
         try (
+            final Statement selectDishStatement = connection.createStatement();
             final PreparedStatement selectPreparedRecipeStatement = getSelectPreparedRecipeStatement(selectOptions);
             final PreparedStatement selectPreparedIngredientStatement = getSelectPreparedIngredientStatement(selectOptions);
-            final ResultSet recipeResultSet = selectPreparedRecipeStatement.executeQuery();
-            final ResultSet ingredientResultSet = selectPreparedIngredientStatement.executeQuery();
         ) {
-            dishDTO = new DishDTO(recipeResultSet, ingredientResultSet);
+            selectDishStatement.execute(
+                String.format(
+                    "%s; %s",
+                    selectPreparedRecipeStatement.toString(),
+                    selectPreparedIngredientStatement.toString()
+                )
+            );
+            dishDTO = new DishDTO(selectDishStatement);
         }
         return dishDTO;
     }
@@ -127,7 +144,7 @@ public class PostgresDbDriver implements DbDriver {
 
     @Override
     public void insertDish(final DishInsertOptions insertOptions) throws SQLException, Exception {
-        runAsTransaction(() -> {
+        executeAsTransaction(() -> {
             internalInsertDish(insertOptions);
         });
     }
@@ -150,8 +167,11 @@ public class PostgresDbDriver implements DbDriver {
 
     private PreparedStatement getInsertPreparedRecipeStatement(final DishInsertOptions insertOptions) throws SQLException {
         final String recipeInsert = String.format(
-            "INSERT INTO %s.recipe VALUES (?, ?, ?);",
-            postgresDbDriverOptions.getDbSchema()
+            "INSERT INTO %s.recipe (%s, %s, %s) VALUES (?, ?, ?);",
+            postgresDbDriverOptions.getDbSchema(),
+            PostgresRecipeSchema.USER_ID,
+            PostgresRecipeSchema.DISH_NAME,
+            PostgresRecipeSchema.RECIPE
         );
         final PreparedStatement insertPreparedRecipeStatement = connection.prepareStatement(recipeInsert);
         insertPreparedRecipeStatement.setLong(1, insertOptions.userId());
@@ -162,8 +182,11 @@ public class PostgresDbDriver implements DbDriver {
 
     private PreparedStatement getInsertPreparedIngredientStatement(final DishInsertOptions insertOptions) throws SQLException {
         final String ingredientInsert = String.format(
-            "INSERT INTO %s.ingredient VALUES (?, ?, ?);",
-            postgresDbDriverOptions.getDbSchema()
+            "INSERT INTO %s.ingredient (%s, %s, %s) VALUES (?, ?, ?);",
+            postgresDbDriverOptions.getDbSchema(),
+            PostgresIngredientSchema.USER_ID,
+            PostgresIngredientSchema.DISH_NAME,
+            PostgresIngredientSchema.INGREDIENT
         );
         final PreparedStatement insertPreparedIngredientStatement = connection.prepareStatement(ingredientInsert);
         insertPreparedIngredientStatement.setLong(1, insertOptions.userId());
@@ -197,7 +220,7 @@ public class PostgresDbDriver implements DbDriver {
 
     @Override
     public void updateDish(final DishUpdateOptions updateOptions) throws SQLException, Exception {
-        runAsTransaction(() -> {
+        executeAsTransaction(() -> {
             internalUpdateDish(updateOptions);
         });
     }
@@ -210,10 +233,10 @@ public class PostgresDbDriver implements DbDriver {
             updateOptions.recipe()
         );
         try (
+            final Statement dishStatement = connection.createStatement();
             final PreparedStatement updatePreparedRecipeStatement = getUpdatePreparedRecipeStatement(updateOptions);
             final PreparedStatement deletePreparedIngredientStatement = getDeletePreparedIngredientStatement(updateOptions);
             final PreparedStatement insertPreparedIngredientStatement = getInsertPreparedIngredientStatement(insertOptions);
-            final Statement dishStatement = connection.createStatement();
         ) {
             dishStatement.addBatch(updatePreparedRecipeStatement.toString());
             dishStatement.addBatch(deletePreparedIngredientStatement.toString());
@@ -280,12 +303,13 @@ public class PostgresDbDriver implements DbDriver {
         }
     }
 
-    // TODO: What about SQLData interface to insert enum
-    // Does this approach have benefits ?
     private PreparedStatement getInsertPreparedUserContextStatement(final UserContextInsertOptions insertOptions) throws SQLException {
         final String userContextInsert = String.format(
-            "INSERT INTO %s.user_context VALUES (?, ?, ?);",
-            postgresDbDriverOptions.getDbSchema()
+            "INSERT INTO %s.user_context (%s, %s, %s) VALUES (?, ?, ?);",
+            postgresDbDriverOptions.getDbSchema(),
+            PostgresUserContextSchema.USER_ID,
+            PostgresUserContextSchema.MULTI_STATE_COMMAND_TYPE,
+            PostgresUserContextSchema.COMMAND_STATE
         );
         final PreparedStatement insertPreparedUserContextStatement = connection.prepareStatement(userContextInsert);
         insertPreparedUserContextStatement.setLong(1, insertOptions.userId());
@@ -322,8 +346,6 @@ public class PostgresDbDriver implements DbDriver {
         }
     }
 
-    // TODO: What about SQLData interface to insert enum
-    // Does this approach have benefits ?
     private PreparedStatement getUpdatePreparedUserContextStatement(final UserContextUpdateOptions updateOptions) throws SQLException {
         final String userContextUpdate = String.format(
             "UPDATE %s.user_context SET command_state = ? WHERE user_id = ?;",
@@ -346,8 +368,10 @@ public class PostgresDbDriver implements DbDriver {
 
     private PreparedStatement getInsertPreparedFeedbackStatement(final FeedbackInsertOptions insertOptions) throws SQLException {
         final String feedbackInsert = String.format(
-            "INSERT INTO %s.feedback (user_id, feedback) VALUES (?, ?);",
-            postgresDbDriverOptions.getDbSchema()
+            "INSERT INTO %s.feedback (%s, %s) VALUES (?, ?);",
+            postgresDbDriverOptions.getDbSchema(),
+            PostgresFeedbackSchema.USER_ID,
+            PostgresFeedbackSchema.FEEDBACK
         );
         final PreparedStatement insertPreparedFeedbackStatement = connection.prepareStatement(feedbackInsert);
         insertPreparedFeedbackStatement.setLong(1, insertOptions.userId());

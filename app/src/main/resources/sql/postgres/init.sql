@@ -1,4 +1,3 @@
--- TODO: Add indexes
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'multi_state_command_types') THEN
@@ -49,8 +48,9 @@ CREATE TABLE IF NOT EXISTS public.user_context (
 );
 
 CREATE TABLE IF NOT EXISTS public.feedback (
-    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
     user_id bigint NOT NULL,
-    created_at timestamp with time zone DEFAULT now(),
-    feedback text
+    created_at timestamp with time zone NOT NULL DEFAULT now(),
+    feedback text NOT NULL,
+    PRIMARY KEY (id)
 );

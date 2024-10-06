@@ -2,13 +2,13 @@ package models.dtos;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static models.schemas.postgres.PostgresIngredientSchema.DISH_NAME_INDEX;
-import static models.schemas.postgres.PostgresIngredientSchema.INGREDIENT_INDEX;
-import static models.schemas.postgres.PostgresRecipeSchema.RECIPE_INDEX;
+import models.schemas.postgres.PostgresIngredientSchema;
+import models.schemas.postgres.PostgresRecipeSchema;
 
 public class DishDTO {
     private final String name;
@@ -16,18 +16,28 @@ public class DishDTO {
     private final String recipe;
 
     public DishDTO(
-        final ResultSet recipeResultSet,
-        final ResultSet ingredientResultSet
-    ) throws SQLException {
-        recipeResultSet.next();
-        name = recipeResultSet.getString(DISH_NAME_INDEX);
-        recipe = recipeResultSet.getString(RECIPE_INDEX);
-        final ArrayList<String> ingredientListBuffer = new ArrayList<>();
-        while (ingredientResultSet.next()) {
-            final String ingredient = ingredientResultSet.getString(INGREDIENT_INDEX);
-            ingredientListBuffer.add(ingredient);
+        final Statement selectDishStatement
+    ) throws SQLException, Exception {
+        try (
+            final ResultSet recipeResultSet = selectDishStatement.getResultSet();
+        ) {
+            recipeResultSet.next();
+            name = recipeResultSet.getString(PostgresRecipeSchema.DISH_NAME);
+            recipe = recipeResultSet.getString(PostgresRecipeSchema.RECIPE);
         }
-        ingredientList = Collections.unmodifiableList(ingredientListBuffer);
+        if (!selectDishStatement.getMoreResults()) {
+            throw new Exception("ingredientResultSet was not found in DishDTO");
+        }
+        try (
+            final ResultSet ingredientResultSet = selectDishStatement.getResultSet();
+        ) {
+            final ArrayList<String> ingredientListBuffer = new ArrayList<>();
+            while (ingredientResultSet.next()) {
+                final String ingredient = ingredientResultSet.getString(PostgresIngredientSchema.INGREDIENT);
+                ingredientListBuffer.add(ingredient);
+            }
+            ingredientList = Collections.unmodifiableList(ingredientListBuffer);
+        }
     }
 
     public String getName() {

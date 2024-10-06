@@ -18,9 +18,9 @@ import models.sqlops.usercontext.UserContextUpdateOptions;
 public interface DbDriver extends AutoCloseable {
     public void connect() throws SQLException;
     public void setup() throws SQLException, Exception;
-    public void runAsTransaction(SQLStatementBatch sqlStatementBatch) throws SQLException, Exception;
+    public void executeAsTransaction(SQLStatementBatch sqlStatementBatch) throws SQLException, Exception;
 
-    public DishDTO selectDish(final DishSelectOptions selectOptions) throws SQLException;
+    public DishDTO selectDish(final DishSelectOptions selectOptions) throws SQLException, Exception;
     public void insertDish(final DishInsertOptions insertOptions) throws SQLException, Exception;
     public void deleteDish(final DishDeleteOptions deleteOptions) throws SQLException;
     public void updateDish(final DishUpdateOptions updateOptions) throws SQLException, Exception;
