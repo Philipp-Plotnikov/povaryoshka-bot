@@ -305,7 +305,7 @@ public class PostgresDbDriver implements DbDriver {
 
     private PreparedStatement getInsertPreparedUserContextStatement(final UserContextInsertOptions insertOptions) throws SQLException {
         final String userContextInsert = String.format(
-            "INSERT INTO %s.user_context (%s, %s, %s) VALUES (?, ?, ?);",
+            "INSERT INTO %s.user_context (%s, %s, %s) VALUES (?, ?::multi_state_command_types, ?::command_states);",
             postgresDbDriverOptions.getDbSchema(),
             PostgresUserContextSchema.USER_ID,
             PostgresUserContextSchema.MULTI_STATE_COMMAND_TYPE,
@@ -348,7 +348,7 @@ public class PostgresDbDriver implements DbDriver {
 
     private PreparedStatement getUpdatePreparedUserContextStatement(final UserContextUpdateOptions updateOptions) throws SQLException {
         final String userContextUpdate = String.format(
-            "UPDATE %s.user_context SET command_state = ? WHERE user_id = ?;",
+            "UPDATE %s.user_context SET command_state = ?::command_states WHERE user_id = ?;",
             postgresDbDriverOptions.getDbSchema()
         );
         final PreparedStatement updatePreparedUserContextStatement = connection.prepareStatement(userContextUpdate);
