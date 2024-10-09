@@ -1,6 +1,7 @@
 package models;
 
 public class EnvVars {
+    public static final String DB_TYPE = "DB_TYPE";
     public static final String DB_HOST = "DB_HOST";
     public static final String DB_PORT = "DB_PORT";
     public static final String DB_DATABASE = "DB_DATABASE";
@@ -10,6 +11,8 @@ public class EnvVars {
     public static final String INIT_SQL_SCRIPT_PATH = "INIT_SQL_SCRIPT_PATH";
     public static final String ALTER_SQL_SCRIPT_PATH = "ALTER_SQL_SCRIPT_PATH";
     public static final String IS_DISTRIBUTED_DATABASE = "IS_DISTRIBUTED_DATABASE";
+
+    public static final String COMMAND_TYPE = "COMMAND_TYPE";
 
     public static final String TELEGRAM_BOT_API_TOKEN = "TELEGRAM_BOT_API_TOKEN";
 }

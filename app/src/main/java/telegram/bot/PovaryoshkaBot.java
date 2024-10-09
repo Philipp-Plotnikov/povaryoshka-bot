@@ -1,6 +1,7 @@
 package telegram.bot;
 
 import java.sql.SQLException;
+import java.util.Map;
 
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer;
@@ -9,37 +10,22 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
+import core.factory.FacadeFactory;
 import dbdrivers.DbDriver;
-import dbdrivers.postgres.PostgresDbDriver;
-import static models.EnvVars.ALTER_SQL_SCRIPT_PATH;
-import static models.EnvVars.DB_DATABASE;
-import static models.EnvVars.DB_HOST;
-import static models.EnvVars.DB_PASSWORD;
-import static models.EnvVars.DB_PORT;
-import static models.EnvVars.DB_SCHEMA;
-import static models.EnvVars.DB_USERNAME;
-import static models.EnvVars.INIT_SQL_SCRIPT_PATH;
-import static models.EnvVars.IS_DISTRIBUTED_DATABASE;
-import models.dbdrivers.postgres.PostgresDbDriverOptions;
+import telegram.commands.AbstractCommand;
 
+// TODO: Is it suitable for us LongPollingSingleThreadUpdateConsumer
+// TODO: Think maybe to make keys as enum for commandMap
 public class PovaryoshkaBot implements LongPollingSingleThreadUpdateConsumer {
     private final TelegramClient telegramClient;
     private final DbDriver dbDriver;
+    private final Map<String, AbstractCommand> commandMap;
 
     public PovaryoshkaBot(String botToken) throws SQLException, Exception {
         telegramClient = new OkHttpTelegramClient(botToken);
-        final PostgresDbDriverOptions postgresDbDriverOptions = new PostgresDbDriverOptions(
-            System.getenv(DB_HOST),
-            System.getenv(DB_PORT),
-            System.getenv(DB_DATABASE),
-            System.getenv(DB_SCHEMA),
-            System.getenv(DB_USERNAME),
-            System.getenv(DB_PASSWORD),
-            System.getenv(INIT_SQL_SCRIPT_PATH),
-            System.getenv(ALTER_SQL_SCRIPT_PATH),
-            System.getenv(IS_DISTRIBUTED_DATABASE)
-        );
-        dbDriver = PostgresDbDriver.getInstance(postgresDbDriverOptions);
+        final FacadeFactory facadeFactory = new FacadeFactory();
+        dbDriver = facadeFactory.getDbDriver();
+        commandMap = facadeFactory.getCommandMap();
         dbDriver.connect();
         dbDriver.setup();
     }

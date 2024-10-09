@@ -3,10 +3,10 @@ package models.dtos;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import models.CommandStates;
-import models.MultiStateCommandTypes;
-import static models.schemas.postgres.PostgresUserContextSchema.COMMAND_STATE_INDEX;
-import static models.schemas.postgres.PostgresUserContextSchema.MULTI_STATE_COMMAND_TYPE_INDEX;
+import models.commands.CommandStates;
+import models.commands.MultiStateCommandTypes;
+import static models.db.schemas.postgres.PostgresUserContextSchema.COMMAND_STATE_INDEX;
+import static models.db.schemas.postgres.PostgresUserContextSchema.MULTI_STATE_COMMAND_TYPE_INDEX;
 
 public class UserContextDTO {
     private final MultiStateCommandTypes multiStateCommandType;

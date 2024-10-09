@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import models.schemas.postgres.PostgresIngredientSchema;
-import models.schemas.postgres.PostgresRecipeSchema;
+import models.db.schemas.postgres.PostgresIngredientSchema;
+import models.db.schemas.postgres.PostgresRecipeSchema;
 
 public class DishDTO {
     private final String name;
