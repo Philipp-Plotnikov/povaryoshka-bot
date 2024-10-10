@@ -14,8 +14,6 @@ import core.factory.FacadeFactory;
 import dbdrivers.DbDriver;
 import telegram.commands.AbstractCommand;
 
-// TODO: Is it suitable for us LongPollingSingleThreadUpdateConsumer
-// TODO: Think maybe to make keys as enum for commandMap
 public class PovaryoshkaBot implements LongPollingSingleThreadUpdateConsumer {
     private final TelegramClient telegramClient;
     private final DbDriver dbDriver;
@@ -24,8 +22,8 @@ public class PovaryoshkaBot implements LongPollingSingleThreadUpdateConsumer {
     public PovaryoshkaBot(String botToken) throws SQLException, Exception {
         telegramClient = new OkHttpTelegramClient(botToken);
         final FacadeFactory facadeFactory = new FacadeFactory();
-        dbDriver = facadeFactory.getDbDriver();
         commandMap = facadeFactory.getCommandMap();
+        dbDriver = facadeFactory.getDbDriver();
         dbDriver.connect();
         dbDriver.setup();
     }

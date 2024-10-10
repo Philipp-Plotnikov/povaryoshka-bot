@@ -14,7 +14,6 @@ public class CommandFactoryProducer {
         commandFactoryGeneratorMap = getCommandFactoryGeneratorMap();
     }
 
-    // TODO: Read about enum map vs hash map
     private Map<CommandTypes, CommandFactoryGenerator> getCommandFactoryGeneratorMap() {
         final EnumMap<CommandTypes, CommandFactoryGenerator> localCommandFactoryGeneratorMap = new EnumMap<>(CommandTypes.class);
         localCommandFactoryGeneratorMap.put(CommandTypes.SIMPLE, () -> new SimpleCommandFactory());
