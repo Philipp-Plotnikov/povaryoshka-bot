@@ -15,42 +15,34 @@ import java.util.Properties;
 import org.apache.ibatis.jdbc.ScriptRunner;
 
 import dbdrivers.DbDriver;
-import models.dbdrivers.SQLStatementBatch;
-import static models.dbdrivers.postgres.PostgresConnectionProperties.CURRENT_SCHEMA;
-import static models.dbdrivers.postgres.PostgresConnectionProperties.PASSWORD;
-import static models.dbdrivers.postgres.PostgresConnectionProperties.USER;
-import models.dbdrivers.postgres.PostgresDbDriverOptions;
+import models.db.drivers.SQLStatementBatch;
+import static models.db.drivers.postgres.PostgresConnectionProperties.CURRENT_SCHEMA;
+import static models.db.drivers.postgres.PostgresConnectionProperties.PASSWORD;
+import static models.db.drivers.postgres.PostgresConnectionProperties.USER;
+import models.db.drivers.postgres.PostgresDbDriverOptions;
+import models.db.schemas.postgres.PostgresFeedbackSchema;
+import models.db.schemas.postgres.PostgresIngredientSchema;
+import models.db.schemas.postgres.PostgresRecipeSchema;
+import models.db.schemas.postgres.PostgresUserContextSchema;
+import models.db.sqlops.dish.DishDeleteOptions;
+import models.db.sqlops.dish.DishInsertOptions;
+import models.db.sqlops.dish.DishSelectOptions;
+import models.db.sqlops.dish.DishUpdateOptions;
+import models.db.sqlops.feedback.FeedbackInsertOptions;
+import models.db.sqlops.usercontext.UserContextDeleteOptions;
+import models.db.sqlops.usercontext.UserContextInsertOptions;
+import models.db.sqlops.usercontext.UserContextSelectOptions;
+import models.db.sqlops.usercontext.UserContextUpdateOptions;
 import models.dtos.DishDTO;
 import models.dtos.UserContextDTO;
-import models.schemas.postgres.PostgresFeedbackSchema;
-import models.schemas.postgres.PostgresIngredientSchema;
-import models.schemas.postgres.PostgresRecipeSchema;
-import models.schemas.postgres.PostgresUserContextSchema;
-import models.sqlops.dish.DishDeleteOptions;
-import models.sqlops.dish.DishInsertOptions;
-import models.sqlops.dish.DishSelectOptions;
-import models.sqlops.dish.DishUpdateOptions;
-import models.sqlops.feedback.FeedbackInsertOptions;
-import models.sqlops.usercontext.UserContextDeleteOptions;
-import models.sqlops.usercontext.UserContextInsertOptions;
-import models.sqlops.usercontext.UserContextSelectOptions;
-import models.sqlops.usercontext.UserContextUpdateOptions;
 
 public class PostgresDbDriver implements DbDriver {
-    private static PostgresDbDriver instance;
     private final PostgresDbDriverOptions postgresDbDriverOptions;
 
     private Connection connection;
 
-    private PostgresDbDriver(final PostgresDbDriverOptions options) {
+    public PostgresDbDriver(final PostgresDbDriverOptions options) {
         postgresDbDriverOptions = options;
-    }
-
-    public static PostgresDbDriver getInstance(final PostgresDbDriverOptions options) {
-        if (instance == null) {
-            instance = new PostgresDbDriver(options);
-        }
-        return instance;
     }
 
     @Override

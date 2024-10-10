@@ -2,18 +2,18 @@ package dbdrivers;
 
 import java.sql.SQLException;
 
-import models.dbdrivers.SQLStatementBatch;
+import models.db.drivers.SQLStatementBatch;
+import models.db.sqlops.dish.DishDeleteOptions;
+import models.db.sqlops.dish.DishInsertOptions;
+import models.db.sqlops.dish.DishSelectOptions;
+import models.db.sqlops.dish.DishUpdateOptions;
+import models.db.sqlops.feedback.FeedbackInsertOptions;
+import models.db.sqlops.usercontext.UserContextDeleteOptions;
+import models.db.sqlops.usercontext.UserContextInsertOptions;
+import models.db.sqlops.usercontext.UserContextSelectOptions;
+import models.db.sqlops.usercontext.UserContextUpdateOptions;
 import models.dtos.DishDTO;
 import models.dtos.UserContextDTO;
-import models.sqlops.dish.DishDeleteOptions;
-import models.sqlops.dish.DishInsertOptions;
-import models.sqlops.dish.DishSelectOptions;
-import models.sqlops.dish.DishUpdateOptions;
-import models.sqlops.feedback.FeedbackInsertOptions;
-import models.sqlops.usercontext.UserContextDeleteOptions;
-import models.sqlops.usercontext.UserContextInsertOptions;
-import models.sqlops.usercontext.UserContextSelectOptions;
-import models.sqlops.usercontext.UserContextUpdateOptions;
 
 public interface DbDriver extends AutoCloseable {
     public void connect() throws SQLException;
