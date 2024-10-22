@@ -2,7 +2,7 @@ package models.db.drivers.postgres;
 
 public class PostgresDbDriverOptions {
     private final String DB_HOST;
-    private final String DB_PORT;
+    private final int DB_PORT;
     private final String DB_DATABASE;
     private final String DB_SCHEMA;
     private final String DB_USERNAME;
@@ -14,7 +14,7 @@ public class PostgresDbDriverOptions {
 
     public PostgresDbDriverOptions(
         final String dbHost,
-        final String dbPort,
+        final int dbPort,
         final String dbDatabase,
         final String dbSchema,
         final String dbUsername,
@@ -33,6 +33,18 @@ public class PostgresDbDriverOptions {
         ALTER_SQL_SCRIPT_PATH = alterSQLScriptPath;
         IS_DISTRIBUTED_DATABASE = Boolean.parseBoolean(isDistributedDatabase);
         DB_URL = constructAndGetDbUrl();
+    }
+
+    public String getDbHost() {
+        return DB_HOST;
+    }
+
+    public int getDbPort() {
+        return DB_PORT;
+    }
+
+    public String getDbDatabase() {
+        return DB_DATABASE;
     }
 
     public String getDbUrl() {
@@ -64,7 +76,7 @@ public class PostgresDbDriverOptions {
     }
 
     private String constructAndGetDbUrl() {
-        final String dbUrlTemplate = "jdbc:postgresql://%s:%s/%s";
+        final String dbUrlTemplate = "jdbc:postgresql://%s:%d/%s";
         return String.format(
             dbUrlTemplate,
             DB_HOST,

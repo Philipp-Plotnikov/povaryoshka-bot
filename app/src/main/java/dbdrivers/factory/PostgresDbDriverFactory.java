@@ -18,7 +18,7 @@ public class PostgresDbDriverFactory implements DbDriverFactory {
     public DbDriver getDbDriver() {
         final PostgresDbDriverOptions postgresDbDriverOptions = new PostgresDbDriverOptions(
             System.getenv(DB_HOST),
-            System.getenv(DB_PORT),
+            Integer.parseInt(System.getenv(DB_PORT)),
             System.getenv(DB_DATABASE),
             System.getenv(DB_SCHEMA),
             System.getenv(DB_USERNAME),

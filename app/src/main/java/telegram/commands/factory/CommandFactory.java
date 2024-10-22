@@ -1,9 +1,11 @@
 package telegram.commands.factory;
 
-import java.util.Map;
+import java.util.List;
 
-import telegram.commands.AbstractCommand;
+import org.telegram.telegrambots.abilitybots.api.util.AbilityExtension;
+
+import telegram.bot.PovaryoshkaBot;
 
 public interface CommandFactory {
-    Map<String, AbstractCommand> getCommandMap();
+    List<AbilityExtension> getCommandList(final PovaryoshkaBot povaryoshkaBot);
 }
