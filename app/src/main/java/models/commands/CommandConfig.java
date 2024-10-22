@@ -2,19 +2,19 @@ package models.commands;
 
 public class CommandConfig {
     public final static CommandSettings CREATE_DISH_COMMAND_SETTINGS = new CommandSettings(
-        "create-dish",
+        "create",
         "создает новое блюдо"
     );
     public final static CommandSettings DELETE_DISH_COMMAND_SETTINGS = new CommandSettings(
-        "delete-dish",
+        "delete",
         "удаляет существующее блюдо"
     );
     public final static CommandSettings UPDATE_DISH_COMMAND_SETTINGS = new CommandSettings(
-        "update-dish",
+        "update",
         "позволяет отредактировать существующее блюдо (название, ингредиенты, описание)"
     );
     public final static CommandSettings GET_DISH_COMMAND_SETTINGS = new CommandSettings(
-        "get-dish",
+        "get",
         "выдает ингредиенты и описание блюда по названию"
     );
     public final static CommandSettings FEEDBACK_COMMAND_SETTINGS = new CommandSettings(

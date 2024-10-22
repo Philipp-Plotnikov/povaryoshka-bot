@@ -15,4 +15,6 @@ public class EnvVars {
     public static final String COMMAND_TYPE = "COMMAND_TYPE";
 
     public static final String TELEGRAM_BOT_API_TOKEN = "TELEGRAM_BOT_API_TOKEN";
+    public static final String BOT_USERNAME = "BOT_USERNAME";
+    public static final String CREATOR_ID = "CREATOR_ID";
 }

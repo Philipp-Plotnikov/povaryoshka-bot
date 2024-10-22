@@ -1,16 +1,12 @@
 package telegram.commands.factory;
 
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
-import static models.commands.CommandConfig.CREATE_DISH_COMMAND_SETTINGS;
-import static models.commands.CommandConfig.DELETE_DISH_COMMAND_SETTINGS;
-import static models.commands.CommandConfig.END_COMMAND_SETTINGS;
-import static models.commands.CommandConfig.FEEDBACK_COMMAND_SETTINGS;
-import static models.commands.CommandConfig.GET_DISH_COMMAND_SETTINGS;
-import static models.commands.CommandConfig.UPDATE_DISH_COMMAND_SETTINGS;
-import telegram.commands.AbstractCommand;
+import org.telegram.telegrambots.abilitybots.api.util.AbilityExtension;
+
+import telegram.bot.PovaryoshkaBot;
 import telegram.commands.CreateDishCommand;
 import telegram.commands.DeleteDishCommand;
 import telegram.commands.EndCommand;
@@ -20,50 +16,14 @@ import telegram.commands.UpdateDishCommand;
 
 public class SimpleCommandFactory implements CommandFactory {
     @Override
-    public Map<String, AbstractCommand> getCommandMap() {
-        final HashMap<String, AbstractCommand> simpleCommandMap = new HashMap<>();
-        simpleCommandMap.put(
-            CREATE_DISH_COMMAND_SETTINGS.commandName(),
-            new CreateDishCommand(
-                CREATE_DISH_COMMAND_SETTINGS.commandName(),
-                CREATE_DISH_COMMAND_SETTINGS.commandDescription()
-            )
-        );
-        simpleCommandMap.put(
-            DELETE_DISH_COMMAND_SETTINGS.commandName(),
-            new DeleteDishCommand(
-                DELETE_DISH_COMMAND_SETTINGS.commandName(),
-                DELETE_DISH_COMMAND_SETTINGS.commandDescription()
-            )
-        );
-        simpleCommandMap.put(
-            UPDATE_DISH_COMMAND_SETTINGS.commandName(),
-            new UpdateDishCommand(
-                UPDATE_DISH_COMMAND_SETTINGS.commandName(),
-                UPDATE_DISH_COMMAND_SETTINGS.commandDescription()
-            )
-        );
-        simpleCommandMap.put(
-            GET_DISH_COMMAND_SETTINGS.commandName(),
-            new GetDishCommand(
-                GET_DISH_COMMAND_SETTINGS.commandName(),
-                GET_DISH_COMMAND_SETTINGS.commandDescription()
-            )
-        );
-        simpleCommandMap.put(
-            FEEDBACK_COMMAND_SETTINGS.commandName(),
-            new FeedbackCommand(
-                FEEDBACK_COMMAND_SETTINGS.commandName(),
-                FEEDBACK_COMMAND_SETTINGS.commandDescription()
-            )
-        );
-        simpleCommandMap.put(
-            END_COMMAND_SETTINGS.commandName(),
-            new EndCommand(
-                END_COMMAND_SETTINGS.commandName(),
-                END_COMMAND_SETTINGS.commandDescription()
-            )
-        );
-        return Collections.unmodifiableMap(simpleCommandMap);
+    public List<AbilityExtension> getCommandList(final PovaryoshkaBot povaryoshkaBot) {
+        final ArrayList<AbilityExtension> simpleCommandList = new ArrayList<>();
+        simpleCommandList.add(new CreateDishCommand(povaryoshkaBot));
+        simpleCommandList.add(new DeleteDishCommand(povaryoshkaBot));
+        simpleCommandList.add(new UpdateDishCommand(povaryoshkaBot));
+        simpleCommandList.add(new GetDishCommand(povaryoshkaBot));
+        simpleCommandList.add(new FeedbackCommand(povaryoshkaBot));
+        simpleCommandList.add(new EndCommand(povaryoshkaBot));
+        return Collections.unmodifiableList(simpleCommandList);
     }
 }

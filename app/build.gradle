@@ -29,6 +29,7 @@ dependencies {
     implementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.16'
     // https://mvnrepository.com/artifact/org.mybatis/mybatis
     implementation group: 'org.mybatis', name: 'mybatis', version: '3.5.16'
+    implementation 'org.telegram:telegrambots-abilities:7.10.0'
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
