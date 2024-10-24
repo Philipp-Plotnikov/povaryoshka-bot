@@ -5,8 +5,8 @@ import java.sql.SQLException;
 
 import models.commands.CommandStates;
 import models.commands.MultiStateCommandTypes;
-import static models.db.schemas.postgres.PostgresUserContextSchema.COMMAND_STATE_INDEX;
-import static models.db.schemas.postgres.PostgresUserContextSchema.MULTI_STATE_COMMAND_TYPE_INDEX;
+
+import static models.db.schemas.postgres.PostgresUserContextSchema.*;
 
 public class UserContextDTO {
     private final MultiStateCommandTypes multiStateCommandType;
@@ -14,8 +14,12 @@ public class UserContextDTO {
 
     public UserContextDTO(final ResultSet userContextResultSet) throws SQLException {
         userContextResultSet.next();
-        multiStateCommandType = userContextResultSet.getObject(MULTI_STATE_COMMAND_TYPE_INDEX, MultiStateCommandTypes.class);
-        commandState = userContextResultSet.getObject(COMMAND_STATE_INDEX, CommandStates.class);
+        multiStateCommandType = MultiStateCommandTypes.valueOf(
+                userContextResultSet.getString(MULTI_STATE_COMMAND_TYPE).toUpperCase()
+        );
+        commandState = CommandStates.valueOf(
+                userContextResultSet.getString(COMMAND_STATE).toUpperCase()
+        );
     }
 
     public MultiStateCommandTypes getMultiStateCommandTypes() {

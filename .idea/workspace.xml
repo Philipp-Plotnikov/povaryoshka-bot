@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="f96e10e1-70f6-4eb4-8823-1ab6eee61485" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/app/PovaryoshkaBot" beforeDir="false" afterPath="$PROJECT_DIR$/app/PovaryoshkaBot" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/models/commands/CommandStates.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/models/commands/CommandStates.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/models/dtos/UserContextDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/models/dtos/UserContextDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/telegram/commands/CreateDishCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/telegram/commands/CreateDishCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/telegram/commands/EndCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/telegram/commands/EndCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/telegram/commands/FeedbackCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/telegram/commands/FeedbackCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/resources/sql/postgres/init.sql" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/resources/sql/postgres/init.sql" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="ExternalProjectsManager">
+    <system id="GRADLE">
+      <state>
+        <task path="$PROJECT_DIR$">
+          <activation />
+        </task>
+        <projects_view>
+          <tree_state>
+            <expand>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="telegram-bot" type="f1a62948:ProjectNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="telegram-bot" type="f1a62948:ProjectNode" />
+                <item name="Tasks" type="e4a08cd1:TasksNode" />
+              </path>
+            </expand>
+            <select />
+          </tree_state>
+        </projects_view>
+      </state>
+    </system>
+  </component>
+  <component name="Git.Settings">
+    <option name="PUSH_TAGS">
+      <GitPushTagMode>
+        <option name="argument" value="--follow-tags" />
+        <option name="title" value="Current Branch" />
+      </GitPushTagMode>
+    </option>
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="philipp/ability-bot" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;AnyaVoynova&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/Philipp-Plotnikov/povaryoshka-bot.git&quot;,
+    &quot;accountId&quot;: &quot;e0e12171-fc36-4ace-aa9c-930b513e699a&quot;
+  }
+}</component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
+  <component name="ProjectId" id="2nl5I4f9wdfnSWm1YekvVDap8ty" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Gradle.povaryoshka-bot:app [:app:core.Main.main()].executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;anny/commands&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;vcs.log&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\Users\pankr\IdeaProjects\povaryoshka-bot\app" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="povaryoshka-bot" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="povaryoshka-bot" />
+      <option name="filePath" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-28b599e66164-intellij.indexing.shared.core-IU-242.23339.11" />
+        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-IU-242.23339.11" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="f96e10e1-70f6-4eb4-8823-1ab6eee61485" name="Changes" comment="" />
+      <created>1729534739774</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1729534739774</updated>
+      <workItem from="1729534742153" duration="4535000" />
+      <workItem from="1729540304869" duration="1633000" />
+      <workItem from="1729573711006" duration="687000" />
+      <workItem from="1729581430199" duration="5295000" />
+      <workItem from="1729612897925" duration="13155000" />
+      <workItem from="1729667865696" duration="8324000" />
+      <workItem from="1729695391839" duration="10042000" />
+      <workItem from="1729761301217" duration="4447000" />
+      <workItem from="1729784988457" duration="14209000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="com.intellij.fileTypeFactory" implementationName=".env" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="origin/philipp/ability-bot" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

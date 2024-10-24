@@ -6,7 +6,7 @@ BEGIN
     		'get',
     		'update',
     		'delete',
-    		'feedback',
+            'feedback'
     		'help'
 		);
     END IF;
@@ -20,6 +20,7 @@ BEGIN
             'dish_name',
             'ingredients',
             'recipe'
+            'feedback'
         );
     END IF;
 END

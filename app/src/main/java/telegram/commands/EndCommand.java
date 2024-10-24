@@ -22,6 +22,7 @@ public class EndCommand implements AbilityExtension {
             .privacy(PUBLIC)
             .locality(ALL) // ?
             .action(ctx -> {
+
                 povaryoshkaBot.getSilent().send("delete action", ctx.chatId());
             })
             .build();
