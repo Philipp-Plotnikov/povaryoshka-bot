@@ -1,5 +1,6 @@
 package telegram.commands;
 
+import models.db.sqlops.usercontext.UserContextDeleteOptions;
 import org.telegram.telegrambots.abilitybots.api.objects.Ability;
 import static org.telegram.telegrambots.abilitybots.api.objects.Locality.ALL;
 import static org.telegram.telegrambots.abilitybots.api.objects.Privacy.PUBLIC;
@@ -23,7 +24,16 @@ public class EndCommand implements AbilityExtension {
             .locality(ALL) // ?
             .action(ctx -> {
 
-                povaryoshkaBot.getSilent().send("delete action", ctx.chatId());
+                povaryoshkaBot.getSilent().send(" Создание блюда завершено.", ctx.chatId());
+                try {
+                    povaryoshkaBot.getDbDriver().deleteUserContext(
+                            new UserContextDeleteOptions(
+                                    ctx.user().getId()
+                            )
+                    );
+                } catch (Exception e) {
+                    System.out.println("error");;
+                };
             })
             .build();
     }

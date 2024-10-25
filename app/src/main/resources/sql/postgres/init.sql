@@ -6,7 +6,7 @@ BEGIN
     		'get',
     		'update',
     		'delete',
-            'feedback'
+            'feedback',
     		'help'
 		);
     END IF;
@@ -19,7 +19,7 @@ BEGIN
         CREATE TYPE command_states AS ENUM (
             'dish_name',
             'ingredients',
-            'recipe'
+            'recipe',
             'feedback'
         );
     END IF;

@@ -6,6 +6,7 @@ import java.util.function.Predicate;
 import models.commands.CommandStates;
 import models.db.sqlops.feedback.FeedbackInsertOptions;
 
+import models.db.sqlops.usercontext.UserContextDeleteOptions;
 import models.db.sqlops.usercontext.UserContextSelectOptions;
 import models.dtos.UserContextDTO;
 import org.telegram.telegrambots.abilitybots.api.objects.Ability;
@@ -48,7 +49,8 @@ public class FeedbackCommand implements AbilityExtension {
                         povaryoshkaBot.getSilent().send("В следующем сообщении напишите ваш отзыв о нашем сервисе, и мы его сохраним.", ctx.chatId());
 
                     } catch(SQLException e) {
-                        System.out.println(e);
+                        povaryoshkaBot.getSilent().send("Извините, произошла ошибка. Попробуйте позже.", ctx.chatId());
+                        System.out.println("Ошибка при вставке контекста: " + e.getMessage());
                     }
                 })
                 .reply((action, update) -> {
@@ -58,7 +60,7 @@ public class FeedbackCommand implements AbilityExtension {
                                         update.getMessage().getFrom().getId()
                                 )
                         );
-                        if (userContextDTO.getMultiStateCommandTypes().equals(FEEDBACK)) {
+                        if (userContextDTO.getMultiStateCommandTypes() == FEEDBACK) {
                             String feedbackText = update.getMessage().getText();
                             povaryoshkaBot.getDbDriver().insertFeedback(
                                     new FeedbackInsertOptions(
@@ -67,8 +69,13 @@ public class FeedbackCommand implements AbilityExtension {
                                     )
                             );
                         }
+                        povaryoshkaBot.getDbDriver().deleteUserContext(
+                                new UserContextDeleteOptions(
+                                        update.getMessage().getFrom().getId()
+                                )
+                        );
                     } catch(Exception e) {
-                        System.out.println(e);
+                        System.out.println("Ошибка при обработке отзыва: " + e.getMessage());
                     }
 
                 },
