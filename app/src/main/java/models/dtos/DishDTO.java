@@ -29,15 +29,25 @@ public class DishDTO {
             throw new Exception("ingredientResultSet was not found in DishDTO");
         }
         try (
-            final ResultSet ingredientResultSet = selectDishStatement.getResultSet();
+            final ResultSet dishIngredientResultSet = selectDishStatement.getResultSet();
         ) {
             final ArrayList<String> ingredientListBuffer = new ArrayList<>();
-            while (ingredientResultSet.next()) {
-                final String ingredient = ingredientResultSet.getString(PostgresIngredientSchema.INGREDIENT);
+            while (dishIngredientResultSet.next()) {
+                final String ingredient = dishIngredientResultSet.getString(PostgresIngredientSchema.INGREDIENT);
                 ingredientListBuffer.add(ingredient);
             }
             ingredientList = Collections.unmodifiableList(ingredientListBuffer);
         }
+    }
+
+    public DishDTO(
+        final String dishName,
+        final List<String> ingredientList,
+        final String recipe
+    ) {
+        this.name = dishName;
+        this.ingredientList = Collections.unmodifiableList(ingredientList);
+        this.recipe = recipe;
     }
 
     public String getName() {

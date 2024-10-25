@@ -31,6 +31,7 @@ public class PovaryoshkaBot extends AbilityBot {
         dbDriver.setup();
     }
 
+    // TODO: Think about it
     public void initCommandList() {
         final List<AbilityExtension> commandList = facadeFactory.getCommandList(this);
         addExtensions(commandList);
