@@ -46,9 +46,11 @@ import models.exceptions.db.sqlops.NotFoundUserContextException;
 
 // TODO: Read about inheritance with annotations
 public class PostgresDbDriver implements DbDriver {
-    @NonNull private final PostgresDbDriverOptions postgresDbDriverOptions;
+    @NonNull
+    private final PostgresDbDriverOptions postgresDbDriverOptions;
 
-    @Nullable private Connection connection;
+    @Nullable
+    private Connection connection;
 
     public PostgresDbDriver(@NonNull final PostgresDbDriverOptions options) {
         postgresDbDriverOptions = options;

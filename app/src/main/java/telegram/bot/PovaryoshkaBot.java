@@ -3,6 +3,7 @@ package telegram.bot;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.telegram.telegrambots.abilitybots.api.bot.AbilityBot;
 import org.telegram.telegrambots.abilitybots.api.util.AbilityExtension;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
@@ -10,17 +11,19 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 import core.factory.FacadeFactory;
 import dbdrivers.DbDriver;
 
-// TODO: Think about command list
 public class PovaryoshkaBot extends AbilityBot {
     private final long creatorId;
+
+    @NonNull
     private final DbDriver dbDriver;
+
+    @NonNull
     private final FacadeFactory facadeFactory;
 
-    // TODO: Use addExtensions
     // TODO: Read about methods in Java
     public PovaryoshkaBot(
-        final TelegramClient telegramClient,
-        final String botUsername,
+        @NonNull final TelegramClient telegramClient,
+        @NonNull final String botUsername,
         final long creatorId
     ) throws SQLException, Exception {
         super(telegramClient, botUsername);
@@ -38,6 +41,7 @@ public class PovaryoshkaBot extends AbilityBot {
         onRegister();
     }
 
+    @NonNull
     public DbDriver getDbDriver() {
         return dbDriver;
     }

@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.telegram.telegrambots.abilitybots.api.objects.Ability;
 import static org.telegram.telegrambots.abilitybots.api.objects.Locality.ALL;
 import static org.telegram.telegrambots.abilitybots.api.objects.Privacy.PUBLIC;
@@ -30,15 +31,17 @@ import models.dtos.UserContextDTO;
 import telegram.bot.PovaryoshkaBot;
 
 public class CreateDishCommand implements AbilityExtension {
+    @NonNull
     private final PovaryoshkaBot povaryoshkaBot;
 
-    public CreateDishCommand(final PovaryoshkaBot povaryoshkaBot) {
+    public CreateDishCommand(@NonNull final PovaryoshkaBot povaryoshkaBot) {
         this.povaryoshkaBot = povaryoshkaBot;
     }
 
     // TODO: Try to reuse user select from isInCreateDishContext
     // TODO: Replace switch to map
     // TODO: Read about switch
+    @NonNull
     public Ability createDish() {
         return Ability.builder()
             .name(CREATE_DISH_COMMAND_SETTINGS.commandName())
@@ -80,7 +83,7 @@ public class CreateDishCommand implements AbilityExtension {
             .build();
     }
 
-    private void handleDishNameState(final Update update) {
+    private void handleDishNameState(@NonNull final Update update) {
         try {
             povaryoshkaBot.getDbDriver().updateUserContext(
                 new UserContextUpdateOptions(
@@ -103,7 +106,10 @@ public class CreateDishCommand implements AbilityExtension {
         }
     }
 
-    private void handleIngredientsState(final Update update, final UserContextDTO userContextDTO) {
+    private void handleIngredientsState(
+        @NonNull final Update update,
+        @NonNull final UserContextDTO userContextDTO
+    ) {
         try {
             povaryoshkaBot.getDbDriver().updateUserContext(
                 new UserContextUpdateOptions(
@@ -129,7 +135,10 @@ public class CreateDishCommand implements AbilityExtension {
         }
     }
 
-    private void handleRecipeState(final Update update, final UserContextDTO userContextDTO) {
+    private void handleRecipeState(
+        @NonNull final Update update,
+        @NonNull final UserContextDTO userContextDTO
+    ) {
         try {
             povaryoshkaBot.getDbDriver().deleteUserContext(
                 new UserContextDeleteOptions(update.getMessage().getFrom().getId())
@@ -151,6 +160,7 @@ public class CreateDishCommand implements AbilityExtension {
         }
     }
 
+    @NonNull
     private Predicate<Update> isInCreateDishContext() {
         return update -> {
             boolean isCreateDishContext = false;

@@ -2,10 +2,12 @@ package telegram.commands.factory;
 
 import java.util.List;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.telegram.telegrambots.abilitybots.api.util.AbilityExtension;
 
 import telegram.bot.PovaryoshkaBot;
 
 public interface CommandFactory {
-    List<AbilityExtension> getCommandList(final PovaryoshkaBot povaryoshkaBot);
+    @NonNull
+    List<@NonNull AbilityExtension> getCommandList(@NonNull final PovaryoshkaBot povaryoshkaBot);
 }

@@ -10,7 +10,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import models.db.DbTypes;
 import models.db.drivers.DbDriverFactoryGenerator;
 
-
 public class DbDriverFactoryProducer {
     @NonNull private final Map<@NonNull DbTypes, @Nullable DbDriverFactoryGenerator> dbDriverFactoryGeneratorMap;
 

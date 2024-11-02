@@ -23,24 +23,43 @@ import models.dtos.UserContextDTO;
 
 public interface DbDriver extends AutoCloseable {
     public void connect() throws SQLException;
+    
     public void setup() throws SQLException, Exception;
+    
     public void executeAsTransaction(@NonNull SQLStatementBatch sqlStatementBatch) throws SQLException, Exception;
-    @Nullable public DishDTO selectDish(@NonNull final DishSelectOptions selectOptions) throws SQLException;
-    @Nullable public List<DishDTO> selectDishList(@NonNull final DishListSelectOptions selectOptions) throws SQLException;
+
+
+    @Nullable
+    public DishDTO selectDish(@NonNull final DishSelectOptions selectOptions) throws SQLException;    
+    
+    @Nullable
+    public List<DishDTO> selectDishList(@NonNull final DishListSelectOptions selectOptions) throws SQLException;
+
     public void insertDish(@NonNull final DishInsertOptions insertOptions) throws SQLException, Exception;
+    
     public void deleteDish(@NonNull final DishDeleteOptions deleteOptions) throws SQLException;
+    
     public void updateDish(@NonNull final DishUpdateOptions updateOptions) throws SQLException, Exception;
+    
     public void updateDishIngredientList(@NonNull final DishUpdateOptions updateOptions) throws SQLException, Exception;
+    
     public void updateDishRecipe(@NonNull final DishUpdateOptions updateOptions) throws SQLException;
     
-    @Nullable public UserContextDTO selectUserContext(@NonNull final UserContextSelectOptions selectOptions) throws SQLException;
+
+    @Nullable
+    public UserContextDTO selectUserContext(@NonNull final UserContextSelectOptions selectOptions) throws SQLException;
+    
     public void insertUserContext(@NonNull final UserContextInsertOptions insertOptions) throws SQLException;
+    
     public void deleteUserContext(@NonNull final UserContextDeleteOptions deleteOptions) throws SQLException;
+    
     public void updateUserContext(@NonNull final UserContextUpdateOptions updateOptions) throws SQLException;
+    
     public void updateUserContextCommandState(@NonNull final UserContextUpdateOptions updateOptions) throws SQLException;
 
     public void insertFeedback(@NonNull final FeedbackInsertOptions insertOptions) throws SQLException;
 
+    
     @Override
     public void close() throws SQLException, IOException;
 }

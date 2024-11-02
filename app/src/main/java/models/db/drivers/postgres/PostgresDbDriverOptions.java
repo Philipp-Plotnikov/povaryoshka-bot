@@ -3,15 +3,32 @@ package models.db.drivers.postgres;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class PostgresDbDriverOptions {
-    @NonNull private final String DB_HOST;
+    @NonNull
+    private final String DB_HOST;
+
     private final int DB_PORT;
-    @NonNull private final String DB_DATABASE;
-    @NonNull private final String DB_SCHEMA;
-    @NonNull private final String DB_USERNAME;
-    @NonNull private final String DB_PASSWORD;
-    @NonNull private final String DB_URL;
-    @NonNull private final String INIT_SQL_SCRIPT_PATH;
-    @NonNull private final String ALTER_SQL_SCRIPT_PATH;
+
+    @NonNull
+    private final String DB_DATABASE;
+
+    @NonNull
+    private final String DB_SCHEMA;
+
+    @NonNull
+    private final String DB_USERNAME;
+
+    @NonNull
+    private final String DB_PASSWORD;
+
+    @NonNull
+    private final String DB_URL;
+
+    @NonNull
+    private final String INIT_SQL_SCRIPT_PATH;
+
+    @NonNull
+    private final String ALTER_SQL_SCRIPT_PATH;
+
     private final boolean IS_DISTRIBUTED_DATABASE;
 
     public PostgresDbDriverOptions(

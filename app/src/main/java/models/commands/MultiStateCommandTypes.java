@@ -1,5 +1,7 @@
 package models.commands;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 public enum MultiStateCommandTypes {
     CREATE("create"),
     GET("get"),
@@ -8,12 +10,14 @@ public enum MultiStateCommandTypes {
     FEEDBACK("feedback"),
     HELP("help");
 
+    @NonNull
     private final String value;
 
-    private MultiStateCommandTypes(final String value) {
+    private MultiStateCommandTypes(@NonNull final String value) {
         this.value = value;
     }
 
+    @NonNull
     public String getValue() {
         return value;
     }

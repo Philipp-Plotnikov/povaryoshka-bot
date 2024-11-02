@@ -15,9 +15,14 @@ import static models.db.schemas.postgres.PostgresUserContextSchema.DISH_NAME;
 import static models.db.schemas.postgres.PostgresUserContextSchema.MULTI_STATE_COMMAND_TYPE;
 
 public class UserContextDTO {
-    @NonNull private final MultiStateCommandTypes multiStateCommandType;
-    @NonNull private final CommandStates commandState;
-    @Nullable private final String dishName;
+    @NonNull
+    private final MultiStateCommandTypes multiStateCommandType;
+    
+    @NonNull
+    private final CommandStates commandState;
+    
+    @Nullable
+    private final String dishName;
 
     // TODO: Think about getObject
     public UserContextDTO(@NonNull final ResultSet userContextResultSet) throws SQLException,
@@ -35,14 +40,17 @@ public class UserContextDTO {
         dishName = userContextResultSet.getString(DISH_NAME);
     }
 
+    @NonNull
     public MultiStateCommandTypes getMultiStateCommandTypes() {
         return multiStateCommandType;
     }
 
+    @NonNull
     public CommandStates getCommandState() {
         return commandState;
     }
 
+    @Nullable
     public String getDishName() {
         return dishName;
     }

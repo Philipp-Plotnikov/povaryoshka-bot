@@ -3,18 +3,22 @@ package telegram.commands;
 import org.telegram.telegrambots.abilitybots.api.objects.Ability;
 import static org.telegram.telegrambots.abilitybots.api.objects.Locality.ALL;
 import static org.telegram.telegrambots.abilitybots.api.objects.Privacy.PUBLIC;
+
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.telegram.telegrambots.abilitybots.api.util.AbilityExtension;
 
 import static models.commands.CommandConfig.DELETE_DISH_COMMAND_SETTINGS;
 import telegram.bot.PovaryoshkaBot;
 
 public class DeleteDishCommand implements AbilityExtension {
+    @NonNull
     private final PovaryoshkaBot povaryoshkaBot;
 
-    public DeleteDishCommand(final PovaryoshkaBot povaryoshkaBot) {
+    public DeleteDishCommand(@NonNull final PovaryoshkaBot povaryoshkaBot) {
         this.povaryoshkaBot = povaryoshkaBot;
     }
 
+    @NonNull
     public Ability deleteDish() {
         return Ability.builder()
             .name(DELETE_DISH_COMMAND_SETTINGS.commandName())

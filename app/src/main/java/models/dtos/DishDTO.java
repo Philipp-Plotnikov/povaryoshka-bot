@@ -17,9 +17,14 @@ import static models.exceptions.db.sqlops.ExceptionMessages.RECIPE_NOT_FOUND;
 import models.exceptions.db.sqlops.NotFoundDishException;
 
 public class DishDTO {
-    @NonNull private final String name;
-    @Nullable private final List<String> ingredientList;
-    @Nullable private final String recipe;
+    @NonNull
+    private final String name;
+
+    @Nullable
+    private final List<String> ingredientList;
+
+    @Nullable
+    private final String recipe;
 
     public DishDTO(@NonNull final Statement selectDishStatement) throws SQLException,
                                                                         NotFoundDishException
