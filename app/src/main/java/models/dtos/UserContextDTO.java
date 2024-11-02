@@ -3,20 +3,29 @@ package models.dtos;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import models.commands.CommandStates;
 import models.commands.MultiStateCommandTypes;
+import models.exceptions.db.sqlops.NotFoundUserContextException;
+
 import static models.db.schemas.postgres.PostgresUserContextSchema.COMMAND_STATE;
 import static models.db.schemas.postgres.PostgresUserContextSchema.DISH_NAME;
 import static models.db.schemas.postgres.PostgresUserContextSchema.MULTI_STATE_COMMAND_TYPE;
 
 public class UserContextDTO {
-    private final MultiStateCommandTypes multiStateCommandType;
-    private final CommandStates commandState;
-    private final String dishName;
+    @NonNull private final MultiStateCommandTypes multiStateCommandType;
+    @NonNull private final CommandStates commandState;
+    @Nullable private final String dishName;
 
     // TODO: Think about getObject
-    public UserContextDTO(final ResultSet userContextResultSet) throws SQLException {
-        userContextResultSet.next();
+    public UserContextDTO(@NonNull final ResultSet userContextResultSet) throws SQLException,
+                                                                                NotFoundUserContextException
+    {
+        if (!userContextResultSet.next()) {
+            throw new NotFoundUserContextException("");
+        }
         multiStateCommandType = MultiStateCommandTypes.valueOf(
             userContextResultSet.getString(MULTI_STATE_COMMAND_TYPE).toUpperCase()
         );

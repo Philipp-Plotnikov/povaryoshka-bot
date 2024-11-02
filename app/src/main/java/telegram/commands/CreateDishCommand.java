@@ -38,9 +38,7 @@ public class CreateDishCommand implements AbilityExtension {
 
     // TODO: Try to reuse user select from isInCreateDishContext
     // TODO: Replace switch to map
-    // TODO: think about handle when data was not found (is it correct for now)
     // TODO: Read about switch
-    // TODO: We need to think about null
     public Ability createDish() {
         return Ability.builder()
             .name(CREATE_DISH_COMMAND_SETTINGS.commandName())

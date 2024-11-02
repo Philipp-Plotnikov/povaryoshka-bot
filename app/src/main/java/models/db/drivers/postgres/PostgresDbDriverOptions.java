@@ -1,27 +1,29 @@
 package models.db.drivers.postgres;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 public class PostgresDbDriverOptions {
-    private final String DB_HOST;
+    @NonNull private final String DB_HOST;
     private final int DB_PORT;
-    private final String DB_DATABASE;
-    private final String DB_SCHEMA;
-    private final String DB_USERNAME;
-    private final String DB_PASSWORD;
-    private final String DB_URL;
-    private final String INIT_SQL_SCRIPT_PATH;
-    private final String ALTER_SQL_SCRIPT_PATH;
+    @NonNull private final String DB_DATABASE;
+    @NonNull private final String DB_SCHEMA;
+    @NonNull private final String DB_USERNAME;
+    @NonNull private final String DB_PASSWORD;
+    @NonNull private final String DB_URL;
+    @NonNull private final String INIT_SQL_SCRIPT_PATH;
+    @NonNull private final String ALTER_SQL_SCRIPT_PATH;
     private final boolean IS_DISTRIBUTED_DATABASE;
 
     public PostgresDbDriverOptions(
-        final String dbHost,
+        @NonNull final String dbHost,
         final int dbPort,
-        final String dbDatabase,
-        final String dbSchema,
-        final String dbUsername,
-        final String dbPassword,
-        final String initSQLScriptPath,
-        final String alterSQLScriptPath,
-        final String isDistributedDatabase
+        @NonNull final String dbDatabase,
+        @NonNull final String dbSchema,
+        @NonNull final String dbUsername,
+        @NonNull final String dbPassword,
+        @NonNull final String initSQLScriptPath,
+        @NonNull final String alterSQLScriptPath,
+        @NonNull final String isDistributedDatabase
     ) {
         DB_HOST = dbHost;
         DB_PORT = dbPort;
@@ -35,6 +37,7 @@ public class PostgresDbDriverOptions {
         DB_URL = constructAndGetDbUrl();
     }
 
+    @NonNull
     public String getDbHost() {
         return DB_HOST;
     }
@@ -43,30 +46,37 @@ public class PostgresDbDriverOptions {
         return DB_PORT;
     }
 
+    @NonNull
     public String getDbDatabase() {
         return DB_DATABASE;
     }
 
+    @NonNull
     public String getDbUrl() {
         return DB_URL;
     }
 
+    @NonNull
     public String getDbSchema() {
         return DB_SCHEMA;
     }
 
+    @NonNull
     public String getDbUsername() {
         return DB_USERNAME;
     }
 
+    @NonNull
     public String getDbPassword() {
         return DB_PASSWORD;
     }
 
+    @NonNull
     public String getInitSQLScriptPath() {
         return INIT_SQL_SCRIPT_PATH;
     }
 
+    @NonNull
     public String getAlterSQLScriptPath() {
         return ALTER_SQL_SCRIPT_PATH;
     }
@@ -75,6 +85,7 @@ public class PostgresDbDriverOptions {
         return IS_DISTRIBUTED_DATABASE;
     }
 
+    @NonNull
     private String constructAndGetDbUrl() {
         final String dbUrlTemplate = "jdbc:postgresql://%s:%d/%s";
         return String.format(

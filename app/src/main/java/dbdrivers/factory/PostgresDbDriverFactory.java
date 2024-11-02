@@ -11,10 +11,14 @@ import static models.EnvVars.DB_SCHEMA;
 import static models.EnvVars.DB_USERNAME;
 import static models.EnvVars.INIT_SQL_SCRIPT_PATH;
 import static models.EnvVars.IS_DISTRIBUTED_DATABASE;
+
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import models.db.drivers.postgres.PostgresDbDriverOptions;
 
 public class PostgresDbDriverFactory implements DbDriverFactory {
     @Override
+    @NonNull
     public DbDriver getDbDriver() {
         final PostgresDbDriverOptions postgresDbDriverOptions = new PostgresDbDriverOptions(
             System.getenv(DB_HOST),
