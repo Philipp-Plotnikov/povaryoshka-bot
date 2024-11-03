@@ -41,13 +41,13 @@ CREATE TABLE IF NOT EXISTS public.ingredient (
     FOREIGN KEY (user_id, dish_name) REFERENCES recipe (user_id, dish_name) ON DELETE CASCADE
 );
 
+-- Think about foreign key for dish_name
 CREATE TABLE IF NOT EXISTS public.user_context (
     user_id bigint NOT NULL,
     multi_state_command_type multi_state_command_types NOT NULL,
     command_state command_states NOT NULL,
     dish_name text,
-    PRIMARY KEY (user_id),
-    FOREIGN KEY (dish_name) REFERENCES recipe (dish_name) ON DELETE CASCADE 
+    PRIMARY KEY (user_id)
 );
 
 CREATE TABLE IF NOT EXISTS public.feedback (
