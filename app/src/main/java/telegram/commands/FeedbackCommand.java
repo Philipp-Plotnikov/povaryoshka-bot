@@ -1,13 +1,22 @@
 package telegram.commands;
 
 import java.util.function.Predicate;
+import java.sql.SQLException;
+
+import models.commands.CommandStates;
+import models.db.sqlops.feedback.FeedbackInsertOptions;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
+import models.db.sqlops.usercontext.UserContextDeleteOptions;
+import models.db.sqlops.usercontext.UserContextSelectOptions;
+import models.dtos.UserContextDTO;
 import org.telegram.telegrambots.abilitybots.api.objects.Ability;
+import static models.commands.MultiStateCommandTypes.FEEDBACK;
 import static org.telegram.telegrambots.abilitybots.api.objects.Locality.ALL;
 import static org.telegram.telegrambots.abilitybots.api.objects.Privacy.PUBLIC;
 import org.telegram.telegrambots.abilitybots.api.util.AbilityExtension;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import models.db.sqlops.usercontext.UserContextInsertOptions;
 
 import static models.commands.CommandConfig.FEEDBACK_COMMAND_SETTINGS;
 import telegram.bot.PovaryoshkaBot;
@@ -29,19 +38,73 @@ public class FeedbackCommand implements AbilityExtension {
             .info(FEEDBACK_COMMAND_SETTINGS.commandDescription())
             .privacy(PUBLIC)
             .locality(ALL) // ?
-            .action(ctx -> {
-                isInFeedbackContext = true;
-                povaryoshkaBot.getSilent().send("feedback action", ctx.chatId());
-            })
-            .reply((action, update) -> {
-                    povaryoshkaBot.getSilent().send("feedback reply", update.getMessage().getChatId());
-                },
-                isInFeedbackContext()
-            )
-            .build();
+                .action(ctx -> {
+
+                    try {
+                        povaryoshkaBot.getDbDriver().insertUserContext(
+                                new UserContextInsertOptions(
+                                        ctx.user().getId(),
+                                        FEEDBACK,
+                                        CommandStates.FEEDBACK,
+                                        null
+                                )
+                        );
+                        povaryoshkaBot.getSilent().send("В следующем сообщении напишите ваш отзыв о нашем сервисе, и мы его сохраним.", ctx.chatId());
+
+                    } catch(SQLException e) {
+                        povaryoshkaBot.getSilent().send("Извините, произошла ошибка. Попробуйте позже.", ctx.chatId());
+                        System.out.println("Ошибка при вставке контекста: " + e.getMessage());
+                    }
+                })
+                .reply((action, update) -> {
+                            try {
+                                final UserContextDTO userContextDTO = povaryoshkaBot.getDbDriver().selectUserContext(
+                                        new UserContextSelectOptions(
+                                                update.getMessage().getFrom().getId()
+                                        )
+                                );
+                                if (userContextDTO.getMultiStateCommandTypes() == FEEDBACK) {
+                                    String feedbackText = update.getMessage().getText();
+                                    povaryoshkaBot.getDbDriver().insertFeedback(
+                                            new FeedbackInsertOptions(
+                                                    update.getMessage().getFrom().getId(),
+                                                    feedbackText
+                                            )
+                                    );
+                                }
+                                povaryoshkaBot.getDbDriver().deleteUserContext(
+                                        new UserContextDeleteOptions(
+                                                update.getMessage().getFrom().getId()
+                                        )
+                                );
+                            } catch(Exception e) {
+                                System.out.println("Ошибка при обработке отзыва: " + e.getMessage());
+                            }
+
+                        },
+                        isFeedbackContext()
+                )
+                .build();
+
     }
 
-    private Predicate<Update> isInFeedbackContext() {
-        return update -> isInFeedbackContext;
+    private Predicate<Update> isFeedbackContext(){
+        return update -> {
+            boolean isFeedbackContext = false;
+            try {
+                final UserContextDTO userContextDTO = povaryoshkaBot.getDbDriver().selectUserContext(
+                        new UserContextSelectOptions(
+                                update.getMessage().getFrom().getId()
+                        )
+                );
+                if (userContextDTO.getMultiStateCommandTypes() == FEEDBACK) {
+                    isFeedbackContext = true;
+                }
+            } catch(SQLException e) {
+                System.out.println(e);
+            }
+            return isFeedbackContext;
+
+        };
     }
-}
+    }
