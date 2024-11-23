@@ -103,10 +103,10 @@ public class GetDishCommand implements AbilityExtension {
                                         new DishSelectOptions(update.getMessage().getFrom().getId(), dishName)
                                 );
 
-                                final String message = "Название: " + selectedDish.getName() + "\n" +
-                                        "Ингредиенты: " + (selectedDish.getIngredientList() != null ? String.join(", ", selectedDish.getIngredientList()) : "Нет информации") + "\n" +
-                                        "Рецепт: " + (selectedDish.getRecipe() != null ? selectedDish.getRecipe() : "Нет информации");
-
+                                final String message = String.format("Название: %s\nИнгредиенты: %s\nРецепт: %s",
+                                        selectedDish.getName(),
+                                        (selectedDish.getIngredientList() != null ? String.join(", ", selectedDish.getIngredientList()) : "Нет информации"),
+                                        (selectedDish.getRecipe() != null ? selectedDish.getRecipe() : "Нет информации"));
                                 povaryoshkaBot.getSilent().send(message, update.getMessage().getChatId());
                                 povaryoshkaBot.getDbDriver().deleteUserContext(
                                         new UserContextDeleteOptions(
