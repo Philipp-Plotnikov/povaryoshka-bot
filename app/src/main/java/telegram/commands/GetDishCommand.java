@@ -46,6 +46,20 @@ public class GetDishCommand implements AbilityExtension {
             .locality(ALL) // ?
             .action(ctx -> {
                 try {
+                    final List<DishDTO> dishes = povaryoshkaBot.getDbDriver().selectDishList(
+                            new DishListSelectOptions(ctx.user().getId())
+                    );
+                    if (dishes == null) {
+                        povaryoshkaBot.getSilent().send("У вас нет сохраненных блюд", ctx.chatId());
+                        return;
+                    }
+                    final StringBuilder message = new StringBuilder("Ваши блюда:\n");
+                    for (DishDTO dish : dishes) {
+                        message.append("- ").append(dish.getName()).append("\n");
+                    }
+
+                    povaryoshkaBot.getSilent().send(message.toString(), ctx.chatId());
+                    povaryoshkaBot.getSilent().send("Напишите название блюда из списка, которое хотите получить", ctx.chatId());
                     povaryoshkaBot.getDbDriver().insertUserContext(
                             new UserContextInsertOptions(
                                     ctx.user().getId(),
@@ -54,21 +68,6 @@ public class GetDishCommand implements AbilityExtension {
                                     null
                             )
                     );
-                    List<DishDTO> dishes = povaryoshkaBot.getDbDriver().selectDishList(
-                            new DishListSelectOptions(ctx.user().getId())
-                    );
-                    if (dishes.isEmpty()) {
-                        povaryoshkaBot.getSilent().send("У вас нет сохраненных блюд", ctx.chatId());
-                        return;
-                    }
-                    StringBuilder message = new StringBuilder("Ваши блюда:\n");
-                    for (DishDTO dish : dishes) {
-                        message.append("- ").append(dish.getName()).append("\n");
-                    }
-
-                    povaryoshkaBot.getSilent().send(message.toString(), ctx.chatId());
-                    povaryoshkaBot.getSilent().send("Напишите название блюда из списка, которое хотите получить", ctx.chatId());
-
                 } catch(SQLException e) {
                     povaryoshkaBot.getSilent().send("Извините, произошла ошибка. Попробуйте позже.", ctx.chatId());
                     System.out.println("Ошибка при вставке: " + e.getMessage());
@@ -81,41 +80,40 @@ public class GetDishCommand implements AbilityExtension {
                                                 update.getMessage().getFrom().getId()
                                         )
                                 );
-                                if (userContextDTO.getMultiStateCommandTypes() == GET) {
-                                    String dishName = update.getMessage().getText().trim();
 
-                                    // Проверка, есть ли такое блюдо в списке
-                                    boolean dishFound = false;
-                                    for (DishDTO dish : povaryoshkaBot.getDbDriver().selectDishList(
-                                            new DishListSelectOptions(update.getMessage().getFrom().getId())
-                                    )) {
+                                String dishName = update.getMessage().getText().trim();
+                                final List<DishDTO> listDishes = povaryoshkaBot.getDbDriver().selectDishList(
+                                        new DishListSelectOptions(update.getMessage().getFrom().getId())
+                                );
+
+                                boolean dishFound = false;
+                                if (listDishes != null){
+                                    for (DishDTO dish : listDishes) {
                                         if (dish.getName().equalsIgnoreCase(dishName)) {
                                             dishFound = true;
                                             break;
                                         }
                                     }
-
-                                    if (dishFound) {
-                                        DishDTO selectedDish = povaryoshkaBot.getDbDriver().selectDish(
-                                                new DishSelectOptions(update.getMessage().getFrom().getId(), dishName)
-                                        );
-
-                                        // Выводим информацию о блюде (название, ингредиенты, рецепт)
-                                        String message = "Название: " + selectedDish.getName() + "\n" +
-                                                "Ингредиенты: " + (selectedDish.getIngredientList() != null ? String.join(", ", selectedDish.getIngredientList()) : "Нет информации") + "\n" +
-                                                "Рецепт: " + (selectedDish.getRecipe() != null ? selectedDish.getRecipe() : "Нет информации");
-
-                                        povaryoshkaBot.getSilent().send(message, update.getMessage().getChatId());
-                                        povaryoshkaBot.getDbDriver().deleteUserContext(
-                                                new UserContextDeleteOptions(
-                                                        update.getMessage().getFrom().getId()
-                                                )
-                                        );
-                                        povaryoshkaBot.getSilent().send("Вот ваше блюдо", update.getMessage().getChatId());
-                                    } else {
-                                        povaryoshkaBot.getSilent().send("Такого блюда нет в списке. Попробуйте снова.", update.getMessage().getChatId());
-                                    }
                                 }
+                                if (!dishFound) {
+                                    povaryoshkaBot.getSilent().send("Такого блюда нет в списке. Попробуйте снова.", update.getMessage().getChatId());
+                                    return;
+                                }
+                                DishDTO selectedDish = povaryoshkaBot.getDbDriver().selectDish(
+                                        new DishSelectOptions(update.getMessage().getFrom().getId(), dishName)
+                                );
+
+                                final String message = "Название: " + selectedDish.getName() + "\n" +
+                                        "Ингредиенты: " + (selectedDish.getIngredientList() != null ? String.join(", ", selectedDish.getIngredientList()) : "Нет информации") + "\n" +
+                                        "Рецепт: " + (selectedDish.getRecipe() != null ? selectedDish.getRecipe() : "Нет информации");
+
+                                povaryoshkaBot.getSilent().send(message, update.getMessage().getChatId());
+                                povaryoshkaBot.getDbDriver().deleteUserContext(
+                                        new UserContextDeleteOptions(
+                                                update.getMessage().getFrom().getId()
+                                        )
+                                );
+                                povaryoshkaBot.getSilent().send("Вот ваше блюдо", update.getMessage().getChatId());
                             } catch(Exception e) {
                                 System.out.println("Ошибка : " + e.getMessage());
                             }
@@ -128,13 +126,16 @@ public class GetDishCommand implements AbilityExtension {
     private Predicate<Update> isGetContext(){
         return update -> {
             boolean isGetContext = false;
+            if (update.getMessage().getText().equals("/end")){
+                return false;
+            }
             try {
                 final UserContextDTO userContextDTO = povaryoshkaBot.getDbDriver().selectUserContext(
                         new UserContextSelectOptions(
                                 update.getMessage().getFrom().getId()
                         )
                 );
-                if (userContextDTO.getMultiStateCommandTypes() == GET) {
+                if (userContextDTO != null && userContextDTO.getMultiStateCommandTypes() == GET) {
                     isGetContext = true;
                 }
             } catch(SQLException e) {

@@ -27,7 +27,7 @@ public class EndCommand implements AbilityExtension {
             .privacy(PUBLIC)
             .locality(ALL) // ?
             .action(ctx -> {
-                povaryoshkaBot.getSilent().send(" Создание блюда завершено.", ctx.chatId());
+                povaryoshkaBot.getSilent().send("Команда прервана", ctx.chatId());
                 try {
                     povaryoshkaBot.getDbDriver().deleteUserContext(
                             new UserContextDeleteOptions(

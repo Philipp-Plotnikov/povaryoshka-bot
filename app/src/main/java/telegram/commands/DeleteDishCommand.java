@@ -46,6 +46,20 @@ public class DeleteDishCommand implements AbilityExtension {
             .locality(ALL) // ?
             .action(ctx -> {
                 try {
+                    final List<DishDTO> dishes = povaryoshkaBot.getDbDriver().selectDishList(
+                            new DishListSelectOptions(ctx.user().getId())
+                    );
+                    if (dishes == null) {
+                        povaryoshkaBot.getSilent().send("У вас нет сохраненных блюд", ctx.chatId());
+                        return;
+                    }
+                    final StringBuilder message = new StringBuilder("Ваши блюда:\n");
+                    for (DishDTO dish : dishes) {
+                        message.append("- ").append(dish.getName()).append("\n");
+                    }
+
+                    povaryoshkaBot.getSilent().send(message.toString(), ctx.chatId());
+                    povaryoshkaBot.getSilent().send("Напишите название блюда из списка, которое хотите удалить", ctx.chatId());
                     povaryoshkaBot.getDbDriver().insertUserContext(
                             new UserContextInsertOptions(
                                     ctx.user().getId(),
@@ -54,21 +68,6 @@ public class DeleteDishCommand implements AbilityExtension {
                                     null
                             )
                     );
-                    List<DishDTO> dishes = povaryoshkaBot.getDbDriver().selectDishList(
-                            new DishListSelectOptions(ctx.user().getId())
-                    );
-                    if (dishes.isEmpty()) {
-                        povaryoshkaBot.getSilent().send("У вас нет сохраненных блюд", ctx.chatId());
-                        return;
-                    }
-                    StringBuilder message = new StringBuilder("Ваши блюда:\n");
-                    for (DishDTO dish : dishes) {
-                        message.append("- ").append(dish.getName()).append("\n");
-                    }
-
-                    povaryoshkaBot.getSilent().send(message.toString(), ctx.chatId());
-                    povaryoshkaBot.getSilent().send("Напишите название блюда из списка, которое хотите удалить", ctx.chatId());
-
                 } catch(SQLException e) {
                     povaryoshkaBot.getSilent().send("Извините, произошла ошибка. Попробуйте позже.", ctx.chatId());
                     System.out.println("Ошибка при вставке: " + e.getMessage());
@@ -76,40 +75,42 @@ public class DeleteDishCommand implements AbilityExtension {
             })
                 .reply((action, update) -> {
                             try {
+                                long idUser = update.getMessage().getFrom().getId();
                                 final UserContextDTO userContextDTO = povaryoshkaBot.getDbDriver().selectUserContext(
-                                        new UserContextSelectOptions(
-                                                update.getMessage().getFrom().getId()
-                                        )
+                                        new UserContextSelectOptions(idUser)
                                 );
-                                if (userContextDTO.getMultiStateCommandTypes() == DELETE) {
-                                    String dishName = update.getMessage().getText().trim();
+                                String dishName = update.getMessage().getText().trim();
+                                final List<DishDTO> listDishes= povaryoshkaBot.getDbDriver().selectDishList(
+                                        new DishListSelectOptions(idUser)
+                                );
 
-                                    // Проверка, есть ли такое блюдо в списке
-                                    boolean dishFound = false;
-                                    for (DishDTO dish : povaryoshkaBot.getDbDriver().selectDishList(
-                                            new DishListSelectOptions(update.getMessage().getFrom().getId())
-                                    )) {
+                                boolean dishFound = false;
+                                if (listDishes != null){
+                                    for (DishDTO dish : listDishes) {
                                         if (dish.getName().equalsIgnoreCase(dishName)) {
                                             dishFound = true;
                                             break;
                                         }
                                     }
-
-                                    if (dishFound) {
-                                        povaryoshkaBot.getDbDriver().deleteDish(new DishDeleteOptions(
-                                                update.getMessage().getFrom().getId(),
-                                                dishName
-                                        ));
-                                        povaryoshkaBot.getDbDriver().deleteUserContext(
-                                                new UserContextDeleteOptions(
-                                                        update.getMessage().getFrom().getId()
-                                                )
-                                        );
-                                        povaryoshkaBot.getSilent().send("Блюдо удалено", update.getMessage().getChatId());
-                                    } else {
-                                        povaryoshkaBot.getSilent().send("Такого блюда нет в списке. Попробуйте снова.", update.getMessage().getChatId());
-                                    }
                                 }
+                                if (!dishFound) {
+                                    povaryoshkaBot.getSilent().send("Такого блюда нет в списке. Попробуйте снова.", update.getMessage().getChatId());
+                                    return;
+                                }
+                                povaryoshkaBot.getDbDriver().executeAsTransaction(
+                                        () -> {
+                                            povaryoshkaBot.getDbDriver().deleteDish(new DishDeleteOptions(
+                                                    idUser,
+                                                    dishName
+                                            ));
+                                            povaryoshkaBot.getDbDriver().deleteUserContext(
+                                                    new UserContextDeleteOptions(
+                                                            idUser
+                                                    )
+                                            );
+                                        }
+                                );
+                                povaryoshkaBot.getSilent().send("Блюдо удалено", update.getMessage().getChatId());
                             } catch(Exception e) {
                                 System.out.println("Ошибка : " + e.getMessage());
                             }
@@ -122,13 +123,16 @@ public class DeleteDishCommand implements AbilityExtension {
     private Predicate<Update> isDeleteContext(){
         return update -> {
             boolean isDeleteContext = false;
+            if (update.getMessage().getText().equals("/end")){
+                return false;
+            }
             try {
                 final UserContextDTO userContextDTO = povaryoshkaBot.getDbDriver().selectUserContext(
                         new UserContextSelectOptions(
                                 update.getMessage().getFrom().getId()
                         )
                 );
-                if (userContextDTO.getMultiStateCommandTypes() == DELETE) {
+                if (userContextDTO != null && userContextDTO.getMultiStateCommandTypes() == DELETE) {
                     isDeleteContext = true;
                 }
             } catch(SQLException e) {

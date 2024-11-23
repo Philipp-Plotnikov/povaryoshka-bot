@@ -50,15 +50,15 @@ public class CreateDishCommand implements AbilityExtension {
             .locality(ALL) // ?
             .action(ctx -> {
                 try {
-                  povaryoshkaBot.getDbDriver().insertUserContext(
-                        new UserContextInsertOptions(
-                            ctx.user().getId(),
-                            CREATE,
-                            DISH_NAME,
-                            null
-                        )
+                    povaryoshkaBot.getSilent().send("Напиши название блюда", ctx.chatId());
+                    povaryoshkaBot.getDbDriver().insertUserContext(
+                            new UserContextInsertOptions(
+                                    ctx.user().getId(),
+                                    CREATE,
+                                    DISH_NAME,
+                                    null
+                            )
                     );
-                    povaryoshkaBot.getSilent().send("Напиши название блюда", ctx.chatId());  
                 } catch (SQLException e) {
                 }
             })
@@ -164,13 +164,16 @@ public class CreateDishCommand implements AbilityExtension {
     private Predicate<Update> isInCreateDishContext() {
         return update -> {
             boolean isCreateDishContext = false;
+            if (update.getMessage().getText().equals("/end")){
+                return false;
+            }
             try {
                 final UserContextDTO userContextDTO = povaryoshkaBot.getDbDriver().selectUserContext(
                     new UserContextSelectOptions(
                         update.getMessage().getFrom().getId()
                     )
                 );
-                if (userContextDTO.getMultiStateCommandTypes() == CREATE) {
+                if (userContextDTO != null && userContextDTO.getMultiStateCommandTypes() == CREATE) {
                     isCreateDishContext = true; 
                 }
             } catch (SQLException e) {

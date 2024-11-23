@@ -25,7 +25,7 @@ public class FeedbackCommand implements AbilityExtension {
     @NonNull
     private final PovaryoshkaBot povaryoshkaBot;
 
-    private boolean isInFeedbackContext = false;
+    private boolean isFeedbackContext = false;
 
     public FeedbackCommand(@NonNull final PovaryoshkaBot povaryoshkaBot) {
         this.povaryoshkaBot = povaryoshkaBot;
@@ -41,6 +41,7 @@ public class FeedbackCommand implements AbilityExtension {
                 .action(ctx -> {
 
                     try {
+                        povaryoshkaBot.getSilent().send("В следующем сообщении напишите ваш отзыв о нашем сервисе, и мы его сохраним.", ctx.chatId());
                         povaryoshkaBot.getDbDriver().insertUserContext(
                                 new UserContextInsertOptions(
                                         ctx.user().getId(),
@@ -49,8 +50,6 @@ public class FeedbackCommand implements AbilityExtension {
                                         null
                                 )
                         );
-                        povaryoshkaBot.getSilent().send("В следующем сообщении напишите ваш отзыв о нашем сервисе, и мы его сохраним.", ctx.chatId());
-
                     } catch(SQLException e) {
                         povaryoshkaBot.getSilent().send("Извините, произошла ошибка. Попробуйте позже.", ctx.chatId());
                         System.out.println("Ошибка при вставке контекста: " + e.getMessage());
@@ -63,19 +62,21 @@ public class FeedbackCommand implements AbilityExtension {
                                                 update.getMessage().getFrom().getId()
                                         )
                                 );
-                                if (userContextDTO.getMultiStateCommandTypes() == FEEDBACK) {
-                                    String feedbackText = update.getMessage().getText();
-                                    povaryoshkaBot.getDbDriver().insertFeedback(
-                                            new FeedbackInsertOptions(
-                                                    update.getMessage().getFrom().getId(),
-                                                    feedbackText
-                                            )
-                                    );
-                                }
-                                povaryoshkaBot.getDbDriver().deleteUserContext(
-                                        new UserContextDeleteOptions(
-                                                update.getMessage().getFrom().getId()
-                                        )
+                                final String feedbackText = update.getMessage().getText();
+                                povaryoshkaBot.getDbDriver().executeAsTransaction(
+                                        () -> {
+                                            povaryoshkaBot.getDbDriver().insertFeedback(
+                                                    new FeedbackInsertOptions(
+                                                            update.getMessage().getFrom().getId(),
+                                                            feedbackText
+                                                    )
+                                            );
+                                            povaryoshkaBot.getDbDriver().deleteUserContext(
+                                                    new UserContextDeleteOptions(
+                                                            update.getMessage().getFrom().getId()
+                                                    )
+                                            );
+                                        }
                                 );
                             } catch(Exception e) {
                                 System.out.println("Ошибка при обработке отзыва: " + e.getMessage());
@@ -91,13 +92,16 @@ public class FeedbackCommand implements AbilityExtension {
     private Predicate<Update> isFeedbackContext(){
         return update -> {
             boolean isFeedbackContext = false;
+            if (update.getMessage().getText().equals("/end")){
+                return false;
+            }
             try {
                 final UserContextDTO userContextDTO = povaryoshkaBot.getDbDriver().selectUserContext(
                         new UserContextSelectOptions(
                                 update.getMessage().getFrom().getId()
                         )
                 );
-                if (userContextDTO.getMultiStateCommandTypes() == FEEDBACK) {
+                if (userContextDTO != null && userContextDTO.getMultiStateCommandTypes() == FEEDBACK) {
                     isFeedbackContext = true;
                 }
             } catch(SQLException e) {
