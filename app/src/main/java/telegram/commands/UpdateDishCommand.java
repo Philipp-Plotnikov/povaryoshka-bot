@@ -83,15 +83,15 @@ public class UpdateDishCommand implements AbilityExtension {
                                         update.getMessage().getFrom().getId()
                                 )
                         );
-                        switch (userContextDTO.getCommandState()) {
-                            case DISH_NAME -> handleDishNameState(update);
-//                            case IS_INGREDIENTS_UPDATE -> handleIsIngredientsUpdateState(update);
-                            case CONFIRM_INGREDIENT_UPDATE -> handleConfirmIngredientUpdate(update);
-                            case INGREDIENTS -> updateIngredients(update, userContextDTO);
-//                            case IS_RECIPE_UPDATE -> handleIsRecipeUpdateState(update);
-                            case CONFIRM_RECIPE_UPDATE -> handleConfirmRecipeUpdate(update);
-                            case RECIPE -> updateRecipe(update, userContextDTO);
-                            default -> throw new Exception();
+                        if (userContextDTO != null) {
+                            switch (userContextDTO.getCommandState()) {
+                                case DISH_NAME -> handleDishNameState(update);
+                                case CONFIRM_INGREDIENT_UPDATE -> handleConfirmIngredientUpdate(update);
+                                case INGREDIENTS -> updateIngredients(update, userContextDTO);
+                                case CONFIRM_RECIPE_UPDATE -> handleConfirmRecipeUpdate(update);
+                                case RECIPE -> updateRecipe(update, userContextDTO);
+                                default -> throw new Exception();
+                            }
                         }
                     } catch(Exception e) {
                         System.out.println("Ошибка обновления блюда: " + e.getMessage());
@@ -117,20 +117,12 @@ public class UpdateDishCommand implements AbilityExtension {
         }
     }
 
-    private void handleIsIngredientsUpdateState(@NonNull final Update update) throws SQLException {
-        povaryoshkaBot.getDbDriver().updateUserContextCommandState(new UserContextUpdateOptions(
-                update.getMessage().getFrom().getId(),
-                CONFIRM_INGREDIENT_UPDATE,
-                null
-        ));
-    }
-
     private void handleConfirmIngredientUpdate(@NonNull final Update update) throws SQLException {
         if (update.getMessage().getText().trim().equalsIgnoreCase("Нет")){
             povaryoshkaBot.getSilent().send("Ингредиенты не меняем", update.getMessage().getChatId());
             povaryoshkaBot.getDbDriver().updateUserContextCommandState(new UserContextUpdateOptions(
                     update.getMessage().getFrom().getId(),
-                    IS_RECIPE_UPDATE,
+                    CONFIRM_RECIPE_UPDATE,
                     null
             ));
             return;
@@ -167,14 +159,6 @@ public class UpdateDishCommand implements AbilityExtension {
                 }
         );
         povaryoshkaBot.getSilent().send("Обновляем рецепт блюда?(Да/Нет)", update.getMessage().getChatId());
-    }
-
-    private void handleIsRecipeUpdateState(@NonNull final Update update) throws SQLException {
-        povaryoshkaBot.getDbDriver().updateUserContextCommandState(new UserContextUpdateOptions(
-                update.getMessage().getFrom().getId(),
-                CONFIRM_RECIPE_UPDATE,
-                null
-        ));
     }
 
     private void handleConfirmRecipeUpdate(@NonNull final Update update) throws SQLException {

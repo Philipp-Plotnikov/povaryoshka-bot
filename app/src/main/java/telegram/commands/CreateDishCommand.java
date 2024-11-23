@@ -69,13 +69,17 @@ public class CreateDishCommand implements AbilityExtension {
                                 update.getMessage().getFrom().getId()
                             )
                         );
-                        switch (userContextDTO.getCommandState()) {
-                            case DISH_NAME -> handleDishNameState(update);
-                            case INGREDIENTS -> handleIngredientsState(update, userContextDTO);
-                            case RECIPE -> handleRecipeState(update, userContextDTO);
-                            default -> throw new Exception();
+                        if (userContextDTO != null) {
+                            switch (userContextDTO.getCommandState()) {
+                                case DISH_NAME -> handleDishNameState(update);
+                                case INGREDIENTS -> handleIngredientsState(update, userContextDTO);
+                                case RECIPE -> handleRecipeState(update, userContextDTO);
+                                default -> throw new Exception();
+                            }
                         }
                     } catch (Exception e) {
+                        System.out.println("Ошибка создания блюда: " + e.getMessage());
+
                     }
                 },
                 isInCreateDishContext()

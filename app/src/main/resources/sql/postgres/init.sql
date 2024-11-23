@@ -18,10 +18,8 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'command_states') THEN
         CREATE TYPE command_states AS ENUM (
             'dish_name',
-            'is_ingredients_update',
             'confirm_ingredient_update',
             'ingredients',
-            'is_recipe_update',
             'confirm_recipe_update',
             'recipe',
             'feedback'
