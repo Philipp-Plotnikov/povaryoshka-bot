@@ -2,21 +2,23 @@ package telegram.commands;
 
 import models.db.sqlops.usercontext.UserContextDeleteOptions;
 import org.telegram.telegrambots.abilitybots.api.objects.Ability;
+import org.telegram.telegrambots.meta.api.objects.Update;
+
+import language.ru.BotMessages;
+
 import static org.telegram.telegrambots.abilitybots.api.objects.Locality.ALL;
 import static org.telegram.telegrambots.abilitybots.api.objects.Privacy.PUBLIC;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.telegram.telegrambots.abilitybots.api.util.AbilityExtension;
 
 import static models.commands.CommandConfig.END_COMMAND_SETTINGS;
 import telegram.bot.PovaryoshkaBot;
 
-public class EndCommand implements AbilityExtension {
-    @NonNull
-    private final PovaryoshkaBot povaryoshkaBot;
+
+public class EndCommand extends AbstractCommand {
 
     public EndCommand(@NonNull final PovaryoshkaBot povaryoshkaBot) {
-        this.povaryoshkaBot = povaryoshkaBot;
+        super(povaryoshkaBot);
     }
 
     @NonNull
@@ -27,14 +29,16 @@ public class EndCommand implements AbilityExtension {
             .privacy(PUBLIC)
             .locality(ALL) // ?
             .action(ctx -> {
-                povaryoshkaBot.getSilent().send("Команда прервана", ctx.chatId());
+                final Update update = ctx.update();
+                sendSilently(BotMessages.COMMAND_WAS_TERMINATED, update);
                 try {
-                    povaryoshkaBot.getDbDriver().deleteUserContext(
-                            new UserContextDeleteOptions(
-                                    ctx.user().getId()
-                            )
+                    dbDriver.deleteUserContext(
+                        new UserContextDeleteOptions(
+                            ctx.user().getId()
+                        )
                     );
                 } catch (Exception e) {
+                    sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
                     System.out.println("error");;
                 };
             })

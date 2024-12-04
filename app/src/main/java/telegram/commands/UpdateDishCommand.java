@@ -1,27 +1,25 @@
 package telegram.commands;
 
-import models.db.sqlops.dish.DishInsertOptions;
-import models.db.sqlops.dish.DishListSelectOptions;
-import models.db.sqlops.dish.DishSelectOptions;
+import models.commands.CommandStateHandler;
+import models.commands.CommandStates;
 import models.db.sqlops.dish.DishUpdateOptions;
 import models.db.sqlops.usercontext.UserContextDeleteOptions;
 import models.db.sqlops.usercontext.UserContextInsertOptions;
 import models.db.sqlops.usercontext.UserContextSelectOptions;
 import models.db.sqlops.usercontext.UserContextUpdateOptions;
-import models.dtos.DishDTO;
 import models.dtos.UserContextDTO;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 import org.telegram.telegrambots.abilitybots.api.objects.Ability;
-import org.telegram.telegrambots.abilitybots.api.util.AbilityExtension;
+import org.telegram.telegrambots.abilitybots.api.objects.Flag;
 import org.telegram.telegrambots.meta.api.objects.Update;
+
+import language.ru.BotMessages;
 import telegram.bot.PovaryoshkaBot;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -31,12 +29,22 @@ import static models.commands.MultiStateCommandTypes.*;
 import static org.telegram.telegrambots.abilitybots.api.objects.Locality.ALL;
 import static org.telegram.telegrambots.abilitybots.api.objects.Privacy.PUBLIC;
 
-public class UpdateDishCommand implements AbilityExtension {
+
+public class UpdateDishCommand extends AbstractCommand {
     @NonNull
-    private final PovaryoshkaBot povaryoshkaBot;
+    private final EnumMap<@NonNull CommandStates, CommandStateHandler> stateHandlersMap = new EnumMap<>(CommandStates.class);
 
     public UpdateDishCommand(@NonNull final PovaryoshkaBot povaryoshkaBot) {
-        this.povaryoshkaBot = povaryoshkaBot;
+        super(povaryoshkaBot);
+        initStateHandlersMap();
+    }
+
+    private void initStateHandlersMap() {
+        stateHandlersMap.put(DISH_NAME, this::handleDishNameState);
+        stateHandlersMap.put(INGREDIENTS_UPDATE_CONFIRM, this::handleIngredientsUpdateConfirmState);
+        stateHandlersMap.put(INGREDIENTS, this::handleIngredientsState);
+        stateHandlersMap.put(RECIPE_UPDATE_CONFIRM, this::handleRecipeUpdateConfirmState);
+        stateHandlersMap.put(RECIPE, this::handleRecipeState);
     }
 
     @NonNull
@@ -47,158 +55,180 @@ public class UpdateDishCommand implements AbilityExtension {
             .privacy(PUBLIC)
             .locality(ALL) // ?
             .action(ctx -> {
+                final Update update = ctx.update();
                 try {
-
-                    final List<DishDTO> dishes = povaryoshkaBot.getDbDriver().selectDishList(
-                            new DishListSelectOptions(ctx.user().getId())
-                    );
-                    if (dishes == null) {
-                        povaryoshkaBot.getSilent().send("У вас нет сохраненных блюд", ctx.chatId());
+                    final String message = getUserDishList(ctx);
+                    if (message == null) {
+                        sendSilently(BotMessages.USER_DOES_NOT_HAVE_DISHES, update);
                         return;
                     }
-                    StringBuilder message = new StringBuilder("Ваши блюда:\n");
-                    for (DishDTO dish : dishes) {
-                        message.append("- ").append(dish.getName()).append("\n");
-                    }
-
-                    povaryoshkaBot.getSilent().send(message.toString(), ctx.chatId());
-                    povaryoshkaBot.getSilent().send("Напишите название блюда из списка, которое хотите обновить", ctx.chatId());
-                    povaryoshkaBot.getDbDriver().insertUserContext(
-                            new UserContextInsertOptions(
-                                    ctx.user().getId(),
-                                    UPDATE,
-                                    DISH_NAME,
-                                    null
-                            )
+                    sendSilently(message, update);
+                    sendSilently(BotMessages.WRITE_DISH_NAME_FROM_LIST_TO_DELETE, update);
+                    dbDriver.insertUserContext(
+                        new UserContextInsertOptions(
+                            ctx.user().getId(),
+                            UPDATE,
+                            DISH_NAME,
+                            null
+                        )
                     );
                 } catch(SQLException e) {
-                    povaryoshkaBot.getSilent().send("Извините, произошла ошибка. Попробуйте позже.", ctx.chatId());
+                    sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
                     System.out.println("Ошибка при вставке: " + e.getMessage());
                 }
             })
-                .reply((action, update) -> {
-                    try {
-                        final UserContextDTO userContextDTO = povaryoshkaBot.getDbDriver().selectUserContext(
-                                new UserContextSelectOptions(
-                                        update.getMessage().getFrom().getId()
-                                )
-                        );
-                        if (userContextDTO != null) {
-                            switch (userContextDTO.getCommandState()) {
-                                case DISH_NAME -> handleDishNameState(update);
-                                case CONFIRM_INGREDIENT_UPDATE -> handleConfirmIngredientUpdate(update);
-                                case INGREDIENTS -> updateIngredients(update, userContextDTO);
-                                case CONFIRM_RECIPE_UPDATE -> handleConfirmRecipeUpdate(update);
-                                case RECIPE -> updateRecipe(update, userContextDTO);
-                                default -> throw new Exception();
-                            }
+            .reply((action, update) -> {
+                try {
+                    final UserContextDTO userContextDTO = dbDriver.selectUserContext(
+                        new UserContextSelectOptions(
+                            update.getMessage().getFrom().getId()
+                        )
+                    );
+                    if (userContextDTO != null) {
+                        final CommandStates commandState = userContextDTO.getCommandState();
+                        final CommandStateHandler commandStateHandler = stateHandlersMap.get(commandState);
+                        if (commandStateHandler == null) {
+                            throw new Exception("Dont have needed handlers");
                         }
+                        commandStateHandler.handle(update, userContextDTO);
+                    }
                     } catch(Exception e) {
+                        sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
                         System.out.println("Ошибка обновления блюда: " + e.getMessage());
                     }
-                    },
-                        isUpdateContext()
-                )
-                .build();
+                },
+                Flag.TEXT,
+                isUpdateContext()
+            )
+            .build();
     }
 
-    private void handleDishNameState(@NonNull final Update update) {
+    private void handleDishNameState(@NonNull final Update update, @NonNull final UserContextDTO userContextDTO) {
         try {
-            povaryoshkaBot.getDbDriver().updateUserContext(
-                    new UserContextUpdateOptions(
-                            update.getMessage().getFrom().getId(),
-                            CONFIRM_INGREDIENT_UPDATE,
-                            update.getMessage().getText().trim()
-                    )
+            dbDriver.updateUserContext(
+                new UserContextUpdateOptions(
+                    update.getMessage().getFrom().getId(),
+                    INGREDIENTS_UPDATE_CONFIRM,
+                    update.getMessage().getText().trim()
+                )
             );
-            povaryoshkaBot.getSilent().send("Обновляем ингредиенты блюда?(Да/Нет)", update.getMessage().getChatId());
+            sendSilently(BotMessages.CONFIRM_INGREDIENTS_UPDATE, update);
         } catch (Exception e) {
+            sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
             System.out.println(e);
         }
     }
 
-    private void handleConfirmIngredientUpdate(@NonNull final Update update) throws SQLException {
-        if (update.getMessage().getText().trim().equalsIgnoreCase("Нет")){
-            povaryoshkaBot.getSilent().send("Ингредиенты не меняем", update.getMessage().getChatId());
-            povaryoshkaBot.getDbDriver().updateUserContextCommandState(new UserContextUpdateOptions(
-                    update.getMessage().getFrom().getId(),
-                    CONFIRM_RECIPE_UPDATE,
+    private void handleIngredientsUpdateConfirmState(@NonNull final Update update, @NonNull final UserContextDTO userContextDTO) {
+        try {
+            final long userId = update.getMessage().getFrom().getId();
+            if (update.getMessage().getText().trim().equalsIgnoreCase("Нет")) {
+                sendSilently(BotMessages.INGREDIENTS_ARE_NOT_UPDATED, update);
+                dbDriver.updateUserContextCommandState(new UserContextUpdateOptions(
+                    userId,
+                    RECIPE_UPDATE_CONFIRM,
                     null
-            ));
-            return;
-        }
-        povaryoshkaBot.getSilent().send("Введите новые ингредиенты", update.getMessage().getChatId());
-        povaryoshkaBot.getDbDriver().updateUserContextCommandState(new UserContextUpdateOptions(
-                update.getMessage().getFrom().getId(),
+                ));
+                return;
+            }
+            sendSilently(BotMessages.INPUT_NEW_INGREDIENTS, update);
+            dbDriver.updateUserContextCommandState(new UserContextUpdateOptions(
+                userId,
                 INGREDIENTS,
                 null
-        ));
-    }
-
-    private void updateIngredients(@NonNull final Update update, @NonNull final UserContextDTO userContextDTO) throws SQLException, Exception {
-        final List<String> ingredientList = Collections.unmodifiableList(
-                Arrays.asList(update.getMessage().getText().trim().split(", "))
-        );
-        povaryoshkaBot.getDbDriver().executeAsTransaction(
-                () -> {
-                    povaryoshkaBot.getDbDriver().updateDishIngredientList(new DishUpdateOptions(
-                                    update.getMessage().getFrom().getId(),
-                                    userContextDTO.getDishName(),
-                                    ingredientList,
-                                    null
-                            )
-                    );
-
-                    povaryoshkaBot.getDbDriver().updateUserContextCommandState(
-                            new UserContextUpdateOptions(
-                                    update.getMessage().getFrom().getId(),
-                                    CONFIRM_RECIPE_UPDATE,
-                                    null
-                            )
-                    );
-                }
-        );
-        povaryoshkaBot.getSilent().send("Обновляем рецепт блюда?(Да/Нет)", update.getMessage().getChatId());
-    }
-
-    private void handleConfirmRecipeUpdate(@NonNull final Update update) throws SQLException {
-        if (update.getMessage().getText().trim().equalsIgnoreCase("Нет")){
-            povaryoshkaBot.getSilent().send(" Рецепт не меняем", update.getMessage().getChatId());
-            povaryoshkaBot.getDbDriver().deleteUserContext(
-                    new UserContextDeleteOptions(
-                            update.getMessage().getFrom().getId()
-                    )
-            );
-            return;
+            ));
+        } catch (Exception e) {
+            sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
+            System.out.println(e);
         }
-        povaryoshkaBot.getSilent().send("Введите новый рецепт", update.getMessage().getChatId());
-        povaryoshkaBot.getDbDriver().updateUserContextCommandState(new UserContextUpdateOptions(
-                update.getMessage().getFrom().getId(),
-                RECIPE,
-                null
-        ));
     }
 
-    private void updateRecipe(@NonNull final Update update, @NonNull final UserContextDTO userContextDTO) throws SQLException, Exception {
-        final String recipe = update.getMessage().getText().trim();
-        povaryoshkaBot.getDbDriver().executeAsTransaction(
+    private void handleIngredientsState(@NonNull final Update update, @NonNull final UserContextDTO userContextDTO) {
+        try {
+            final long userId = update.getMessage().getFrom().getId();
+            final List<String> ingredientList = Collections.unmodifiableList(
+                Arrays.asList(update.getMessage().getText().trim().split(", "))
+            );
+            dbDriver.executeAsTransaction(
                 () -> {
-                    povaryoshkaBot.getDbDriver().updateDishRecipe(
-                            new DishUpdateOptions(
-                                    update.getMessage().getFrom().getId(),
-                                    userContextDTO.getDishName(),
-                                    null,
-                                    recipe
-                            )
+                    dbDriver.updateDishIngredientList(
+                        new DishUpdateOptions(
+                            userId,
+                            userContextDTO.getDishName(),
+                            null,
+                            ingredientList,
+                            null
+                        )
                     );
-                    povaryoshkaBot.getDbDriver().deleteUserContext(
-                            new UserContextDeleteOptions(
-                                    update.getMessage().getFrom().getId()
-                            )
+                    dbDriver.updateUserContextCommandState(
+                        new UserContextUpdateOptions(
+                            userId,
+                            RECIPE_UPDATE_CONFIRM,
+                            null
+                        )
                     );
                 }
-        );
-        povaryoshkaBot.getSilent().send("Блюдо обновлено", update.getMessage().getChatId());
+            );
+            sendSilently(BotMessages.CONFIRM_RECIPE_UPDATE, update);
+        } catch (Exception e) {
+            sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
+            System.out.println(e);
+        }
+    }
+
+    private void handleRecipeUpdateConfirmState(@NonNull final Update update, @NonNull final UserContextDTO userContextDTO) {
+        try {
+            final long userId = update.getMessage().getFrom().getId();
+            if (update.getMessage().getText().trim().equalsIgnoreCase("Нет")) {
+                sendSilently(BotMessages.RECIPE_IS_NOT_UPDATED, update);
+                dbDriver.deleteUserContext(
+                    new UserContextDeleteOptions(
+                        userId
+                    )
+                );
+                return;
+            }
+            sendSilently(BotMessages.INPUT_NEW_RECIPE, update);
+            dbDriver.updateUserContextCommandState(
+                new UserContextUpdateOptions(
+                    userId,
+                    RECIPE,
+                    null
+                )
+            );
+        } catch (Exception e) {
+            sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
+            System.out.println(e);
+        }
+    }
+
+    private void handleRecipeState(@NonNull final Update update, @NonNull final UserContextDTO userContextDTO) {
+        try {
+            final long userId = update.getMessage().getFrom().getId();
+            final String recipe = update.getMessage().getText().trim();
+            dbDriver.executeAsTransaction(
+                () -> {
+                    dbDriver.updateDishRecipe(
+                        new DishUpdateOptions(
+                            userId,
+                            userContextDTO.getDishName(),
+                            null,
+                            null,
+                            recipe
+                        )
+                    );
+                    dbDriver.deleteUserContext(
+                        new UserContextDeleteOptions(
+                            userId
+                        )
+                    );
+                }
+            );
+            sendSilently(BotMessages.DISH_WAS_UPDATED_WITH_SUCCESS, update);
+        } catch (Exception e) {
+            sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
+            System.out.println(e);
+        }
     }
 
     private Predicate<Update> isUpdateContext(){
@@ -208,10 +238,10 @@ public class UpdateDishCommand implements AbilityExtension {
                 return false;
             }
             try {
-                final UserContextDTO userContextDTO = povaryoshkaBot.getDbDriver().selectUserContext(
-                        new UserContextSelectOptions(
-                                update.getMessage().getFrom().getId()
-                        )
+                final UserContextDTO userContextDTO = dbDriver.selectUserContext(
+                    new UserContextSelectOptions(
+                        update.getMessage().getFrom().getId()
+                    )
                 );
                 if (userContextDTO != null && userContextDTO.getMultiStateCommandTypes() == UPDATE) {
                     isUpdateContext = true;
@@ -220,7 +250,6 @@ public class UpdateDishCommand implements AbilityExtension {
                 System.out.println(e);
             }
             return isUpdateContext;
-
         };
     }
 }

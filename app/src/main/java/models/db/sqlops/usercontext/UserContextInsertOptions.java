@@ -8,7 +8,7 @@ import models.commands.MultiStateCommandTypes;
 
 public record UserContextInsertOptions(
     long userId,
-    @NonNull MultiStateCommandTypes multiStateCommantType,
+    @NonNull MultiStateCommandTypes multiStateCommandType,
     @NonNull CommandStates commandState,
     @Nullable String dishName
 ) {}

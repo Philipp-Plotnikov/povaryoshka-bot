@@ -44,33 +44,36 @@ import models.dtos.UserContextDTO;
 import models.exceptions.db.sqlops.NotFoundDishException;
 import models.exceptions.db.sqlops.NotFoundUserContextException;
 
-// TODO: Read about inheritance with annotations
+
 public class PostgresDbDriver implements DbDriver {
     @NonNull
     private final PostgresDbDriverOptions postgresDbDriverOptions;
 
-    @Nullable
     private Connection connection;
 
-    public PostgresDbDriver(@NonNull final PostgresDbDriverOptions options) {
+    public PostgresDbDriver(@NonNull final PostgresDbDriverOptions options) throws SQLException
+    {
         postgresDbDriverOptions = options;
+        connect();
     }
 
-    @Override
-    public void connect() throws SQLException {
+    private void connect() throws SQLException
+    {
         Properties connectionProperties = new Properties();
         setConnectionProperties(connectionProperties);
         connection = DriverManager.getConnection(postgresDbDriverOptions.getDbUrl(), connectionProperties);
     }
 
-    private void setConnectionProperties(@NonNull final Properties connectionProperties) {
+    private void setConnectionProperties(@NonNull final Properties connectionProperties)
+    {
         connectionProperties.setProperty(USER, postgresDbDriverOptions.getDbUsername());
         connectionProperties.setProperty(PASSWORD, postgresDbDriverOptions.getDbPassword());
         connectionProperties.setProperty(CURRENT_SCHEMA, postgresDbDriverOptions.getDbSchema());
     }
 
     @Override
-    public void setup() throws SQLException, Exception {
+    public void setup() throws SQLException, Exception
+    {
         executeAsTransaction(() -> {
             runInitScripts();
             runAlterScripts();
@@ -109,7 +112,8 @@ public class PostgresDbDriver implements DbDriver {
 
     @Override
     @Nullable
-    public DishDTO selectDish(@NonNull final DishSelectOptions selectOptions) throws SQLException {
+    public DishDTO selectDish(@NonNull final DishSelectOptions selectOptions) throws SQLException
+    {
         DishDTO dishDTO;
         try (
             final Statement selectDishStatement = connection.createStatement();
@@ -131,7 +135,8 @@ public class PostgresDbDriver implements DbDriver {
     }
 
     @NonNull
-    private PreparedStatement getSelectPreparedRecipeStatement(@NonNull final DishSelectOptions selectOptions) throws SQLException {
+    private PreparedStatement getSelectPreparedRecipeStatement(@NonNull final DishSelectOptions selectOptions) throws SQLException
+    {  
         final String recipeSelect = String.format(
             "SELECT dish_name, recipe FROM %s.recipe WHERE user_id = ? AND dish_name = ?;",
             postgresDbDriverOptions.getDbSchema()
@@ -143,7 +148,8 @@ public class PostgresDbDriver implements DbDriver {
     }
 
     @NonNull
-    private PreparedStatement getSelectPreparedDishIngredientListStatement(@NonNull final DishSelectOptions selectOptions) throws SQLException {
+    private PreparedStatement getSelectPreparedDishIngredientListStatement(@NonNull final DishSelectOptions selectOptions) throws SQLException
+    { 
         final String dishIngredientListSelect = String.format(
             "SELECT ingredient FROM %s.ingredient WHERE user_id = ? AND dish_name = ?;",
             postgresDbDriverOptions.getDbSchema()
@@ -156,7 +162,8 @@ public class PostgresDbDriver implements DbDriver {
 
     @Override
     @Nullable
-    public List<DishDTO> selectDishList(@NonNull final DishListSelectOptions selectOptions) throws SQLException {
+    public List<DishDTO> selectDishList(@NonNull final DishListSelectOptions selectOptions) throws SQLException
+    {
         final ArrayList<DishDTO> dishList = new ArrayList<>();
         try (
             final PreparedStatement selectPreparedRecipeListStatement = getSelectPreparedRecipeListStatement(selectOptions);
@@ -184,7 +191,8 @@ public class PostgresDbDriver implements DbDriver {
     }
 
     @Nullable
-    private List<String> getDishIngredientList(@NonNull final PreparedStatement selectPreparedIngredientListStatement) throws SQLException {
+    private List<String> getDishIngredientList(@NonNull final PreparedStatement selectPreparedIngredientListStatement) throws SQLException
+    {
         final List<String> ingredientList = new ArrayList<>();
         try (
             final ResultSet dishIngredientResultSet = selectPreparedIngredientListStatement.executeQuery();
@@ -201,7 +209,8 @@ public class PostgresDbDriver implements DbDriver {
     }
 
     @NonNull
-    private PreparedStatement getSelectPreparedRecipeListStatement(@NonNull final DishListSelectOptions selectOptions) throws SQLException {
+    private PreparedStatement getSelectPreparedRecipeListStatement(@NonNull final DishListSelectOptions selectOptions) throws SQLException
+    {
         final String recipeSelect = String.format(
             "SELECT dish_name, recipe FROM %s.recipe WHERE user_id = ?;",
             postgresDbDriverOptions.getDbSchema()
@@ -212,7 +221,8 @@ public class PostgresDbDriver implements DbDriver {
     }
 
     @NonNull
-    private PreparedStatement getSelectPreparedIngredientListStatement(@NonNull final DishListSelectOptions selectOptions) throws SQLException {
+    private PreparedStatement getSelectPreparedIngredientListStatement(@NonNull final DishListSelectOptions selectOptions) throws SQLException
+    {
         final String ingredientListSelect = String.format(
             "SELECT ingredient FROM %s.ingredient WHERE user_id = ? AND dish_name = ?;",
             postgresDbDriverOptions.getDbSchema()
@@ -223,13 +233,15 @@ public class PostgresDbDriver implements DbDriver {
     }
 
     @Override
-    public void insertDish(@NonNull final DishInsertOptions insertOptions) throws SQLException, Exception {
+    public void insertDish(@NonNull final DishInsertOptions insertOptions) throws SQLException, Exception
+    {
         executeAsTransaction(() -> {
             internalInsertDish(insertOptions);
         });
     }
 
-    private void internalInsertDish(@NonNull final DishInsertOptions insertOptions) throws SQLException {
+    private void internalInsertDish(@NonNull final DishInsertOptions insertOptions) throws SQLException
+    { 
         try (
             final Statement dishStatement = connection.createStatement();
             final PreparedStatement insertPreparedRecipeStatement = getInsertPreparedRecipeStatement(insertOptions);
@@ -248,7 +260,8 @@ public class PostgresDbDriver implements DbDriver {
     }
 
     @NonNull
-    private PreparedStatement getInsertPreparedRecipeStatement(@NonNull final DishInsertOptions insertOptions) throws SQLException {
+    private PreparedStatement getInsertPreparedRecipeStatement(@NonNull final DishInsertOptions insertOptions) throws SQLException
+    {
         final String recipeInsert = String.format(
             "INSERT INTO %s.recipe (%s, %s, %s) VALUES (?, ?, ?);",
             postgresDbDriverOptions.getDbSchema(),
@@ -264,7 +277,8 @@ public class PostgresDbDriver implements DbDriver {
     }
 
     @NonNull
-    private PreparedStatement getInsertPreparedIngredientStatement(@NonNull final DishInsertOptions insertOptions) throws SQLException {
+    private PreparedStatement getInsertPreparedIngredientStatement(@NonNull final DishInsertOptions insertOptions) throws SQLException
+    {
         final String ingredientInsert = String.format(
             "INSERT INTO %s.ingredient (%s, %s, %s) VALUES (?, ?, ?);",
             postgresDbDriverOptions.getDbSchema(),
@@ -279,20 +293,26 @@ public class PostgresDbDriver implements DbDriver {
     }
 
     @Override
-    public void deleteDish(@NonNull final DishDeleteOptions deleteOptions) throws SQLException {
+    public void deleteDish(@NonNull final DishDeleteOptions deleteOptions) throws SQLException
+    {
         deleteRecipe(deleteOptions);
     }
 
-    private void deleteRecipe(@NonNull final DishDeleteOptions deleteOptions) throws SQLException {
+    private void deleteRecipe(@NonNull final DishDeleteOptions deleteOptions) throws SQLException
+    {
         try (
             final PreparedStatement deletePreparedRecipeStatement = getDeletePreparedRecipeStatement(deleteOptions);
         ) {
-            deletePreparedRecipeStatement.executeUpdate();
+            int deletedRowAmount = deletePreparedRecipeStatement.executeUpdate();
+            if (deletedRowAmount == 0) {
+                throw new NotFoundDishException("");
+            }
         }
     }
 
     @NonNull
-    private PreparedStatement getDeletePreparedRecipeStatement(@NonNull final DishDeleteOptions deleteOptions) throws SQLException {
+    private PreparedStatement getDeletePreparedRecipeStatement(@NonNull final DishDeleteOptions deleteOptions) throws SQLException
+    {
         final String recipeDelete = String.format(
             "DELETE FROM %s.recipe WHERE user_id = ? AND dish_name = ?;",
             postgresDbDriverOptions.getDbSchema()
@@ -304,13 +324,15 @@ public class PostgresDbDriver implements DbDriver {
     }
 
     @Override
-    public void updateDish(@NonNull final DishUpdateOptions updateOptions) throws SQLException, Exception {
+    public void updateDish(@NonNull final DishUpdateOptions updateOptions) throws SQLException, Exception
+    {
         executeAsTransaction(() -> {
             internalUpdateDish(updateOptions);
         });
     }
 
-    private void internalUpdateDish(@NonNull final DishUpdateOptions updateOptions) throws SQLException {
+    private void internalUpdateDish(@NonNull final DishUpdateOptions updateOptions) throws SQLException
+    {
         final DishInsertOptions insertOptions = new DishInsertOptions(
             updateOptions.userId(),
             updateOptions.dishName(),
@@ -337,7 +359,8 @@ public class PostgresDbDriver implements DbDriver {
     }
 
     @NonNull
-    private PreparedStatement getUpdatePreparedRecipeStatement(@NonNull final DishUpdateOptions updateOptions) throws SQLException {
+    private PreparedStatement getUpdatePreparedRecipeStatement(@NonNull final DishUpdateOptions updateOptions) throws SQLException
+    {
         final String recipeUpdate = String.format(
             "UPDATE %s.recipe SET recipe = ? WHERE user_id = ? AND dish_name = ?;",
             postgresDbDriverOptions.getDbSchema()
@@ -350,13 +373,45 @@ public class PostgresDbDriver implements DbDriver {
     }
 
     @Override
-    public void updateDishIngredientList(@NonNull final DishUpdateOptions updateOptions) throws SQLException, Exception {
+    public void updateDishName(@NonNull final DishUpdateOptions updateOptions) throws SQLException, Exception
+    {
+        executeAsTransaction(() -> {
+            internalUpdateDishName(updateOptions);
+        });
+    }
+
+    private void internalUpdateDishName(@NonNull final DishUpdateOptions updateOptions) throws SQLException
+    {
+        try (
+            final PreparedStatement updatePreparedDishNameStatement = getUpdatePreparedDishNameStatement(updateOptions)
+        ) {
+            updatePreparedDishNameStatement.executeUpdate();
+        }
+    }
+
+    @NonNull
+    private PreparedStatement getUpdatePreparedDishNameStatement(@NonNull final DishUpdateOptions updateOptions) throws SQLException {
+        final String dishNameUpdate = String.format(
+            "UPDATE %s.recipe SET dish_name = ? WHERE user_id = ? AND dish_name = ?;",
+            postgresDbDriverOptions.getDbSchema()
+        );
+        final PreparedStatement updatePreparedDishNameStatement = connection.prepareStatement(dishNameUpdate);
+        updatePreparedDishNameStatement.setString(1, updateOptions.newDishName());
+        updatePreparedDishNameStatement.setLong(2, updateOptions.userId());
+        updatePreparedDishNameStatement.setString(3, updateOptions.dishName());
+        return updatePreparedDishNameStatement;
+    }
+
+    @Override
+    public void updateDishIngredientList(@NonNull final DishUpdateOptions updateOptions) throws SQLException, Exception
+    {
         executeAsTransaction(() -> {
             internalUpdateDishIngredientList(updateOptions);
         });
     }
 
-    private void internalUpdateDishIngredientList(@NonNull final DishUpdateOptions updateOptions) throws SQLException {
+    private void internalUpdateDishIngredientList(@NonNull final DishUpdateOptions updateOptions) throws SQLException
+    {
         final DishInsertOptions insertOptions = new DishInsertOptions(
             updateOptions.userId(),
             updateOptions.dishName(),
@@ -381,7 +436,8 @@ public class PostgresDbDriver implements DbDriver {
     }
 
     @NonNull
-    private PreparedStatement getDeletePreparedIngredientStatement(@NonNull final DishUpdateOptions updateOptions) throws SQLException {
+    private PreparedStatement getDeletePreparedIngredientStatement(@NonNull final DishUpdateOptions updateOptions) throws SQLException
+    {
         final String ingredientDelete = String.format(
             "DELETE FROM %s.ingredient WHERE user_id = ? AND dish_name = ?;",
             postgresDbDriverOptions.getDbSchema()
@@ -393,11 +449,13 @@ public class PostgresDbDriver implements DbDriver {
     }
 
     @Override
-    public void updateDishRecipe(@NonNull final DishUpdateOptions updateOptions) throws SQLException {
+    public void updateDishRecipe(@NonNull final DishUpdateOptions updateOptions) throws SQLException
+    {
         internalUpdateDishRecipe(updateOptions);
     }
 
-    private void internalUpdateDishRecipe(@NonNull final DishUpdateOptions updateOptions) throws SQLException {
+    private void internalUpdateDishRecipe(@NonNull final DishUpdateOptions updateOptions) throws SQLException
+    {
         try (
             final PreparedStatement updatePreparedRecipeStatement = getUpdatePreparedRecipeStatement(updateOptions);
         ) {
@@ -407,7 +465,8 @@ public class PostgresDbDriver implements DbDriver {
 
     @Override
     @Nullable
-    public UserContextDTO selectUserContext(@NonNull final UserContextSelectOptions selectOptions) throws SQLException {
+    public UserContextDTO selectUserContext(@NonNull final UserContextSelectOptions selectOptions) throws SQLException
+    {
         UserContextDTO userContextDTO;
         try (
             final PreparedStatement selectPreparedUserContextStatement = getSelectPreparedUserContextStatement(selectOptions);
@@ -421,7 +480,8 @@ public class PostgresDbDriver implements DbDriver {
     }
 
     @NonNull
-    private PreparedStatement getSelectPreparedUserContextStatement(@NonNull final UserContextSelectOptions selectOptions) throws SQLException {
+    private PreparedStatement getSelectPreparedUserContextStatement(@NonNull final UserContextSelectOptions selectOptions) throws SQLException
+    {
         final String userContextSelect = String.format(
             "SELECT multi_state_command_type, command_state, dish_name FROM %s.user_context WHERE user_id = ?;",
             postgresDbDriverOptions.getDbSchema()
@@ -441,7 +501,8 @@ public class PostgresDbDriver implements DbDriver {
     }
 
     @NonNull
-    private PreparedStatement getInsertPreparedUserContextStatement(@NonNull final UserContextInsertOptions insertOptions) throws SQLException {
+    private PreparedStatement getInsertPreparedUserContextStatement(@NonNull final UserContextInsertOptions insertOptions) throws SQLException
+    {
         final String userContextInsert = String.format(
             "INSERT INTO %s.user_context (%s, %s, %s, %s) VALUES (?, ?::multi_state_command_types, ?::command_states, ?);",
             postgresDbDriverOptions.getDbSchema(),
@@ -452,14 +513,15 @@ public class PostgresDbDriver implements DbDriver {
         );
         final PreparedStatement insertPreparedUserContextStatement = connection.prepareStatement(userContextInsert);
         insertPreparedUserContextStatement.setLong(1, insertOptions.userId());
-        insertPreparedUserContextStatement.setString(2, insertOptions.multiStateCommantType().getValue());
+        insertPreparedUserContextStatement.setString(2, insertOptions.multiStateCommandType().getValue());
         insertPreparedUserContextStatement.setString(3, insertOptions.commandState().getValue());
         insertPreparedUserContextStatement.setString(4, insertOptions.dishName());
         return insertPreparedUserContextStatement;
     }
 
     @Override
-    public void deleteUserContext(@NonNull final UserContextDeleteOptions deleteOptions) throws SQLException {
+    public void deleteUserContext(@NonNull final UserContextDeleteOptions deleteOptions) throws SQLException
+    {
         try (
             final PreparedStatement deletePreparedUserContextStatement = getDeletePreparedUserContextStatement(deleteOptions);
         ) {
@@ -468,7 +530,8 @@ public class PostgresDbDriver implements DbDriver {
     }
 
     @NonNull
-    private PreparedStatement getDeletePreparedUserContextStatement(@NonNull final UserContextDeleteOptions deleteOptions) throws SQLException {
+    private PreparedStatement getDeletePreparedUserContextStatement(@NonNull final UserContextDeleteOptions deleteOptions) throws SQLException
+    {
         final String userContextDelete = String.format(
             "DELETE FROM %s.user_context WHERE user_id = ?;",
             postgresDbDriverOptions.getDbSchema()
@@ -479,7 +542,8 @@ public class PostgresDbDriver implements DbDriver {
     }
 
     @Override
-    public void updateUserContext(@NonNull final UserContextUpdateOptions updateOptions) throws SQLException {
+    public void updateUserContext(@NonNull final UserContextUpdateOptions updateOptions) throws SQLException
+    {
         try (
             final PreparedStatement updatePreparedUserContextStatement = getUpdatePreparedUserContextStatement(updateOptions);
         ) {
@@ -488,7 +552,8 @@ public class PostgresDbDriver implements DbDriver {
     }
 
     @NonNull
-    private PreparedStatement getUpdatePreparedUserContextStatement(@NonNull final UserContextUpdateOptions updateOptions) throws SQLException {
+    private PreparedStatement getUpdatePreparedUserContextStatement(@NonNull final UserContextUpdateOptions updateOptions) throws SQLException
+    {
         final String userContextUpdate = String.format(
             "UPDATE %s.user_context SET command_state = ?::command_states, dish_name = ? WHERE user_id = ?;",
             postgresDbDriverOptions.getDbSchema()
@@ -501,7 +566,8 @@ public class PostgresDbDriver implements DbDriver {
     }
 
     @Override
-    public void updateUserContextCommandState(@NonNull final UserContextUpdateOptions updateOptions) throws SQLException {
+    public void updateUserContextCommandState(@NonNull final UserContextUpdateOptions updateOptions) throws SQLException
+    {
         try (
             final PreparedStatement updatePreparedUserContextCommandStateStatement = getUpdatePreparedUserContextCommandStateStatement(updateOptions);
         ) {
@@ -510,7 +576,8 @@ public class PostgresDbDriver implements DbDriver {
     }
 
     @NonNull
-    private PreparedStatement getUpdatePreparedUserContextCommandStateStatement(@NonNull final UserContextUpdateOptions updateOptions) throws SQLException {
+    private PreparedStatement getUpdatePreparedUserContextCommandStateStatement(@NonNull final UserContextUpdateOptions updateOptions) throws SQLException
+    {
         final String userContextUpdate = String.format(
             "UPDATE %s.user_context SET command_state = ?::command_states WHERE user_id = ?;",
             postgresDbDriverOptions.getDbSchema()
@@ -522,7 +589,8 @@ public class PostgresDbDriver implements DbDriver {
     }
 
     @Override
-    public void insertFeedback(@NonNull final FeedbackInsertOptions insertOptions) throws SQLException {
+    public void insertFeedback(@NonNull final FeedbackInsertOptions insertOptions) throws SQLException
+    {
         try (
             final PreparedStatement insertPreparedFeedbackStatement = getInsertPreparedFeedbackStatement(insertOptions);
         ) {
@@ -531,7 +599,8 @@ public class PostgresDbDriver implements DbDriver {
     }
 
     @NonNull
-    private PreparedStatement getInsertPreparedFeedbackStatement(@NonNull final FeedbackInsertOptions insertOptions) throws SQLException {
+    private PreparedStatement getInsertPreparedFeedbackStatement(@NonNull final FeedbackInsertOptions insertOptions) throws SQLException
+    {
         final String feedbackInsert = String.format(
             "INSERT INTO %s.feedback (%s, %s) VALUES (?, ?);",
             postgresDbDriverOptions.getDbSchema(),
@@ -545,19 +614,23 @@ public class PostgresDbDriver implements DbDriver {
     }
 
     @Override
-    public void close() throws SQLException {
+    public void close() throws SQLException
+    {
         connection.close();
     }
 
-    private void runInitScripts() throws SQLException, IOException {
+    private void runInitScripts() throws SQLException, IOException
+    {
         runScript(postgresDbDriverOptions.getInitSQLScriptPath());
     }
 
-    private void runAlterScripts() throws SQLException, IOException {
+    private void runAlterScripts() throws SQLException, IOException
+    {
         runScript(postgresDbDriverOptions.getAlterSQLScriptPath());
     }
 
-    private void runScript(@NonNull final String filePath) throws SQLException, IOException {
+    private void runScript(@NonNull final String filePath) throws SQLException, IOException
+    {
         try (
             final InputStream inputStream = getClass().getClassLoader().getResourceAsStream(filePath);
             final InputStreamReader inputStreamReader = new InputStreamReader(inputStream);

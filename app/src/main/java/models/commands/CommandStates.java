@@ -2,11 +2,14 @@ package models.commands;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+
 public enum CommandStates {
     DISH_NAME("dish_name"),
-    CONFIRM_INGREDIENT_UPDATE("confirm_ingredient_update"),
+    DISH_NAME_UPDATE_CONFIRM("dish_name_update_confirm"),
+    NEW_DISH_NAME("new_dish_name"),
+    INGREDIENTS_UPDATE_CONFIRM("ingredients_update_confirm"),
     INGREDIENTS("ingredients"),
-    CONFIRM_RECIPE_UPDATE("confirm_recipe_update"),
+    RECIPE_UPDATE_CONFIRM("recipe_update_confirm"),
     RECIPE("recipe"),
     FEEDBACK("feedback");
 

@@ -11,24 +11,24 @@ import models.db.sqlops.usercontext.UserContextDeleteOptions;
 import models.db.sqlops.usercontext.UserContextSelectOptions;
 import models.dtos.UserContextDTO;
 import org.telegram.telegrambots.abilitybots.api.objects.Ability;
+import org.telegram.telegrambots.abilitybots.api.objects.Flag;
+
 import static models.commands.MultiStateCommandTypes.FEEDBACK;
 import static org.telegram.telegrambots.abilitybots.api.objects.Locality.ALL;
 import static org.telegram.telegrambots.abilitybots.api.objects.Privacy.PUBLIC;
-import org.telegram.telegrambots.abilitybots.api.util.AbilityExtension;
 import org.telegram.telegrambots.meta.api.objects.Update;
+
+import language.ru.BotMessages;
 import models.db.sqlops.usercontext.UserContextInsertOptions;
 
 import static models.commands.CommandConfig.FEEDBACK_COMMAND_SETTINGS;
 import telegram.bot.PovaryoshkaBot;
 
-public class FeedbackCommand implements AbilityExtension {
-    @NonNull
-    private final PovaryoshkaBot povaryoshkaBot;
 
-    private boolean isFeedbackContext = false;
+public class FeedbackCommand extends AbstractCommand {
 
     public FeedbackCommand(@NonNull final PovaryoshkaBot povaryoshkaBot) {
-        this.povaryoshkaBot = povaryoshkaBot;
+        super(povaryoshkaBot);
     }
 
     @NonNull
@@ -38,55 +38,50 @@ public class FeedbackCommand implements AbilityExtension {
             .info(FEEDBACK_COMMAND_SETTINGS.commandDescription())
             .privacy(PUBLIC)
             .locality(ALL) // ?
-                .action(ctx -> {
-
+            .action(ctx -> {
+                final Update update = ctx.update();
+                try {
+                    sendSilently(BotMessages.WRITE_FEEDBACK, update);
+                    dbDriver.insertUserContext(
+                        new UserContextInsertOptions(
+                            ctx.user().getId(),
+                            FEEDBACK,
+                            CommandStates.FEEDBACK,
+                            null
+                        )
+                    );
+                } catch(SQLException e) {
+                    sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
+                    System.out.println("Ошибка при вставке контекста: " + e.getMessage());
+                }
+            })
+            .reply((action, update) -> {
                     try {
-                        povaryoshkaBot.getSilent().send("В следующем сообщении напишите ваш отзыв о нашем сервисе, и мы его сохраним.", ctx.chatId());
-                        povaryoshkaBot.getDbDriver().insertUserContext(
-                                new UserContextInsertOptions(
-                                        ctx.user().getId(),
-                                        FEEDBACK,
-                                        CommandStates.FEEDBACK,
-                                        null
+                        final String feedbackText = update.getMessage().getText();
+                        dbDriver.executeAsTransaction(
+                            () -> {
+                                dbDriver.insertFeedback(
+                                    new FeedbackInsertOptions(
+                                        update.getMessage().getFrom().getId(),
+                                        feedbackText
+                                    )
+                                );
+                                dbDriver.deleteUserContext(
+                                    new UserContextDeleteOptions(
+                                    update.getMessage().getFrom().getId()
                                 )
-                        );
-                    } catch(SQLException e) {
-                        povaryoshkaBot.getSilent().send("Извините, произошла ошибка. Попробуйте позже.", ctx.chatId());
-                        System.out.println("Ошибка при вставке контекста: " + e.getMessage());
+                            );
+                        }
+                    );
+                    } catch(Exception e) {
+                        sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
+                        System.out.println("Ошибка при обработке отзыва: " + e.getMessage());
                     }
-                })
-                .reply((action, update) -> {
-                            try {
-                                final UserContextDTO userContextDTO = povaryoshkaBot.getDbDriver().selectUserContext(
-                                        new UserContextSelectOptions(
-                                                update.getMessage().getFrom().getId()
-                                        )
-                                );
-                                final String feedbackText = update.getMessage().getText();
-                                povaryoshkaBot.getDbDriver().executeAsTransaction(
-                                        () -> {
-                                            povaryoshkaBot.getDbDriver().insertFeedback(
-                                                    new FeedbackInsertOptions(
-                                                            update.getMessage().getFrom().getId(),
-                                                            feedbackText
-                                                    )
-                                            );
-                                            povaryoshkaBot.getDbDriver().deleteUserContext(
-                                                    new UserContextDeleteOptions(
-                                                            update.getMessage().getFrom().getId()
-                                                    )
-                                            );
-                                        }
-                                );
-                            } catch(Exception e) {
-                                System.out.println("Ошибка при обработке отзыва: " + e.getMessage());
-                            }
-
-                        },
-                        isFeedbackContext()
-                )
-                .build();
-
+                },
+                Flag.TEXT,
+                isFeedbackContext()
+            )
+            .build();
     }
 
     private Predicate<Update> isFeedbackContext(){
@@ -96,10 +91,10 @@ public class FeedbackCommand implements AbilityExtension {
                 return false;
             }
             try {
-                final UserContextDTO userContextDTO = povaryoshkaBot.getDbDriver().selectUserContext(
-                        new UserContextSelectOptions(
-                                update.getMessage().getFrom().getId()
-                        )
+                final UserContextDTO userContextDTO = dbDriver.selectUserContext(
+                    new UserContextSelectOptions(
+                        update.getMessage().getFrom().getId()
+                    )
                 );
                 if (userContextDTO != null && userContextDTO.getMultiStateCommandTypes() == FEEDBACK) {
                     isFeedbackContext = true;
@@ -108,7 +103,6 @@ public class FeedbackCommand implements AbilityExtension {
                 System.out.println(e);
             }
             return isFeedbackContext;
-
         };
     }
-    }
+}
