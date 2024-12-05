@@ -1,9 +1,13 @@
 package telegram.commands.factory;
 
-import java.util.Map;
+import java.util.List;
 
-import telegram.commands.AbstractCommand;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.telegram.telegrambots.abilitybots.api.util.AbilityExtension;
+
+import telegram.bot.PovaryoshkaBot;
 
 public interface CommandFactory {
-    Map<String, AbstractCommand> getCommandMap();
+    @NonNull
+    List<@NonNull AbilityExtension> getCommandList(@NonNull final PovaryoshkaBot povaryoshkaBot);
 }

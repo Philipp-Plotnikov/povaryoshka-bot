@@ -1,6 +1,9 @@
 package core.factory;
 
-import java.util.Map;
+import java.sql.SQLException;
+import java.util.List;
+
+import org.telegram.telegrambots.abilitybots.api.util.AbilityExtension;
 
 import dbdrivers.DbDriver;
 import dbdrivers.factory.DbDriverFactory;
@@ -9,7 +12,7 @@ import static models.EnvVars.COMMAND_TYPE;
 import static models.EnvVars.DB_TYPE;
 import models.commands.CommandTypes;
 import models.db.DbTypes;
-import telegram.commands.AbstractCommand;
+import telegram.bot.PovaryoshkaBot;
 import telegram.commands.factory.CommandFactory;
 import telegram.commands.factory.CommandFactoryProducer;
 
@@ -26,11 +29,11 @@ public class FacadeFactory {
         commandFactory = commandFactoryProducer.getCommandFactory(commandType);
     }
 
-    public DbDriver getDbDriver() {
+    public DbDriver getDbDriver() throws SQLException {
         return dbDriverFactory.getDbDriver();
     }
 
-    public Map<String, AbstractCommand> getCommandMap() {
-        return commandFactory.getCommandMap();
+    public List<AbilityExtension> getCommandList(final PovaryoshkaBot povaryoshkaBot) {
+        return commandFactory.getCommandList(povaryoshkaBot);
     }
 }
