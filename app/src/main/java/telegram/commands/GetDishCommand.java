@@ -25,6 +25,7 @@ import language.ru.BotMessages;
 import telegram.bot.PovaryoshkaBot;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.function.Predicate;
 
 
@@ -40,7 +41,7 @@ public class GetDishCommand extends AbstractCommand {
             .name(GET_DISH_COMMAND_SETTINGS.commandName())
             .info(GET_DISH_COMMAND_SETTINGS.commandDescription())
             .privacy(PUBLIC)
-            .locality(ALL) // ?
+            .locality(ALL)
             .action(ctx -> {
                 final Update update = ctx.update();
                 try {
@@ -50,7 +51,7 @@ public class GetDishCommand extends AbstractCommand {
                         return;
                     }
                     sendSilently(message, update);
-                    sendSilently(BotMessages.WRITE_DISH_NAME_FROM_LIST_TO_DELETE, update);
+                    sendSilently(BotMessages.WRITE_DISH_NAME_FROM_LIST_TO_GET, update);
                     dbDriver.insertUserContext(
                             new UserContextInsertOptions(
                                     ctx.user().getId(),
@@ -75,26 +76,9 @@ public class GetDishCommand extends AbstractCommand {
                             sendSilently(BotMessages.THIS_DISH_NAME_IS_NOT_FROM_LIST, update);
                             return;
                         }
-            
-                    // TODO: Refactor
-                    final String ingredienList = selectedDish.getIngredientList() != null
-                        ? String.join(", ", selectedDish.getIngredientList())
-                        : BotMessages.NO_INFO;
-                    final String recipe = selectedDish.getRecipe() != null
-                        ? selectedDish.getRecipe()
-                        : BotMessages.NO_INFO;
-                    final String message = String.format(
-                        "%s: %s\n%s: %s\n%s: %s",
-                        BotMessages.DISH_NAME,
-                        selectedDish.getName(),
-                        BotMessages.INGREDIENTS,
-                        ingredienList,
-                        BotMessages.RECIPE,
-                        recipe
-                    );
-
+                        final String formatDishInfo = getFormatDishInfo(selectedDish);
                         sendSilently(BotMessages.USER_DISH_IS, update);
-                        sendSilently(message, update);
+                        sendSilently(formatDishInfo, update);
                         dbDriver.deleteUserContext(
                             new UserContextDeleteOptions(userId)
                         );
@@ -108,6 +92,39 @@ public class GetDishCommand extends AbstractCommand {
             )
             .build();
     }
+
+    @NonNull
+    private String getFormatDishInfo(@NonNull DishDTO selectedDish) {
+        final String formatIngredienListInfo = getFormatIngredientListInfo(selectedDish);
+        final String formatRecipeInfo = getFormatRecipeInfo(selectedDish);
+        final String formatDishInfo = String.format(
+            "%s: %s\n%s: %s\n%s: %s",
+            BotMessages.DISH_NAME,
+            selectedDish.getName(),
+            BotMessages.INGREDIENTS,
+            formatIngredienListInfo,
+            BotMessages.RECIPE,
+            formatRecipeInfo
+        );
+        return formatDishInfo;
+    }
+
+    @NonNull
+    private String getFormatIngredientListInfo(@NonNull DishDTO selectedDish) {
+        final List<String> ingredientList = selectedDish.getIngredientList();
+        return ingredientList != null
+            ? String.join(", ", ingredientList)
+            : BotMessages.NO_INFO;
+    }
+
+    @NonNull
+    private String getFormatRecipeInfo(@NonNull DishDTO selectedDish) {
+        final String recipe = selectedDish.getRecipe();
+        return recipe != null
+            ? recipe
+            : BotMessages.NO_INFO;
+    }
+
     private Predicate<Update> isGetContext(){
         return update -> {
             boolean isGetContext = false;

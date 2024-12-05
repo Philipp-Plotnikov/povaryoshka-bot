@@ -27,7 +27,7 @@ public class EndCommand extends AbstractCommand {
             .name(END_COMMAND_SETTINGS.commandName())
             .info(END_COMMAND_SETTINGS.commandDescription())
             .privacy(PUBLIC)
-            .locality(ALL) // ?
+            .locality(ALL)
             .action(ctx -> {
                 final Update update = ctx.update();
                 sendSilently(BotMessages.COMMAND_WAS_TERMINATED, update);

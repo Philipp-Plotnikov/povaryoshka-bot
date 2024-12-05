@@ -37,7 +37,7 @@ public class FeedbackCommand extends AbstractCommand {
             .name(FEEDBACK_COMMAND_SETTINGS.commandName())
             .info(FEEDBACK_COMMAND_SETTINGS.commandDescription())
             .privacy(PUBLIC)
-            .locality(ALL) // ?
+            .locality(ALL)
             .action(ctx -> {
                 final Update update = ctx.update();
                 try {
@@ -57,7 +57,7 @@ public class FeedbackCommand extends AbstractCommand {
             })
             .reply((action, update) -> {
                     try {
-                        final String feedbackText = update.getMessage().getText();
+                        final String feedbackText = update.getMessage().getText().trim();
                         dbDriver.executeAsTransaction(
                             () -> {
                                 dbDriver.insertFeedback(
@@ -73,6 +73,7 @@ public class FeedbackCommand extends AbstractCommand {
                             );
                         }
                     );
+                    sendSilently(BotMessages.USER_FEEDBACK_WAS_SAVED, update);
                     } catch(Exception e) {
                         sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
                         System.out.println("Ошибка при обработке отзыва: " + e.getMessage());

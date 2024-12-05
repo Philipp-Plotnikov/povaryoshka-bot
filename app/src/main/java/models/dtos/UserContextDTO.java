@@ -24,7 +24,6 @@ public class UserContextDTO {
     @Nullable
     private final String dishName;
 
-    // TODO: Think about getObject
     public UserContextDTO(@NonNull final ResultSet userContextResultSet) throws SQLException,
                                                                                 NotFoundUserContextException
     {

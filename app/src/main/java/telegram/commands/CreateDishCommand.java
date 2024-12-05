@@ -53,14 +53,13 @@ public class CreateDishCommand extends AbstractCommand {
         stateHandlersMap.put(RECIPE, this::handleRecipeState);
     }
 
-    // TODO: Try to reuse user select from isInCreateDishContext
     @NonNull
     public Ability createDish() {
         return Ability.builder()
             .name(CREATE_DISH_COMMAND_SETTINGS.commandName())
             .info(CREATE_DISH_COMMAND_SETTINGS.commandDescription())
             .privacy(PUBLIC)
-            .locality(ALL) // ?
+            .locality(ALL)
             .action(ctx -> {
                 final Update update = ctx.update();
                 try {

@@ -20,7 +20,6 @@ public class PovaryoshkaBot extends AbilityBot {
     @NonNull
     private final FacadeFactory facadeFactory;
 
-    // TODO: Read about methods in Java
     public PovaryoshkaBot(
         @NonNull final TelegramClient telegramClient,
         @NonNull final String botUsername,
@@ -33,7 +32,6 @@ public class PovaryoshkaBot extends AbilityBot {
         dbDriver.setup();
     }
 
-    // TODO: Think about it
     public void initCommandList() {
         final List<AbilityExtension> commandList = facadeFactory.getCommandList(this);
         addExtensions(commandList);

@@ -2,11 +2,13 @@ package telegram.commands;
 
 import models.commands.CommandStateHandler;
 import models.commands.CommandStates;
+import models.db.sqlops.dish.DishSelectOptions;
 import models.db.sqlops.dish.DishUpdateOptions;
 import models.db.sqlops.usercontext.UserContextDeleteOptions;
 import models.db.sqlops.usercontext.UserContextInsertOptions;
 import models.db.sqlops.usercontext.UserContextSelectOptions;
 import models.db.sqlops.usercontext.UserContextUpdateOptions;
+import models.dtos.DishDTO;
 import models.dtos.UserContextDTO;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.telegram.telegrambots.abilitybots.api.objects.Ability;
@@ -14,6 +16,7 @@ import org.telegram.telegrambots.abilitybots.api.objects.Flag;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import language.ru.BotMessages;
+import language.ru.UserMessages;
 import telegram.bot.PovaryoshkaBot;
 
 import java.sql.SQLException;
@@ -53,7 +56,7 @@ public class UpdateDishCommand extends AbstractCommand {
             .name(UPDATE_DISH_COMMAND_SETTINGS.commandName())
             .info(UPDATE_DISH_COMMAND_SETTINGS.commandDescription())
             .privacy(PUBLIC)
-            .locality(ALL) // ?
+            .locality(ALL)
             .action(ctx -> {
                 final Update update = ctx.update();
                 try {
@@ -63,7 +66,7 @@ public class UpdateDishCommand extends AbstractCommand {
                         return;
                     }
                     sendSilently(message, update);
-                    sendSilently(BotMessages.WRITE_DISH_NAME_FROM_LIST_TO_DELETE, update);
+                    sendSilently(BotMessages.WRITE_DISH_NAME_FROM_LIST_TO_UPDATE, update);
                     dbDriver.insertUserContext(
                         new UserContextInsertOptions(
                             ctx.user().getId(),
@@ -105,11 +108,17 @@ public class UpdateDishCommand extends AbstractCommand {
 
     private void handleDishNameState(@NonNull final Update update, @NonNull final UserContextDTO userContextDTO) {
         try {
+            final long userId = update.getMessage().getFrom().getId();
+            final String dishName = update.getMessage().getText().trim();
+            if (!isDishNameExist(userId, dishName)) {
+                sendSilently(BotMessages.THIS_DISH_NAME_IS_NOT_FROM_LIST, update);
+                return;
+            }
             dbDriver.updateUserContext(
                 new UserContextUpdateOptions(
-                    update.getMessage().getFrom().getId(),
+                    userId,
                     INGREDIENTS_UPDATE_CONFIRM,
-                    update.getMessage().getText().trim()
+                    dishName
                 )
             );
             sendSilently(BotMessages.CONFIRM_INGREDIENTS_UPDATE, update);
@@ -119,16 +128,24 @@ public class UpdateDishCommand extends AbstractCommand {
         }
     }
 
+    private boolean isDishNameExist(final long userId, final String dishName) throws SQLException {
+        final DishDTO dishDTO = dbDriver.selectDish(
+            new DishSelectOptions(userId, dishName)
+        );
+        return dishDTO != null ? true : false;
+    }
+
     private void handleIngredientsUpdateConfirmState(@NonNull final Update update, @NonNull final UserContextDTO userContextDTO) {
         try {
             final long userId = update.getMessage().getFrom().getId();
-            if (update.getMessage().getText().trim().equalsIgnoreCase("Нет")) {
-                sendSilently(BotMessages.INGREDIENTS_ARE_NOT_UPDATED, update);
+            if (update.getMessage().getText().trim().equalsIgnoreCase(UserMessages.NO)) {
                 dbDriver.updateUserContextCommandState(new UserContextUpdateOptions(
                     userId,
                     RECIPE_UPDATE_CONFIRM,
                     null
                 ));
+                sendSilently(BotMessages.INGREDIENTS_ARE_NOT_UPDATED, update);
+                sendSilently(BotMessages.CONFIRM_RECIPE_UPDATE, update);
                 return;
             }
             sendSilently(BotMessages.INPUT_NEW_INGREDIENTS, update);
@@ -179,13 +196,14 @@ public class UpdateDishCommand extends AbstractCommand {
     private void handleRecipeUpdateConfirmState(@NonNull final Update update, @NonNull final UserContextDTO userContextDTO) {
         try {
             final long userId = update.getMessage().getFrom().getId();
-            if (update.getMessage().getText().trim().equalsIgnoreCase("Нет")) {
-                sendSilently(BotMessages.RECIPE_IS_NOT_UPDATED, update);
+            if (update.getMessage().getText().trim().equalsIgnoreCase(UserMessages.NO)) {
                 dbDriver.deleteUserContext(
                     new UserContextDeleteOptions(
                         userId
                     )
                 );
+                sendSilently(BotMessages.RECIPE_IS_NOT_UPDATED, update);
+                sendSilently(BotMessages.DISH_WAS_UPDATED_WITH_SUCCESS, update);
                 return;
             }
             sendSilently(BotMessages.INPUT_NEW_RECIPE, update);

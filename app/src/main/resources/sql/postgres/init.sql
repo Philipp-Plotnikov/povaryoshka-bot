@@ -48,7 +48,6 @@ CREATE TABLE IF NOT EXISTS public.ingredient (
         ON DELETE CASCADE
 );
 
--- Think about foreign key for dish_name
 CREATE TABLE IF NOT EXISTS public.user_context (
     user_id bigint NOT NULL,
     multi_state_command_type multi_state_command_types NOT NULL,

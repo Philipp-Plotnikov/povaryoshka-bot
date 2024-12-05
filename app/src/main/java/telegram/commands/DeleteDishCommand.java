@@ -40,7 +40,7 @@ public class DeleteDishCommand extends AbstractCommand {
             .name(DELETE_DISH_COMMAND_SETTINGS.commandName())
             .info(DELETE_DISH_COMMAND_SETTINGS.commandDescription())
             .privacy(PUBLIC)
-            .locality(ALL) // ?
+            .locality(ALL)
             .action(ctx -> {
                 final Update update = ctx.update();
                 try {
