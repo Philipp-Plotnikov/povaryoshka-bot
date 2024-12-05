@@ -20,8 +20,9 @@ import language.ru.BotMessages;
 
 import static models.commands.CommandConfig.CREATE_DISH_COMMAND_SETTINGS;
 import static models.commands.CommandStates.DISH_NAME;
-import static models.commands.CommandStates.INGREDIENTS;
-import static models.commands.CommandStates.RECIPE;
+import static models.commands.CommandStates.DISH_NAME_UPDATE;
+import static models.commands.CommandStates.INGREDIENTS_UPDATE;
+import static models.commands.CommandStates.RECIPE_UPDATE;
 import static models.commands.MultiStateCommandTypes.CREATE;
 
 import models.commands.CommandStateHandler;
@@ -48,9 +49,9 @@ public class CreateDishCommand extends AbstractCommand {
     }
 
     private void initStateHandlersMap() {
-        stateHandlersMap.put(DISH_NAME, this::handleDishNameState);
-        stateHandlersMap.put(INGREDIENTS, this::handleIngredientsState);
-        stateHandlersMap.put(RECIPE, this::handleRecipeState);
+        stateHandlersMap.put(DISH_NAME_UPDATE, this::handleDishNameUpdateState);
+        stateHandlersMap.put(INGREDIENTS_UPDATE, this::handleIngredientsUpdateState);
+        stateHandlersMap.put(RECIPE_UPDATE, this::handleRecipeUpdateState);
     }
 
     @NonNull
@@ -67,9 +68,9 @@ public class CreateDishCommand extends AbstractCommand {
                     dbDriver.insertUserContext(
                         new UserContextInsertOptions(
                             ctx.user().getId(),
-                                CREATE,
-                                DISH_NAME,
-                                null
+                            CREATE,
+                            DISH_NAME_UPDATE,
+                            null
                         )
                     );
                 } catch (SQLException e) {
@@ -101,83 +102,102 @@ public class CreateDishCommand extends AbstractCommand {
             .build();
     }
 
-    private void handleDishNameState(@NonNull final Update update, @NonNull final UserContextDTO userContextDTO)
-    {
+    private void handleDishNameUpdateState(
+        @NonNull final Update update,
+        @NonNull final UserContextDTO userContextDTO
+    ) {
         try {
-            dbDriver.updateUserContext(
-                new UserContextUpdateOptions(
-                    update.getMessage().getFrom().getId(),
-                    INGREDIENTS,
-                    update.getMessage().getText().trim()
-                )
+            dbDriver.executeAsTransaction(
+                () -> {
+                    final long userId = update.getMessage().getFrom().getId();
+                    final String dishName = update.getMessage().getText().trim();
+                    dbDriver.insertDish(
+                        new DishInsertOptions(
+                            userId,
+                            dishName,
+                            null,
+                            null
+                        )
+                    );
+                    dbDriver.updateUserContext(
+                        new UserContextUpdateOptions(
+                            userId,
+                            INGREDIENTS_UPDATE,
+                            dishName
+                        )
+                    );
+                }
             );
-            dbDriver.insertDish(
-                new DishInsertOptions(
-                    update.getMessage().getFrom().getId(),
-                    update.getMessage().getText().trim(),
-                    new ArrayList<>(),
-                    null
-                )
-            );
-            povaryoshkaBot.getSilent().send(BotMessages.WRITE_INGREDIENTS, update.getMessage().getChatId());
+            sendSilently(BotMessages.WRITE_INGREDIENTS, update);
         } catch (Exception e) {
             sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
             System.out.println(e);
         }
     }
 
-    private void handleIngredientsState(
+    private void handleIngredientsUpdateState(
         @NonNull final Update update,
         @NonNull final UserContextDTO userContextDTO
     ) {
         try {
-            dbDriver.updateUserContext(
-                new UserContextUpdateOptions(
-                    update.getMessage().getFrom().getId(),
-                    RECIPE,
-                    userContextDTO.getDishName()
-                )
-            );
+            final String ingredients = update.getMessage().getText().trim();
             final List<String> ingredientList = Collections.unmodifiableList(
-                Arrays.asList(update.getMessage().getText().trim().split(", "))
+                Arrays.asList(ingredients.split(", "))
             );
-            dbDriver.updateDish(
-                new DishUpdateOptions(
-                    update.getMessage().getFrom().getId(),
-                    userContextDTO.getDishName(),
-                    null,
-                    ingredientList,
-                    null
-                )
+            dbDriver.executeAsTransaction(
+                () -> {
+                    final long userId = update.getMessage().getFrom().getId();
+                    dbDriver.updateDish(
+                        new DishUpdateOptions(
+                            userId,
+                            userContextDTO.getDishName(),
+                            null,
+                            ingredientList,
+                            null
+                        )
+                    );
+                    dbDriver.updateUserContext(
+                        new UserContextUpdateOptions(
+                            userId,
+                            RECIPE_UPDATE,
+                            userContextDTO.getDishName()
+                        )
+                    );
+                }
             );
-            povaryoshkaBot.getSilent().send(BotMessages.WRITE_RECIPE, update.getMessage().getChatId());
+            sendSilently(BotMessages.WRITE_RECIPE, update);
         } catch (Exception e) {
             sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
             System.out.println(e);
         }
     }
 
-    private void handleRecipeState(
+    private void handleRecipeUpdateState(
         @NonNull final Update update,
         @NonNull final UserContextDTO userContextDTO
     ) {
         try {
-            dbDriver.deleteUserContext(
-                new UserContextDeleteOptions(update.getMessage().getFrom().getId())
-            );
+            final long userId = update.getMessage().getFrom().getId();
             final DishDTO dishDTO = dbDriver.selectDish(
-                new DishSelectOptions(update.getMessage().getFrom().getId(), userContextDTO.getDishName())
+                new DishSelectOptions(userId, userContextDTO.getDishName())
             );
-            dbDriver.updateDish(
-                new DishUpdateOptions(
-                    update.getMessage().getFrom().getId(),
-                    userContextDTO.getDishName(),
-                    null,
-                    dishDTO.getIngredientList(),
-                    update.getMessage().getText().trim()
-                )
+            dbDriver.executeAsTransaction(
+                () -> {
+                    dbDriver.updateDish(
+                        new DishUpdateOptions(
+                            userId,
+                            userContextDTO.getDishName(),
+                            null,
+                            dishDTO.getIngredientList(),
+                            update.getMessage().getText().trim()
+                        )
+                    );
+                    dbDriver.deleteUserContext(
+                        new UserContextDeleteOptions(userId)
+                    );
+                }
             );
-            povaryoshkaBot.getSilent().send(BotMessages.DISH_WAS_CREATED_WITH_SUCCESS, update.getMessage().getChatId());
+            sendSilently(BotMessages.DISH_WAS_CREATED_WITH_SUCCESS, update);
         } catch(Exception e) {
             sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
             System.out.println(e);

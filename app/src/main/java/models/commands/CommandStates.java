@@ -6,12 +6,12 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public enum CommandStates {
     DISH_NAME("dish_name"),
     DISH_NAME_UPDATE_CONFIRM("dish_name_update_confirm"),
-    NEW_DISH_NAME("new_dish_name"),
+    DISH_NAME_UPDATE("dish_name_update"),
     INGREDIENTS_UPDATE_CONFIRM("ingredients_update_confirm"),
-    INGREDIENTS("ingredients"),
+    INGREDIENTS_UPDATE("ingredients_update"),
     RECIPE_UPDATE_CONFIRM("recipe_update_confirm"),
-    RECIPE("recipe"),
-    FEEDBACK("feedback");
+    RECIPE_UPDATE("recipe_update"),
+    FEEDBACK_UPDATE("feedback_update");
 
     @NonNull
     private final String value;

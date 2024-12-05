@@ -46,7 +46,7 @@ public class FeedbackCommand extends AbstractCommand {
                         new UserContextInsertOptions(
                             ctx.user().getId(),
                             FEEDBACK,
-                            CommandStates.FEEDBACK,
+                            CommandStates.FEEDBACK_UPDATE,
                             null
                         )
                     );

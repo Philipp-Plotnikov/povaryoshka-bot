@@ -98,7 +98,7 @@ public class GetDishCommand extends AbstractCommand {
         final String formatIngredienListInfo = getFormatIngredientListInfo(selectedDish);
         final String formatRecipeInfo = getFormatRecipeInfo(selectedDish);
         final String formatDishInfo = String.format(
-            "%s: %s\n%s: %s\n%s: %s",
+            "%s: %s\n\n%s: %s\n\n%s: %s",
             BotMessages.DISH_NAME,
             selectedDish.getName(),
             BotMessages.INGREDIENTS,

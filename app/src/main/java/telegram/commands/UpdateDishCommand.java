@@ -45,11 +45,11 @@ public class UpdateDishCommand extends AbstractCommand {
     private void initStateHandlersMap() {
         stateHandlersMap.put(DISH_NAME, this::handleDishNameState);
         stateHandlersMap.put(INGREDIENTS_UPDATE_CONFIRM, this::handleIngredientsUpdateConfirmState);
-        stateHandlersMap.put(INGREDIENTS, this::handleIngredientsState);
+        stateHandlersMap.put(INGREDIENTS_UPDATE, this::handleIngredientsUpdateState);
         stateHandlersMap.put(RECIPE_UPDATE_CONFIRM, this::handleRecipeUpdateConfirmState);
-        stateHandlersMap.put(RECIPE, this::handleRecipeState);
+        stateHandlersMap.put(RECIPE_UPDATE, this::handleRecipeUpdateState);
         stateHandlersMap.put(DISH_NAME_UPDATE_CONFIRM, this::handleDishNameUpdateConfirmState);
-        stateHandlersMap.put(NEW_DISH_NAME, this::handleNewDishNameState);
+        stateHandlersMap.put(DISH_NAME_UPDATE, this::handleDishNameUpdateState);
     }
 
     @NonNull
@@ -119,9 +119,74 @@ public class UpdateDishCommand extends AbstractCommand {
             dbDriver.updateUserContext(
                 new UserContextUpdateOptions(
                     userId,
-                    INGREDIENTS_UPDATE_CONFIRM,
+                    DISH_NAME_UPDATE_CONFIRM,
                     dishName
                 )
+            );
+            sendSilently(BotMessages.CONFIRM_DISH_NAME_UPDATE, update);
+        } catch (Exception e) {
+            sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
+            System.out.println(e);
+        }
+    }
+
+    private void handleDishNameUpdateConfirmState(@NonNull final Update update, @NonNull final UserContextDTO userContextDTO) {
+        try {
+            final long userId = update.getMessage().getFrom().getId();
+            final String userMessage = update.getMessage().getText().trim();
+            if (userMessage.equalsIgnoreCase(UserMessages.NO)) {
+                dbDriver.updateUserContextCommandState(
+                    new UserContextUpdateOptions(
+                        userId,
+                        INGREDIENTS_UPDATE_CONFIRM,
+                        null
+                    )
+                );
+                sendSilently(BotMessages.DISH_NAME_IS_NOT_UPDATED, update);
+                sendSilently(BotMessages.CONFIRM_INGREDIENTS_UPDATE, update);
+                return;
+            }
+            if (userMessage.equalsIgnoreCase(UserMessages.YES)){
+                dbDriver.updateUserContextCommandState(
+                    new UserContextUpdateOptions(
+                        userId,
+                        DISH_NAME_UPDATE,
+                        null
+                    )
+                );
+                sendSilently(BotMessages.INPUT_NEW_DISH_NAME, update);
+                return;
+            }
+            sendSilently(BotMessages.ENTER_YES_OR_NO, update);
+        } catch (Exception e) {
+            sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
+            System.out.println(e);
+        }
+    }
+
+    private void handleDishNameUpdateState(@NonNull final Update update, @NonNull final UserContextDTO userContextDTO) {
+        try {
+            final long userId = update.getMessage().getFrom().getId();
+            final String newDishName = update.getMessage().getText().trim();
+            dbDriver.executeAsTransaction(
+                () -> {
+                    dbDriver.updateDishName(
+                        new DishUpdateOptions(
+                            userId,
+                            userContextDTO.getDishName(),
+                            newDishName,
+                            null,
+                            null
+                        )
+                    );
+                    dbDriver.updateUserContext(
+                        new UserContextUpdateOptions(
+                            userId,
+                            INGREDIENTS_UPDATE_CONFIRM,
+                            newDishName
+                        )
+                    );
+                }
             );
             sendSilently(BotMessages.CONFIRM_INGREDIENTS_UPDATE, update);
         } catch (Exception e) {
@@ -140,34 +205,38 @@ public class UpdateDishCommand extends AbstractCommand {
     private void handleIngredientsUpdateConfirmState(@NonNull final Update update, @NonNull final UserContextDTO userContextDTO) {
         try {
             final long userId = update.getMessage().getFrom().getId();
-            if (update.getMessage().getText().trim().equalsIgnoreCase(UserMessages.NO)) {
-                dbDriver.updateUserContextCommandState(new UserContextUpdateOptions(
-                    userId,
-                    RECIPE_UPDATE_CONFIRM,
-                    null
-                ));
+            final String userMessage = update.getMessage().getText().trim();
+            if (userMessage.equalsIgnoreCase(UserMessages.NO)) {
+                dbDriver.updateUserContextCommandState(
+                    new UserContextUpdateOptions(
+                        userId,
+                        RECIPE_UPDATE_CONFIRM,
+                        null
+                    )
+                );
                 sendSilently(BotMessages.INGREDIENTS_ARE_NOT_UPDATED, update);
                 sendSilently(BotMessages.CONFIRM_RECIPE_UPDATE, update);
+                return;
             }
-            else if (update.getMessage().getText().trim().equalsIgnoreCase(UserMessages.YES)){
+            if (userMessage.equalsIgnoreCase(UserMessages.YES)){
                 sendSilently(BotMessages.INPUT_NEW_INGREDIENTS, update);
-                dbDriver.updateUserContextCommandState(new UserContextUpdateOptions(
+                dbDriver.updateUserContextCommandState(
+                    new UserContextUpdateOptions(
                         userId,
-                        INGREDIENTS,
+                        INGREDIENTS_UPDATE,
                         null
-                ));
+                    )
+                );
+                return;
             }
-            else{
-                sendSilently(BotMessages.SORRY_ENTER_YES_NO, update);
-            }
-
+            sendSilently(BotMessages.ENTER_YES_OR_NO, update);
         } catch (Exception e) {
             sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
             System.out.println(e);
         }
     }
 
-    private void handleIngredientsState(@NonNull final Update update, @NonNull final UserContextDTO userContextDTO) {
+    private void handleIngredientsUpdateState(@NonNull final Update update, @NonNull final UserContextDTO userContextDTO) {
         try {
             final long userId = update.getMessage().getFrom().getId();
             final List<String> ingredientList = Collections.unmodifiableList(
@@ -203,36 +272,34 @@ public class UpdateDishCommand extends AbstractCommand {
     private void handleRecipeUpdateConfirmState(@NonNull final Update update, @NonNull final UserContextDTO userContextDTO) {
         try {
             final long userId = update.getMessage().getFrom().getId();
-            if (update.getMessage().getText().trim().equalsIgnoreCase(UserMessages.NO)) {
-                dbDriver.updateUserContextCommandState(new UserContextUpdateOptions(
-                        userId,
-                        DISH_NAME_UPDATE_CONFIRM,
-                        null
-                ));
+            final String userMessage = update.getMessage().getText().trim();
+            if (userMessage.equalsIgnoreCase(UserMessages.NO)) {
+                dbDriver.deleteUserContext(
+                    new UserContextDeleteOptions(userId)
+                );
                 sendSilently(BotMessages.RECIPE_IS_NOT_UPDATED, update);
                 sendSilently(BotMessages.DISH_WAS_UPDATED_WITH_SUCCESS, update);
+                return;
             }
-            else if (update.getMessage().getText().trim().equalsIgnoreCase(UserMessages.YES)){
-                sendSilently(BotMessages.INPUT_NEW_RECIPE, update);
+            if (userMessage.equalsIgnoreCase(UserMessages.YES)){
                 dbDriver.updateUserContextCommandState(
-                        new UserContextUpdateOptions(
-                                userId,
-                                RECIPE,
-                                null
-                        )
+                    new UserContextUpdateOptions(
+                        userId,
+                        RECIPE_UPDATE,
+                        null
+                    )
                 );
+                sendSilently(BotMessages.INPUT_NEW_RECIPE, update);
+                return;
             }
-            else {
-                sendSilently(BotMessages.SORRY_ENTER_YES_NO, update);
-
-            }
+            sendSilently(BotMessages.ENTER_YES_OR_NO, update);
         } catch (Exception e) {
             sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
             System.out.println(e);
         }
     }
 
-    private void handleRecipeState(@NonNull final Update update, @NonNull final UserContextDTO userContextDTO) {
+    private void handleRecipeUpdateState(@NonNull final Update update, @NonNull final UserContextDTO userContextDTO) {
         try {
             final long userId = update.getMessage().getFrom().getId();
             final String recipe = update.getMessage().getText().trim();
@@ -247,73 +314,10 @@ public class UpdateDishCommand extends AbstractCommand {
                             recipe
                         )
                     );
-                    dbDriver.updateUserContextCommandState(
-                            new UserContextUpdateOptions(
-                                    userId,
-                                    DISH_NAME_UPDATE_CONFIRM,
-                                    null
-                            )
+                    dbDriver.deleteUserContext(
+                         new UserContextDeleteOptions(userId)
                     );
                 }
-            );
-            sendSilently(BotMessages.CONFIRM_DISH_NAME_UPDATE, update);
-        } catch (Exception e) {
-            sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
-            System.out.println(e);
-        }
-    }
-
-    private void handleDishNameUpdateConfirmState(@NonNull final Update update, @NonNull final UserContextDTO userContextDTO) {
-        try {
-            final long userId = update.getMessage().getFrom().getId();
-            if (update.getMessage().getText().trim().equalsIgnoreCase(UserMessages.NO)) {
-                dbDriver.deleteUserContext(
-                        new UserContextDeleteOptions(
-                                userId
-                        )
-                );
-                sendSilently(BotMessages.DISH_NAME_ARE_NOT_UPDATED, update);
-                sendSilently(BotMessages.DISH_WAS_UPDATED_WITH_SUCCESS, update);
-            }
-            else if (update.getMessage().getText().trim().equalsIgnoreCase(UserMessages.YES)){
-                sendSilently(BotMessages.INPUT_NEW_DISH_NAME, update);
-                dbDriver.updateUserContextCommandState(new UserContextUpdateOptions(
-                        userId,
-                        NEW_DISH_NAME,
-                        null
-                ));
-            }
-            else{
-                sendSilently(BotMessages.SORRY_ENTER_YES_NO, update);
-            }
-
-        } catch (Exception e) {
-            sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
-            System.out.println(e);
-        }
-    }
-
-    private void handleNewDishNameState(@NonNull final Update update, @NonNull final UserContextDTO userContextDTO) {
-        try {
-            final long userId = update.getMessage().getFrom().getId();
-            final String newDishName = update.getMessage().getText().trim();
-            dbDriver.executeAsTransaction(
-                    () -> {
-                        dbDriver.updateDishName(
-                                new DishUpdateOptions(
-                                        userId,
-                                        userContextDTO.getDishName(),
-                                        newDishName,
-                                        null,
-                                        null
-                                )
-                        );
-                        dbDriver.deleteUserContext(
-                                new UserContextDeleteOptions(
-                                        userId
-                                )
-                        );
-                    }
             );
             sendSilently(BotMessages.DISH_WAS_UPDATED_WITH_SUCCESS, update);
         } catch (Exception e) {
@@ -322,7 +326,7 @@ public class UpdateDishCommand extends AbstractCommand {
         }
     }
 
-    private Predicate<Update> isUpdateContext(){
+    private Predicate<Update> isUpdateContext() {
         return update -> {
             boolean isUpdateContext = false;
             if (update.getMessage().getText().equals("/end")){

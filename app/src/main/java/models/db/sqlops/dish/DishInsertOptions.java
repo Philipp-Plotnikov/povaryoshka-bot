@@ -13,6 +13,8 @@ public record DishInsertOptions(
     @Nullable String recipe
 ) {
     public DishInsertOptions {
-        ingredientList = Collections.unmodifiableList(ingredientList);
+        ingredientList = ingredientList == null
+                ? ingredientList
+                : Collections.unmodifiableList(ingredientList);
     }
 }

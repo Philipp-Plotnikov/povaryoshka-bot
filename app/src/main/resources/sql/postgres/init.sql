@@ -19,12 +19,12 @@ BEGIN
         CREATE TYPE command_states AS ENUM (
             'dish_name',
             'dish_name_update_confirm',
-            'new_dish_name',
+            'dish_name_update',
             'ingredients_update_confirm',
-            'ingredients',
+            'ingredients_update',
             'recipe_update_confirm',
-            'recipe',
-            'feedback'
+            'recipe_update',
+            'feedback_update'
         );
     END IF;
 END
