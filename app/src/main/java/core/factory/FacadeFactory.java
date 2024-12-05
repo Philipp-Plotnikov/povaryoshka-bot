@@ -1,5 +1,6 @@
 package core.factory;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import org.telegram.telegrambots.abilitybots.api.util.AbilityExtension;
@@ -28,7 +29,7 @@ public class FacadeFactory {
         commandFactory = commandFactoryProducer.getCommandFactory(commandType);
     }
 
-    public DbDriver getDbDriver() {
+    public DbDriver getDbDriver() throws SQLException {
         return dbDriverFactory.getDbDriver();
     }
 

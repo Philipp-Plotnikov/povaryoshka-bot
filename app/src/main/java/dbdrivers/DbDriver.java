@@ -21,9 +21,7 @@ import models.db.sqlops.usercontext.UserContextUpdateOptions;
 import models.dtos.DishDTO;
 import models.dtos.UserContextDTO;
 
-public interface DbDriver extends AutoCloseable {
-    public void connect() throws SQLException;
-    
+public interface DbDriver extends AutoCloseable {    
     public void setup() throws SQLException, Exception;
     
     public void executeAsTransaction(@NonNull SQLStatementBatch sqlStatementBatch) throws SQLException, Exception;
@@ -41,6 +39,8 @@ public interface DbDriver extends AutoCloseable {
     
     public void updateDish(@NonNull final DishUpdateOptions updateOptions) throws SQLException, Exception;
     
+    public void updateDishName(@NonNull final DishUpdateOptions updateOptions) throws SQLException, Exception;
+
     public void updateDishIngredientList(@NonNull final DishUpdateOptions updateOptions) throws SQLException, Exception;
     
     public void updateDishRecipe(@NonNull final DishUpdateOptions updateOptions) throws SQLException;

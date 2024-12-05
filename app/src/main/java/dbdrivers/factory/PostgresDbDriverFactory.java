@@ -12,6 +12,8 @@ import static models.EnvVars.DB_USERNAME;
 import static models.EnvVars.INIT_SQL_SCRIPT_PATH;
 import static models.EnvVars.IS_DISTRIBUTED_DATABASE;
 
+import java.sql.SQLException;
+
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import models.db.drivers.postgres.PostgresDbDriverOptions;
@@ -19,7 +21,8 @@ import models.db.drivers.postgres.PostgresDbDriverOptions;
 public class PostgresDbDriverFactory implements DbDriverFactory {
     @Override
     @NonNull
-    public DbDriver getDbDriver() {
+    public DbDriver getDbDriver() throws SQLException
+    {
         final PostgresDbDriverOptions postgresDbDriverOptions = new PostgresDbDriverOptions(
             System.getenv(DB_HOST),
             Integer.parseInt(System.getenv(DB_PORT)),

@@ -10,8 +10,6 @@ import static models.EnvVars.TELEGRAM_BOT_API_TOKEN;
 import telegram.bot.PovaryoshkaBot;
 
 public class Main {
-
-    // TODO: Organise code
     public static void main(String[] args) {
         try (
             TelegramBotsLongPollingApplication botsApplication = new TelegramBotsLongPollingApplication();

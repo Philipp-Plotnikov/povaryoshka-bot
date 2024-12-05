@@ -9,10 +9,13 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public record DishUpdateOptions(
     long userId,
     @NonNull String dishName,
+    @Nullable String newDishName,
     @Nullable List<String> ingredientList,
     @Nullable String recipe
 ) {
     public DishUpdateOptions {
-        ingredientList = Collections.unmodifiableList(ingredientList);
+        ingredientList = ingredientList == null
+                ? ingredientList
+                : Collections.unmodifiableList(ingredientList);
     }
 }

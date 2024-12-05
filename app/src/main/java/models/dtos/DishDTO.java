@@ -63,7 +63,9 @@ public class DishDTO {
         @Nullable final String recipe
     ) {
         this.name = dishName;
-        this.ingredientList = Collections.unmodifiableList(ingredientList);
+        this.ingredientList = ingredientList == null
+                ? ingredientList
+                : Collections.unmodifiableList(ingredientList);
         this.recipe = recipe;
     }
 

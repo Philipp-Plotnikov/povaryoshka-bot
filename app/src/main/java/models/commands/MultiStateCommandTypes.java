@@ -2,6 +2,7 @@ package models.commands;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+
 public enum MultiStateCommandTypes {
     CREATE("create"),
     GET("get"),

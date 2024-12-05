@@ -18,9 +18,13 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'command_states') THEN
         CREATE TYPE command_states AS ENUM (
             'dish_name',
-            'ingredients',
-            'recipe',
-            'feedback'
+            'dish_name_update_confirm',
+            'dish_name_update',
+            'ingredients_update_confirm',
+            'ingredients_update',
+            'recipe_update_confirm',
+            'recipe_update',
+            'feedback_update'
         );
     END IF;
 END
@@ -38,10 +42,12 @@ CREATE TABLE IF NOT EXISTS public.ingredient (
     dish_name text NOT NULL,
     ingredient text,
     PRIMARY KEY (user_id, dish_name, ingredient),
-    FOREIGN KEY (user_id, dish_name) REFERENCES recipe (user_id, dish_name) ON DELETE CASCADE
+    FOREIGN KEY (user_id, dish_name)
+        REFERENCES recipe (user_id, dish_name)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 );
 
--- Think about foreign key for dish_name
 CREATE TABLE IF NOT EXISTS public.user_context (
     user_id bigint NOT NULL,
     multi_state_command_type multi_state_command_types NOT NULL,
