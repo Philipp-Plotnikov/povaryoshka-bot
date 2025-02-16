@@ -3,7 +3,7 @@ package language.ru;
 
 public class BotMessages {
     public static final String WRITE_DISH_NAME = "Выбери название для блюда";
-    public static final String WRITE_INGREDIENTS = "Перечисли ингредиенты";
+    public static final String WRITE_INGREDIENTS = "Перечисли ингредиенты через запятую \nНапример: картошка, морковка, жабья ножка";
     public static final String WRITE_RECIPE = "А теперь напиши рецепт";
     public static final String SOMETHING_WENT_WRONG = "Упс, кажется, что-то пошло не так. Попробуй, пожалуйста, ещё раз";
     public static final String DISH_WAS_CREATED_WITH_SUCCESS = "Блюдо успешно записано";
