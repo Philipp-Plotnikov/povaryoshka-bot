@@ -1,7 +1,6 @@
 package telegram.commands;
 
 import java.sql.SQLException;
-import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -136,16 +135,20 @@ public class CreateDishCommand extends AbstractCommand {
         }
     }
 
+    private List<String> handleIngredientList(final String ingredients) {
+        final List<String> ingredientList = Arrays.asList(ingredients.split(","));
+        ingredientList.replaceAll(String::trim);
+        return ingredientList;
+    }
+
     private void handleIngredientsUpdateState(
         @NonNull final Update update,
         @NonNull final UserContextDTO userContextDTO
     ) {
         try {
             final String ingredients = update.getMessage().getText().trim();
-            final List<String> ingredientList = Arrays.asList(ingredients.split(","));
-            ingredientList.replaceAll(String::trim);
-            final List<String> ingredientListMod = Collections.unmodifiableList(
-                    ingredientList);
+            final List<String> ingredientList = Collections.unmodifiableList(
+                    handleIngredientList(ingredients));
             dbDriver.executeAsTransaction(
                 () -> {
                     final long userId = update.getMessage().getFrom().getId();
@@ -154,7 +157,7 @@ public class CreateDishCommand extends AbstractCommand {
                             userId,
                             userContextDTO.getDishName(),
                             null,
-                            ingredientListMod,
+                            ingredientList,
                             null
                         )
                     );
