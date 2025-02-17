@@ -134,9 +134,9 @@ public class CreateDishCommand extends AbstractCommand {
             System.out.println(e);
         }
     }
-
+    @NonNull
     private List<String> handleIngredientList(final String ingredients) {
-        final List<String> ingredientList = Arrays.asList(ingredients.split(","));
+        final List<String> ingredientList = Arrays.asList(ingredients.toLowerCase().split(","));
         ingredientList.replaceAll(String::trim);
         return ingredientList;
     }
