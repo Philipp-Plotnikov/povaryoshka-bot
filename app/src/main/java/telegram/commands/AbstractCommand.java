@@ -35,6 +35,11 @@ public abstract class AbstractCommand implements AbilityExtension {
         return povaryoshkaBot.getSilent().send(message, update.getMessage().getChatId());
     }
 
+    @NonNull
+    protected Optional<Message> sendSilentlyMarkdownOn(@NonNull String message, @NonNull Update update) {
+        return povaryoshkaBot.getSilent().sendMd(message, update.getMessage().getChatId());
+    }
+
     @Nullable
     protected String getUserDishList(MessageContext ctx) throws SQLException {
         if (ctx == null) {

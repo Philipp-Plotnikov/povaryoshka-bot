@@ -78,7 +78,7 @@ public class GetDishCommand extends AbstractCommand {
                         }
                         final String formatDishInfo = getFormatDishInfo(selectedDish);
                         sendSilently(BotMessages.USER_DISH_IS, update);
-                        sendSilently(formatDishInfo, update);
+                        sendSilentlyMarkdownOn(formatDishInfo, update);
                         dbDriver.deleteUserContext(
                             new UserContextDeleteOptions(userId)
                         );
@@ -98,7 +98,7 @@ public class GetDishCommand extends AbstractCommand {
         final String formatIngredienListInfo = getFormatIngredientListInfo(selectedDish);
         final String formatRecipeInfo = getFormatRecipeInfo(selectedDish);
         final String formatDishInfo = String.format(
-            "%s: %s\n\n%s: %s\n\n%s: %s",
+            "%s: `%s`\n\n%s: `%s`\n\n%s: `%s`",
             BotMessages.DISH_NAME,
             selectedDish.getName(),
             BotMessages.INGREDIENTS,
@@ -113,7 +113,7 @@ public class GetDishCommand extends AbstractCommand {
     private String getFormatIngredientListInfo(@NonNull DishDTO selectedDish) {
         final List<String> ingredientList = selectedDish.getIngredientList();
         return ingredientList != null
-            ? String.join(", ", ingredientList)
+            ? String.join("", ingredientList).replace("\n", ", ")
             : BotMessages.NO_INFO;
     }
 
