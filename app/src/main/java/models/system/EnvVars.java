@@ -1,4 +1,4 @@
-package models;
+package models.system;
 
 public class EnvVars {
     public static final String DB_TYPE = "DB_TYPE";

@@ -4,9 +4,9 @@ import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
-import static models.EnvVars.BOT_USERNAME;
-import static models.EnvVars.CREATOR_ID;
-import static models.EnvVars.TELEGRAM_BOT_API_TOKEN;
+import static models.system.EnvVars.BOT_USERNAME;
+import static models.system.EnvVars.CREATOR_ID;
+import static models.system.EnvVars.TELEGRAM_BOT_API_TOKEN;
 import telegram.bot.PovaryoshkaBot;
 
 public class Main {

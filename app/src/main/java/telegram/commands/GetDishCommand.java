@@ -1,5 +1,6 @@
 package telegram.commands;
 
+import models.commons.SendCommandOption;
 import models.db.sqlops.dish.DishSelectOptions;
 import models.db.sqlops.usercontext.UserContextDeleteOptions;
 import models.db.sqlops.usercontext.UserContextInsertOptions;
@@ -77,8 +78,9 @@ public class GetDishCommand extends AbstractCommand {
                             return;
                         }
                         final String formatDishInfo = getFormatDishInfo(selectedDish);
+                        final SendCommandOption markdown = new SendCommandOption(true);
                         sendSilently(BotMessages.USER_DISH_IS, update);
-                        sendSilentlyMarkdownOn(formatDishInfo, update);
+                        sendSilently(formatDishInfo, update, markdown);
                         dbDriver.deleteUserContext(
                             new UserContextDeleteOptions(userId)
                         );
@@ -98,7 +100,7 @@ public class GetDishCommand extends AbstractCommand {
         final String formatIngredienListInfo = getFormatIngredientListInfo(selectedDish);
         final String formatRecipeInfo = getFormatRecipeInfo(selectedDish);
         final String formatDishInfo = String.format(
-            "%s: `%s`\n\n%s: `%s`\n\n%s: `%s`",
+            "%s:\n`%s`\n\n%s:\n`%s`\n\n%s:\n`%s`",
             BotMessages.DISH_NAME,
             selectedDish.getName(),
             BotMessages.INGREDIENTS,
