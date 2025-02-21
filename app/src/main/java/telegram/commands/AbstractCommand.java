@@ -38,7 +38,7 @@ public abstract class AbstractCommand implements AbilityExtension {
 
     @NonNull
     protected Optional<Message> sendSilently(@NonNull String message, @NonNull Update update, @NonNull SendOptions sendOptions) {
-        return (sendOptions.markdown())
+        return (sendOptions.isMarkdown())
             ? povaryoshkaBot.getSilent().sendMd(message, update.getMessage().getChatId())
             : povaryoshkaBot.getSilent().send(message, update.getMessage().getChatId());
     }
