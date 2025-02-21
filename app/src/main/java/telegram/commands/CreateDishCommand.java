@@ -148,8 +148,7 @@ public class CreateDishCommand extends AbstractCommand {
     ) {
         try {
             final String ingredients = update.getMessage().getText().trim();
-            final List<String> ingredientList = Collections.unmodifiableList(
-                    handleIngredientList(ingredients));
+            final List<String> ingredientList = Collections.unmodifiableList(handleIngredientList(ingredients));
             dbDriver.executeAsTransaction(
                 () -> {
                     final long userId = update.getMessage().getFrom().getId();
