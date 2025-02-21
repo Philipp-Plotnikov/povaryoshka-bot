@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
+import models.commons.SendOptions;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.telegram.telegrambots.abilitybots.api.objects.MessageContext;
@@ -32,7 +33,14 @@ public abstract class AbstractCommand implements AbilityExtension {
 
     @NonNull
     protected Optional<Message> sendSilently(@NonNull String message, @NonNull Update update) {
-        return povaryoshkaBot.getSilent().send(message, update.getMessage().getChatId());
+        return sendSilently(message, update, new SendOptions(false));
+    }
+
+    @NonNull
+    protected Optional<Message> sendSilently(@NonNull String message, @NonNull Update update, @NonNull SendOptions sendOptions) {
+        return (sendOptions.isMarkdown())
+            ? povaryoshkaBot.getSilent().sendMd(message, update.getMessage().getChatId())
+            : povaryoshkaBot.getSilent().send(message, update.getMessage().getChatId());
     }
 
     @Nullable
@@ -54,4 +62,5 @@ public abstract class AbstractCommand implements AbilityExtension {
         }
         return messageBuilder.toString();
     }
+
 }
