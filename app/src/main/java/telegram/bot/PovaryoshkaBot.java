@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.telegram.telegrambots.abilitybots.api.bot.AbilityBot;
+import org.telegram.telegrambots.abilitybots.api.sender.SilentSender;
 import org.telegram.telegrambots.abilitybots.api.util.AbilityExtension;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
@@ -46,5 +47,9 @@ public class PovaryoshkaBot extends AbilityBot {
     @Override
     public long creatorId() {
         return creatorId;
+    }
+
+    public void setSilentSender(@NonNull SilentSender newSilentSender) {
+        silent = newSilentSender;
     }
 }
