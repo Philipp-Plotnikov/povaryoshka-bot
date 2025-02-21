@@ -135,13 +135,6 @@ public class CreateDishCommand extends AbstractCommand {
         }
     }
 
-    @NonNull
-    private List<String> handleIngredientList(@NonNull final String ingredients) {
-        final List<String> ingredientList = Arrays.asList(ingredients.toLowerCase().split(","));
-        ingredientList.replaceAll(String::trim);
-        return ingredientList;
-    }
-
     private void handleIngredientsUpdateState(
         @NonNull final Update update,
         @NonNull final UserContextDTO userContextDTO
@@ -175,6 +168,13 @@ public class CreateDishCommand extends AbstractCommand {
             sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
             System.out.println(e);
         }
+    }
+
+    @NonNull
+    private List<String> handleIngredientList(@NonNull final String ingredients) {
+        final List<String> ingredientList = Arrays.asList(ingredients.toLowerCase().split(","));
+        ingredientList.replaceAll(String::trim);
+        return ingredientList;
     }
 
     private void handleRecipeUpdateState(
