@@ -1,6 +1,6 @@
 package telegram.commands;
 
-import models.commons.SendCommandOption;
+import models.commons.SendOptions;
 import models.db.sqlops.dish.DishSelectOptions;
 import models.db.sqlops.usercontext.UserContextDeleteOptions;
 import models.db.sqlops.usercontext.UserContextInsertOptions;
@@ -78,7 +78,7 @@ public class GetDishCommand extends AbstractCommand {
                             return;
                         }
                         final String formatDishInfo = getFormatDishInfo(selectedDish);
-                        final SendCommandOption markdown = new SendCommandOption(true);
+                        final SendOptions markdown = new SendOptions(true);
                         sendSilently(BotMessages.USER_DISH_IS, update);
                         sendSilently(formatDishInfo, update, markdown);
                         dbDriver.deleteUserContext(
