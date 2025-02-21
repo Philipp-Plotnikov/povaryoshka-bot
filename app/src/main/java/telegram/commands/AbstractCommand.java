@@ -3,8 +3,12 @@ package telegram.commands;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
+import models.commands.MultiStateCommandTypes;
 import models.commons.SendOptions;
+import models.db.sqlops.usercontext.UserContextSelectOptions;
+import models.dtos.UserContextDTO;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.telegram.telegrambots.abilitybots.api.objects.MessageContext;
@@ -63,4 +67,26 @@ public abstract class AbstractCommand implements AbilityExtension {
         return messageBuilder.toString();
     }
 
+    @NonNull
+    protected Predicate<Update> isSpecifiedContext(@NonNull MultiStateCommandTypes commandType) {
+        return update -> {
+            boolean isSpecifiedContext = false;
+            if (update.getMessage().getText().equals("/end")){
+                return false;
+            }
+            try {
+                final UserContextDTO userContextDTO = dbDriver.selectUserContext(
+                        new UserContextSelectOptions(
+                                update.getMessage().getFrom().getId()
+                        )
+                );
+                if (userContextDTO != null && userContextDTO.getMultiStateCommandTypes() == commandType) {
+                    isSpecifiedContext = true;
+                }
+            } catch (SQLException e) {
+                System.out.println(e);
+            }
+            return isSpecifiedContext;
+        };
+    }
 }

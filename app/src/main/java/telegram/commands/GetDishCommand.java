@@ -90,7 +90,7 @@ public class GetDishCommand extends AbstractCommand {
                     }
                 },
                 Flag.TEXT,
-                isGetContext()
+                isSpecifiedContext(GET)
             )
             .build();
     }
@@ -125,27 +125,5 @@ public class GetDishCommand extends AbstractCommand {
         return recipe != null
             ? recipe
             : BotMessages.NO_INFO;
-    }
-
-    private Predicate<Update> isGetContext(){
-        return update -> {
-            boolean isGetContext = false;
-            if (update.getMessage().getText().equals("/end")){
-                return false;
-            }
-            try {
-                final UserContextDTO userContextDTO = dbDriver.selectUserContext(
-                    new UserContextSelectOptions(
-                        update.getMessage().getFrom().getId()
-                    )
-                );
-                if (userContextDTO != null && userContextDTO.getMultiStateCommandTypes() == GET) {
-                    isGetContext = true;
-                }
-            } catch(SQLException e) {
-                System.out.println(e);
-            }
-            return isGetContext;
-        };
     }
 }

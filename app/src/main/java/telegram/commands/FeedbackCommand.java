@@ -80,30 +80,8 @@ public class FeedbackCommand extends AbstractCommand {
                     }
                 },
                 Flag.TEXT,
-                isFeedbackContext()
+                isSpecifiedContext(FEEDBACK)
             )
             .build();
-    }
-
-    private Predicate<Update> isFeedbackContext(){
-        return update -> {
-            boolean isFeedbackContext = false;
-            if (update.getMessage().getText().equals("/end")){
-                return false;
-            }
-            try {
-                final UserContextDTO userContextDTO = dbDriver.selectUserContext(
-                    new UserContextSelectOptions(
-                        update.getMessage().getFrom().getId()
-                    )
-                );
-                if (userContextDTO != null && userContextDTO.getMultiStateCommandTypes() == FEEDBACK) {
-                    isFeedbackContext = true;
-                }
-            } catch(SQLException e) {
-                System.out.println(e);
-            }
-            return isFeedbackContext;
-        };
     }
 }

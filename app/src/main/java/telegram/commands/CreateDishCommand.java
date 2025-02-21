@@ -97,7 +97,7 @@ public class CreateDishCommand extends AbstractCommand {
                     }
                 },
                 Flag.TEXT,
-                isInCreateDishContext()
+                isSpecifiedContext(CREATE)
             )
             .build();
     }
@@ -207,28 +207,5 @@ public class CreateDishCommand extends AbstractCommand {
             sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
             System.out.println(e);
         }
-    }
-
-    @NonNull
-    private Predicate<Update> isInCreateDishContext() {
-        return update -> {
-            boolean isCreateDishContext = false;
-            if (update.getMessage().getText().equals("/end")){
-                return false;
-            }
-            try {
-                final UserContextDTO userContextDTO = dbDriver.selectUserContext(
-                    new UserContextSelectOptions(
-                        update.getMessage().getFrom().getId()
-                    )
-                );
-                if (userContextDTO != null && userContextDTO.getMultiStateCommandTypes() == CREATE) {
-                    isCreateDishContext = true; 
-                }
-            } catch (SQLException e) {
-                System.out.println(e);
-            }
-            return isCreateDishContext;
-        };
     }
 }
