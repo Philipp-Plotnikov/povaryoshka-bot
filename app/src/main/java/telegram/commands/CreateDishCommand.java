@@ -141,9 +141,7 @@ public class CreateDishCommand extends AbstractCommand {
     ) {
         try {
             final String ingredients = update.getMessage().getText().trim();
-            final List<String> ingredientList = Collections.unmodifiableList(
-                Arrays.asList(ingredients.split(", "))
-            );
+            final List<String> ingredientList = Collections.unmodifiableList(handleIngredientList(ingredients));
             dbDriver.executeAsTransaction(
                 () -> {
                     final long userId = update.getMessage().getFrom().getId();
@@ -170,6 +168,13 @@ public class CreateDishCommand extends AbstractCommand {
             sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
             System.out.println(e);
         }
+    }
+
+    @NonNull
+    private List<String> handleIngredientList(@NonNull final String ingredients) {
+        final List<String> ingredientList = Arrays.asList(ingredients.toLowerCase().split(","));
+        ingredientList.replaceAll(String::trim);
+        return ingredientList;
     }
 
     private void handleRecipeUpdateState(
