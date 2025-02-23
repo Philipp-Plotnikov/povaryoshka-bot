@@ -21,13 +21,13 @@ public class SimpleCommandFactory implements CommandFactory {
     @NonNull
     public List<@NonNull AbilityExtension> getCommandList(@NonNull final PovaryoshkaBot povaryoshkaBot) {
         final ArrayList<AbilityExtension> simpleCommandList = new ArrayList<>();
+        simpleCommandList.add(new StartCommand(povaryoshkaBot));
         simpleCommandList.add(new CreateDishCommand(povaryoshkaBot));
         simpleCommandList.add(new DeleteDishCommand(povaryoshkaBot));
         simpleCommandList.add(new UpdateDishCommand(povaryoshkaBot));
         simpleCommandList.add(new GetDishCommand(povaryoshkaBot));
         simpleCommandList.add(new FeedbackCommand(povaryoshkaBot));
         simpleCommandList.add(new EndCommand(povaryoshkaBot));
-        simpleCommandList.add(new StartCommand(povaryoshkaBot));
         return Collections.unmodifiableList(simpleCommandList);
     }
 }

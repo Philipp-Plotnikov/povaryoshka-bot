@@ -13,7 +13,8 @@ import static org.telegram.telegrambots.abilitybots.api.objects.Privacy.PUBLIC;
 
 public class StartCommand extends AbstractCommand {
     public StartCommand(@NonNull final PovaryoshkaBot povaryoshkaBot) {
-        super(povaryoshkaBot); }
+        super(povaryoshkaBot);
+    }
 
     public Ability start(){
         return Ability.builder()
@@ -24,7 +25,6 @@ public class StartCommand extends AbstractCommand {
                 .action(ctx -> {
                     final Update update = ctx.update();
                     sendSilently(BotMessages.START_OUTPUT, update);
-
                 })
                 .build();
     }
