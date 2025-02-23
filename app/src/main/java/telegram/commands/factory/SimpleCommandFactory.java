@@ -14,6 +14,7 @@ import telegram.commands.EndCommand;
 import telegram.commands.FeedbackCommand;
 import telegram.commands.GetDishCommand;
 import telegram.commands.UpdateDishCommand;
+import telegram.commands.StartCommand;
 
 public class SimpleCommandFactory implements CommandFactory {
     @Override
@@ -26,6 +27,7 @@ public class SimpleCommandFactory implements CommandFactory {
         simpleCommandList.add(new GetDishCommand(povaryoshkaBot));
         simpleCommandList.add(new FeedbackCommand(povaryoshkaBot));
         simpleCommandList.add(new EndCommand(povaryoshkaBot));
+        simpleCommandList.add(new StartCommand(povaryoshkaBot));
         return Collections.unmodifiableList(simpleCommandList);
     }
 }
