@@ -8,6 +8,7 @@ import language.ru.command.settings.End;
 import language.ru.command.settings.Feedback;
 import language.ru.command.settings.GetDish;
 import language.ru.command.settings.UpdateDish;
+import language.ru.command.settings.Start;
 
 
 public class CommandConfig {
@@ -45,5 +46,11 @@ public class CommandConfig {
     public final static CommandSettings END_COMMAND_SETTINGS = new CommandSettings(
         End.COMMAND_NAME,
         End.COMMAND_DESCRIPTION
+    );
+
+    @NonNull
+    public final static CommandSettings START_COMMAND_SETTINGS = new CommandSettings(
+            Start.COMMAND_NAME,
+            Start.COMMAND_DESCRIPTION
     );
 }

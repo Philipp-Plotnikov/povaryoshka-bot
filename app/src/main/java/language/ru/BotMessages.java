@@ -2,6 +2,7 @@ package language.ru;
 
 
 public class BotMessages {
+    public static final String START_OUTPUT = "Привет! Этот бот поможет тебе запомнить рецепты. Ты можешь создать свой первый рецепт с помощью команды /create";
     public static final String WRITE_DISH_NAME = "Выбери название для блюда";
     public static final String WRITE_INGREDIENTS = "Перечисли ингредиенты через запятую с пробелом\nНапример: картошка, морковка, жабья ножка";
     public static final String WRITE_RECIPE = "А теперь напиши рецепт";

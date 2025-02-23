@@ -14,12 +14,14 @@ import telegram.commands.EndCommand;
 import telegram.commands.FeedbackCommand;
 import telegram.commands.GetDishCommand;
 import telegram.commands.UpdateDishCommand;
+import telegram.commands.StartCommand;
 
 public class SimpleCommandFactory implements CommandFactory {
     @Override
     @NonNull
     public List<@NonNull AbilityExtension> getCommandList(@NonNull final PovaryoshkaBot povaryoshkaBot) {
         final ArrayList<AbilityExtension> simpleCommandList = new ArrayList<>();
+        simpleCommandList.add(new StartCommand(povaryoshkaBot));
         simpleCommandList.add(new CreateDishCommand(povaryoshkaBot));
         simpleCommandList.add(new DeleteDishCommand(povaryoshkaBot));
         simpleCommandList.add(new UpdateDishCommand(povaryoshkaBot));
