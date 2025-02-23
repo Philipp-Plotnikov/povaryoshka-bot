@@ -70,23 +70,29 @@ public abstract class AbstractCommand implements AbilityExtension {
     @NonNull
     protected Predicate<Update> isSpecifiedContext(@NonNull MultiStateCommandTypes commandType) {
         return update -> {
-            boolean isSpecifiedContext = false;
-            if (update.getMessage().getText().equals("/end")){
+            if (isEndCommand(update)) {
                 return false;
             }
+            boolean isSpecifiedContext = false;
             try {
-                final UserContextDTO userContextDTO = dbDriver.selectUserContext(
-                        new UserContextSelectOptions(
-                                update.getMessage().getFrom().getId()
-                        )
-                );
-                if (userContextDTO != null && userContextDTO.getMultiStateCommandTypes() == commandType) {
-                    isSpecifiedContext = true;
-                }
+                isSpecifiedContext = isSpecifiedMultiStateCommandType(update, commandType);
             } catch (SQLException e) {
                 System.out.println(e);
             }
             return isSpecifiedContext;
         };
+    }
+
+    private boolean isEndCommand(@NonNull Update update) {
+        return update.getMessage().getText().equals("/end");
+    }
+
+    private boolean isSpecifiedMultiStateCommandType(@NonNull Update update, @NonNull MultiStateCommandTypes commandType) throws SQLException {
+        final UserContextDTO userContextDTO = dbDriver.selectUserContext(
+                new UserContextSelectOptions(
+                        update.getMessage().getFrom().getId()
+                )
+        );
+        return userContextDTO != null && userContextDTO.getMultiStateCommandTypes() == commandType;
     }
 }
