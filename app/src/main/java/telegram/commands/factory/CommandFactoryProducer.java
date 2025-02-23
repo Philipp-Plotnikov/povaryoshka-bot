@@ -10,6 +10,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import models.commands.CommandFactoryGenerator;
 import models.commands.CommandTypes;
 
+
 public class CommandFactoryProducer {
     @NonNull
     private final Map<@NonNull CommandTypes, @Nullable CommandFactoryGenerator> commandFactoryGeneratorMap;

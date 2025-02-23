@@ -1,7 +1,6 @@
 package telegram.commands;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -19,7 +18,6 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import language.ru.BotMessages;
 
 import static models.commands.CommandConfig.CREATE_DISH_COMMAND_SETTINGS;
-import static models.commands.CommandStates.DISH_NAME;
 import static models.commands.CommandStates.DISH_NAME_UPDATE;
 import static models.commands.CommandStates.INGREDIENTS_UPDATE;
 import static models.commands.CommandStates.RECIPE_UPDATE;

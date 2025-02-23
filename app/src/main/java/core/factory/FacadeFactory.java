@@ -1,17 +1,18 @@
 package core.factory;
 
 import java.sql.SQLException;
-import java.util.List;
+import java.util.Map;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.telegram.telegrambots.abilitybots.api.util.AbilityExtension;
 
 import dbdrivers.DbDriver;
 import dbdrivers.factory.DbDriverFactory;
 import dbdrivers.factory.DbDriverFactoryProducer;
 
-import static models.EnvVars.COMMAND_TYPE;
 import static utilities.CommonsUtilities.getDbType;
+import static utilities.CoreUtilities.getCommandType;
 
 import models.commands.CommandTypes;
 import models.db.DbTypes;
@@ -19,17 +20,18 @@ import telegram.bot.PovaryoshkaBot;
 import telegram.commands.factory.CommandFactory;
 import telegram.commands.factory.CommandFactoryProducer;
 
+
 public class FacadeFactory {
     private final DbDriverFactory dbDriverFactory;
     private final CommandFactory commandFactory;
 
     public FacadeFactory() throws Exception {
+        final CommandTypes commandType = getCommandType();
         final DbTypes dbType = getDbType();
-        final CommandTypes commandType = CommandTypes.valueOf(System.getenv(COMMAND_TYPE).toUpperCase());
-        final DbDriverFactoryProducer dbDriverFactoryProducer = new DbDriverFactoryProducer();
         final CommandFactoryProducer commandFactoryProducer = new CommandFactoryProducer();
-        dbDriverFactory = dbDriverFactoryProducer.getDbDriverFactory(dbType);
+        final DbDriverFactoryProducer dbDriverFactoryProducer = new DbDriverFactoryProducer();
         commandFactory = commandFactoryProducer.getCommandFactory(commandType);
+        dbDriverFactory = dbDriverFactoryProducer.getDbDriverFactory(dbType);
     }
 
     public DbDriver getDbDriver() throws SQLException {
@@ -37,7 +39,7 @@ public class FacadeFactory {
     }
 
     @NonNull
-    public List<@NonNull AbilityExtension> getCommandList(@NonNull final PovaryoshkaBot povaryoshkaBot) {
-        return commandFactory.getCommandList(povaryoshkaBot);
+    public Map<String, @Nullable AbilityExtension> getCommandMap(@NonNull final PovaryoshkaBot povaryoshkaBot) {
+        return commandFactory.getCommandMap(povaryoshkaBot);
     }
 }

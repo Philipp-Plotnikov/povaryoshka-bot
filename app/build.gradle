@@ -8,7 +8,6 @@
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     id 'application'
-    id "io.github.taisuke-fujimoto.env-loader" version "0.0.1"
 }
 
 repositories {
@@ -32,6 +31,7 @@ dependencies {
     // https://mvnrepository.com/artifact/org.mybatis/mybatis
     implementation group: 'org.mybatis', name: 'mybatis', version: '3.5.16'
     implementation 'org.telegram:telegrambots-abilities:7.10.0'
+    implementation 'io.github.cdimascio:dotenv-java:3.2.0'
 }
 
 // Apply a specific Java toolchain to ease working on different environments.

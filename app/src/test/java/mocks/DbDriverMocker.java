@@ -33,10 +33,12 @@ public class DbDriverMocker {
     @Nullable
     private static Map<@NonNull DbTypes, @Nullable TypedDbDriverMocker> dbDriverMockerMap;
 
+    @NonNull
     public static MockedStatic<DriverManager> getDbDriverMock(
         @NonNull final DbTypes dbType,
         @NonNull final Connection mockedDbConnection
     ) throws Exception {
+        dbDriverMockerMap = getDbDriverMockerMap();
         final TypedDbDriverMocker typedDbDriverMocker = dbDriverMockerMap.get(dbType);
         if (typedDbDriverMocker == null) {
             throw new Exception("TypedDbDriverMocker is null");
@@ -51,6 +53,7 @@ public class DbDriverMocker {
         return Collections.unmodifiableMap(localDbDriverMockerMap);
     }
 
+    // Problem is related with static mock
     @NonNull
     private static MockedStatic<DriverManager> postgresDbDriverMocker(@NonNull final Connection mockedDbConnection) {
         final PostgresDbDriverOptions postgresDbDriverOptions = getPostgresDbDriverOptions();
@@ -66,15 +69,15 @@ public class DbDriverMocker {
     @NonNull
     private static PostgresDbDriverOptions getPostgresDbDriverOptions() {
         final PostgresDbDriverOptions postgresDbDriverOptions = new PostgresDbDriverOptions(
-            System.getenv(DB_HOST),
-            Integer.parseInt(System.getenv(DB_PORT)),
-            System.getenv(DB_DATABASE),
-            System.getenv(DB_SCHEMA),
-            System.getenv(DB_USERNAME),
-            System.getenv(DB_PASSWORD),
-            System.getenv(INIT_SQL_SCRIPT_PATH),
-            System.getenv(ALTER_SQL_SCRIPT_PATH),
-            System.getenv(IS_DISTRIBUTED_DATABASE)
+            System.getProperty(DB_HOST),
+            Integer.parseInt(System.getProperty(DB_PORT)),
+            System.getProperty(DB_DATABASE),
+            System.getProperty(DB_SCHEMA),
+            System.getProperty(DB_USERNAME),
+            System.getProperty(DB_PASSWORD),
+            System.getProperty(INIT_SQL_SCRIPT_PATH),
+            System.getProperty(ALTER_SQL_SCRIPT_PATH),
+            System.getProperty(IS_DISTRIBUTED_DATABASE)
         );
         return postgresDbDriverOptions;
     }
