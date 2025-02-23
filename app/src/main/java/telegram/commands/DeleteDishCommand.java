@@ -92,29 +92,8 @@ public class DeleteDishCommand extends AbstractCommand {
                     }
                 },
                 Flag.TEXT,
-                isDeleteContext()
+                isSpecifiedContext(DELETE)
             )
             .build();
-    }
-    private Predicate<Update> isDeleteContext(){
-        return update -> {
-            boolean isDeleteContext = false;
-            if (update.getMessage().getText().equals("/end")){
-                return false;
-            }
-            try {
-                final UserContextDTO userContextDTO = dbDriver.selectUserContext(
-                    new UserContextSelectOptions(
-                        update.getMessage().getFrom().getId()
-                    )
-                );
-                if (userContextDTO != null && userContextDTO.getMultiStateCommandTypes() == DELETE) {
-                    isDeleteContext = true;
-                }
-            } catch(SQLException e) {
-                System.out.println(e);
-            }
-            return isDeleteContext;
-        };
     }
 }

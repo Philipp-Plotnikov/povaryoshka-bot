@@ -103,7 +103,7 @@ public class UpdateDishCommand extends AbstractCommand {
                     }
                 },
                 Flag.TEXT,
-                isUpdateContext()
+                isSpecifiedContext(UPDATE)
             )
             .build();
     }
@@ -324,27 +324,5 @@ public class UpdateDishCommand extends AbstractCommand {
             sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
             System.out.println(e);
         }
-    }
-
-    private Predicate<Update> isUpdateContext() {
-        return update -> {
-            boolean isUpdateContext = false;
-            if (update.getMessage().getText().equals("/end")){
-                return false;
-            }
-            try {
-                final UserContextDTO userContextDTO = dbDriver.selectUserContext(
-                    new UserContextSelectOptions(
-                        update.getMessage().getFrom().getId()
-                    )
-                );
-                if (userContextDTO != null && userContextDTO.getMultiStateCommandTypes() == UPDATE) {
-                    isUpdateContext = true;
-                }
-            } catch(SQLException e) {
-                System.out.println(e);
-            }
-            return isUpdateContext;
-        };
     }
 }
