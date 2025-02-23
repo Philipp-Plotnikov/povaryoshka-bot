@@ -10,6 +10,6 @@ import models.db.DbTypes;
 public class CommonsUtilities {
     @NonNull
     public static DbTypes getDbType() {
-        return DbTypes.valueOf(System.getenv(DB_TYPE).toUpperCase());
+        return DbTypes.valueOf(System.getProperty(DB_TYPE).toUpperCase());
     }
 }

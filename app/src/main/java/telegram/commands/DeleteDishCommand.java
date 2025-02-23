@@ -3,8 +3,6 @@ package telegram.commands;
 import models.db.sqlops.dish.DishDeleteOptions;
 import models.db.sqlops.usercontext.UserContextDeleteOptions;
 import models.db.sqlops.usercontext.UserContextInsertOptions;
-import models.db.sqlops.usercontext.UserContextSelectOptions;
-import models.dtos.UserContextDTO;
 import models.exceptions.db.sqlops.NotFoundDishException;
 
 import org.telegram.telegrambots.abilitybots.api.objects.Ability;
@@ -25,7 +23,6 @@ import language.ru.BotMessages;
 import telegram.bot.PovaryoshkaBot;
 
 import java.sql.SQLException;
-import java.util.function.Predicate;
 
 
 public class DeleteDishCommand extends AbstractCommand {
