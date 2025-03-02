@@ -8,6 +8,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.function.Predicate;
 
+import models.ioformatter.FormatIngredients;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.telegram.telegrambots.abilitybots.api.objects.Ability;
 import org.telegram.telegrambots.abilitybots.api.objects.Flag;
@@ -141,7 +142,7 @@ public class CreateDishCommand extends AbstractCommand {
     ) {
         try {
             final String ingredients = update.getMessage().getText().trim();
-            final List<String> ingredientList = Collections.unmodifiableList(handleIngredientList(ingredients));
+            final List<String> ingredientList = Collections.unmodifiableList(new FormatIngredients().formatInput(ingredients));
             dbDriver.executeAsTransaction(
                 () -> {
                     final long userId = update.getMessage().getFrom().getId();
@@ -168,13 +169,6 @@ public class CreateDishCommand extends AbstractCommand {
             sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
             System.out.println(e);
         }
-    }
-
-    @NonNull
-    private List<String> handleIngredientList(@NonNull final String ingredients) {
-        final List<String> ingredientList = Arrays.asList(ingredients.toLowerCase().split(","));
-        ingredientList.replaceAll(String::trim);
-        return ingredientList;
     }
 
     private void handleRecipeUpdateState(
