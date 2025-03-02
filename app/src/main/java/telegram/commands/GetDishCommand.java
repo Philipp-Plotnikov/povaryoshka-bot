@@ -8,6 +8,7 @@ import models.db.sqlops.usercontext.UserContextSelectOptions;
 import models.dtos.DishDTO;
 import models.dtos.UserContextDTO;
 
+import models.ioformatter.FormatIngredients;
 import org.telegram.telegrambots.abilitybots.api.objects.Ability;
 import org.telegram.telegrambots.abilitybots.api.objects.Flag;
 
@@ -115,7 +116,7 @@ public class GetDishCommand extends AbstractCommand {
     private String getFormatIngredientListInfo(@NonNull DishDTO selectedDish) {
         final List<String> ingredientList = selectedDish.getIngredientList();
         return ingredientList != null
-            ? String.join("", ingredientList).replace("\n", ", ")
+            ? new FormatIngredients().formatOutput(ingredientList)
             : BotMessages.NO_INFO;
     }
 
