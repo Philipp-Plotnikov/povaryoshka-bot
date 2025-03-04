@@ -15,7 +15,7 @@ import telegram.commands.FeedbackCommand;
 import telegram.commands.GetDishCommand;
 import telegram.commands.UpdateDishCommand;
 
-public class SimpleICommandFactory implements ICommandFactory {
+public class SimpleCommandFactory implements ICommandFactory {
     @Override
     @NonNull
     public List<@NonNull AbilityExtension> getCommandList(@NonNull final PovaryoshkaBot povaryoshkaBot) {

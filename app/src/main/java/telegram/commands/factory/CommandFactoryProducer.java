@@ -21,7 +21,7 @@ public class CommandFactoryProducer {
     @NonNull
     private Map<@NonNull CommandTypes, @Nullable ICommandFactoryGenerator> getCommandFactoryGeneratorMap() {
         final EnumMap<@NonNull CommandTypes, @Nullable ICommandFactoryGenerator> localCommandFactoryGeneratorMap = new EnumMap<>(CommandTypes.class);
-        localCommandFactoryGeneratorMap.put(CommandTypes.SIMPLE, () -> new SimpleICommandFactory());
+        localCommandFactoryGeneratorMap.put(CommandTypes.SIMPLE, () -> new SimpleCommandFactory());
         return Collections.unmodifiableMap(localCommandFactoryGeneratorMap);
     }
 
