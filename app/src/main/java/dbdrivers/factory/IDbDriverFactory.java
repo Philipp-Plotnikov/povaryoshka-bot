@@ -4,9 +4,9 @@ import java.sql.SQLException;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-import dbdrivers.DbDriver;
+import dbdrivers.IDbDriver;
 
-public interface DbDriverFactory {
+public interface IDbDriverFactory {
     @NonNull
-    DbDriver getDbDriver() throws SQLException;
+    IDbDriver getDbDriver() throws SQLException;
 }

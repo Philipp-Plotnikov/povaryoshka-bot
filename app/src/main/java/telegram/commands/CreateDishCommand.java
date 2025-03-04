@@ -1,12 +1,9 @@
 package telegram.commands;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
-import java.util.function.Predicate;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.telegram.telegrambots.abilitybots.api.objects.Ability;
@@ -19,13 +16,12 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import language.ru.BotMessages;
 
 import static models.commands.CommandConfig.CREATE_DISH_COMMAND_SETTINGS;
-import static models.commands.CommandStates.DISH_NAME;
 import static models.commands.CommandStates.DISH_NAME_UPDATE;
 import static models.commands.CommandStates.INGREDIENTS_UPDATE;
 import static models.commands.CommandStates.RECIPE_UPDATE;
 import static models.commands.MultiStateCommandTypes.CREATE;
 
-import models.commands.CommandStateHandler;
+import models.commands.ICommandStateHandler;
 import models.commands.CommandStates;
 import models.db.sqlops.dish.DishInsertOptions;
 import models.db.sqlops.dish.DishSelectOptions;
@@ -37,11 +33,13 @@ import models.db.sqlops.usercontext.UserContextUpdateOptions;
 import models.dtos.DishDTO;
 import models.dtos.UserContextDTO;
 import telegram.bot.PovaryoshkaBot;
+import utilities.factory.FormatterFactory;
+import utilities.factory.IIngredientsFormatter;
 
 
 public class CreateDishCommand extends AbstractCommand {
     @NonNull
-    private final EnumMap<@NonNull CommandStates, CommandStateHandler> stateHandlersMap = new EnumMap<>(CommandStates.class);
+    private final EnumMap<@NonNull CommandStates, ICommandStateHandler> stateHandlersMap = new EnumMap<>(CommandStates.class);
 
     public CreateDishCommand(@NonNull final PovaryoshkaBot povaryoshkaBot) {
         super(povaryoshkaBot);
@@ -86,7 +84,7 @@ public class CreateDishCommand extends AbstractCommand {
                         );
                         if (userContextDTO != null) {
                             final CommandStates commandState = userContextDTO.getCommandState();
-                            final CommandStateHandler commandStateHandler = stateHandlersMap.get(commandState);
+                            final ICommandStateHandler commandStateHandler = stateHandlersMap.get(commandState);
                             if (commandStateHandler == null) {
                                 throw new Exception("Dont have needed handlers");
                             }
@@ -141,7 +139,8 @@ public class CreateDishCommand extends AbstractCommand {
     ) {
         try {
             final String ingredients = update.getMessage().getText().trim();
-            final List<String> ingredientList = Collections.unmodifiableList(handleIngredientList(ingredients));
+            final IIngredientsFormatter ingredientsFormatter = FormatterFactory.getIngredientsFormat();
+            final List<String> ingredientList = Collections.unmodifiableList(ingredientsFormatter.formatInput(ingredients));
             dbDriver.executeAsTransaction(
                 () -> {
                     final long userId = update.getMessage().getFrom().getId();
@@ -168,13 +167,6 @@ public class CreateDishCommand extends AbstractCommand {
             sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
             System.out.println(e);
         }
-    }
-
-    @NonNull
-    private List<String> handleIngredientList(@NonNull final String ingredients) {
-        final List<String> ingredientList = Arrays.asList(ingredients.toLowerCase().split(","));
-        ingredientList.replaceAll(String::trim);
-        return ingredientList;
     }
 
     private void handleRecipeUpdateState(

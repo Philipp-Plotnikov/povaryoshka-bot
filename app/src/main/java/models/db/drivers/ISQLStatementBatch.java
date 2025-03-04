@@ -1,6 +1,6 @@
 package models.db.drivers;
 
 @FunctionalInterface
-public interface SQLStatementBatch {
+public interface ISQLStatementBatch {
     void execute() throws Exception;
 }

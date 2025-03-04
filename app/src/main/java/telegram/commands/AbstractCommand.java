@@ -16,7 +16,7 @@ import org.telegram.telegrambots.abilitybots.api.util.AbilityExtension;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
 
-import dbdrivers.DbDriver;
+import dbdrivers.IDbDriver;
 import language.ru.BotMessages;
 import models.db.sqlops.dish.DishListSelectOptions;
 import models.dtos.DishDTO;
@@ -28,7 +28,7 @@ public abstract class AbstractCommand implements AbilityExtension {
     protected final PovaryoshkaBot povaryoshkaBot;
 
     @NonNull
-    protected final DbDriver dbDriver;
+    protected final IDbDriver dbDriver;
 
     protected AbstractCommand(@NonNull final PovaryoshkaBot povaryoshkaBot) {
         this.povaryoshkaBot = povaryoshkaBot;

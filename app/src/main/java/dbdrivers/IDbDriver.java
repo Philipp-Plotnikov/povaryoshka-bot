@@ -7,7 +7,7 @@ import java.util.List;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import models.db.drivers.SQLStatementBatch;
+import models.db.drivers.ISQLStatementBatch;
 import models.db.sqlops.dish.DishDeleteOptions;
 import models.db.sqlops.dish.DishInsertOptions;
 import models.db.sqlops.dish.DishListSelectOptions;
@@ -21,10 +21,10 @@ import models.db.sqlops.usercontext.UserContextUpdateOptions;
 import models.dtos.DishDTO;
 import models.dtos.UserContextDTO;
 
-public interface DbDriver extends AutoCloseable {    
+public interface IDbDriver extends AutoCloseable {
     public void setup() throws SQLException, Exception;
     
-    public void executeAsTransaction(@NonNull SQLStatementBatch sqlStatementBatch) throws SQLException, Exception;
+    public void executeAsTransaction(@NonNull ISQLStatementBatch sqlStatementBatch) throws SQLException, Exception;
 
 
     @Nullable

@@ -4,9 +4,7 @@ import models.commons.SendOptions;
 import models.db.sqlops.dish.DishSelectOptions;
 import models.db.sqlops.usercontext.UserContextDeleteOptions;
 import models.db.sqlops.usercontext.UserContextInsertOptions;
-import models.db.sqlops.usercontext.UserContextSelectOptions;
 import models.dtos.DishDTO;
-import models.dtos.UserContextDTO;
 
 import org.telegram.telegrambots.abilitybots.api.objects.Ability;
 import org.telegram.telegrambots.abilitybots.api.objects.Flag;
@@ -24,10 +22,11 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 
 import language.ru.BotMessages;
 import telegram.bot.PovaryoshkaBot;
+import utilities.factory.FormatterFactory;
+import utilities.factory.IIngredientsFormatter;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.function.Predicate;
 
 
 public class GetDishCommand extends AbstractCommand {
@@ -114,8 +113,9 @@ public class GetDishCommand extends AbstractCommand {
     @NonNull
     private String getFormatIngredientListInfo(@NonNull DishDTO selectedDish) {
         final List<String> ingredientList = selectedDish.getIngredientList();
+        final IIngredientsFormatter ingredientsFormatter = FormatterFactory.getIngredientsFormat();
         return ingredientList != null
-            ? String.join("", ingredientList).replace("\n", ", ")
+            ? ingredientsFormatter.formatOutput(ingredientList)
             : BotMessages.NO_INFO;
     }
 

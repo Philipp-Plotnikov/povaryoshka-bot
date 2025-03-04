@@ -7,7 +7,7 @@ import org.telegram.telegrambots.abilitybots.api.util.AbilityExtension;
 
 import telegram.bot.PovaryoshkaBot;
 
-public interface CommandFactory {
+public interface ICommandFactory {
     @NonNull
     List<@NonNull AbilityExtension> getCommandList(@NonNull final PovaryoshkaBot povaryoshkaBot);
 }

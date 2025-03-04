@@ -5,20 +5,20 @@ import java.util.List;
 
 import org.telegram.telegrambots.abilitybots.api.util.AbilityExtension;
 
-import dbdrivers.DbDriver;
-import dbdrivers.factory.DbDriverFactory;
+import dbdrivers.IDbDriver;
+import dbdrivers.factory.IDbDriverFactory;
 import dbdrivers.factory.DbDriverFactoryProducer;
 import static models.system.EnvVars.COMMAND_TYPE;
 import static models.system.EnvVars.DB_TYPE;
 import models.commands.CommandTypes;
 import models.db.DbTypes;
 import telegram.bot.PovaryoshkaBot;
-import telegram.commands.factory.CommandFactory;
+import telegram.commands.factory.ICommandFactory;
 import telegram.commands.factory.CommandFactoryProducer;
 
 public class FacadeFactory {
-    private final DbDriverFactory dbDriverFactory;
-    private final CommandFactory commandFactory;
+    private final IDbDriverFactory dbDriverFactory;
+    private final ICommandFactory commandFactory;
 
     public FacadeFactory() throws Exception {
         final DbTypes dbType = DbTypes.valueOf(System.getenv(DB_TYPE).toUpperCase());
@@ -29,7 +29,7 @@ public class FacadeFactory {
         commandFactory = commandFactoryProducer.getCommandFactory(commandType);
     }
 
-    public DbDriver getDbDriver() throws SQLException {
+    public IDbDriver getDbDriver() throws SQLException {
         return dbDriverFactory.getDbDriver();
     }
 
