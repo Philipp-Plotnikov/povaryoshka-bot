@@ -8,7 +8,6 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.function.Predicate;
 
-import models.ioformatter.FormatIngredients;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.telegram.telegrambots.abilitybots.api.objects.Ability;
 import org.telegram.telegrambots.abilitybots.api.objects.Flag;
@@ -38,6 +37,9 @@ import models.db.sqlops.usercontext.UserContextUpdateOptions;
 import models.dtos.DishDTO;
 import models.dtos.UserContextDTO;
 import telegram.bot.PovaryoshkaBot;
+import utilities.FormatIngredients;
+import utilities.factory.FormatterFactory;
+import utilities.factory.IngredientsFormatter;
 
 
 public class CreateDishCommand extends AbstractCommand {
@@ -142,7 +144,8 @@ public class CreateDishCommand extends AbstractCommand {
     ) {
         try {
             final String ingredients = update.getMessage().getText().trim();
-            final List<String> ingredientList = Collections.unmodifiableList(new FormatIngredients().formatInput(ingredients));
+            final IngredientsFormatter formatter = FormatterFactory.getIngredientsFormat();
+            final List<String> ingredientList = Collections.unmodifiableList(formatter.formatInput(ingredients));
             dbDriver.executeAsTransaction(
                 () -> {
                     final long userId = update.getMessage().getFrom().getId();

@@ -8,7 +8,6 @@ import models.db.sqlops.usercontext.UserContextSelectOptions;
 import models.dtos.DishDTO;
 import models.dtos.UserContextDTO;
 
-import models.ioformatter.FormatIngredients;
 import org.telegram.telegrambots.abilitybots.api.objects.Ability;
 import org.telegram.telegrambots.abilitybots.api.objects.Flag;
 
@@ -25,6 +24,9 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 
 import language.ru.BotMessages;
 import telegram.bot.PovaryoshkaBot;
+import utilities.FormatIngredients;
+import utilities.factory.FormatterFactory;
+import utilities.factory.IngredientsFormatter;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -115,8 +117,9 @@ public class GetDishCommand extends AbstractCommand {
     @NonNull
     private String getFormatIngredientListInfo(@NonNull DishDTO selectedDish) {
         final List<String> ingredientList = selectedDish.getIngredientList();
+        final IngredientsFormatter formatter = FormatterFactory.getIngredientsFormat();
         return ingredientList != null
-            ? new FormatIngredients().formatOutput(ingredientList)
+            ? formatter.formatOutput(ingredientList)
             : BotMessages.NO_INFO;
     }
 
