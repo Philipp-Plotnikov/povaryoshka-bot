@@ -9,13 +9,13 @@ import org.telegram.telegrambots.abilitybots.api.util.AbilityExtension;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import core.factory.FacadeFactory;
-import dbdrivers.DbDriver;
+import dbdrivers.IDbDriver;
 
 public class PovaryoshkaBot extends AbilityBot {
     private final long creatorId;
 
     @NonNull
-    private final DbDriver dbDriver;
+    private final IDbDriver dbDriver;
 
     @NonNull
     private final FacadeFactory facadeFactory;
@@ -39,7 +39,7 @@ public class PovaryoshkaBot extends AbilityBot {
     }
 
     @NonNull
-    public DbDriver getDbDriver() {
+    public IDbDriver getDbDriver() {
         return dbDriver;
     }
 

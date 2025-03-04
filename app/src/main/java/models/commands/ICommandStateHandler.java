@@ -6,6 +6,6 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import models.dtos.UserContextDTO;
 
 @FunctionalInterface
-public interface CommandStateHandler {
+public interface ICommandStateHandler {
     void handle(@NonNull final Update update, @NonNull final UserContextDTO userContextDTO);
 }

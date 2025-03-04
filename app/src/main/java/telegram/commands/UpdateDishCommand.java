@@ -1,6 +1,6 @@
 package telegram.commands;
 
-import models.commands.CommandStateHandler;
+import models.commands.ICommandStateHandler;
 import models.commands.CommandStates;
 import models.db.sqlops.dish.DishSelectOptions;
 import models.db.sqlops.dish.DishUpdateOptions;
@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
-import java.util.function.Predicate;
 
 import static models.commands.CommandConfig.UPDATE_DISH_COMMAND_SETTINGS;
 import static models.commands.CommandStates.*;
@@ -35,7 +34,7 @@ import static org.telegram.telegrambots.abilitybots.api.objects.Privacy.PUBLIC;
 
 public class UpdateDishCommand extends AbstractCommand {
     @NonNull
-    private final EnumMap<@NonNull CommandStates, CommandStateHandler> stateHandlersMap = new EnumMap<>(CommandStates.class);
+    private final EnumMap<@NonNull CommandStates, ICommandStateHandler> stateHandlersMap = new EnumMap<>(CommandStates.class);
 
     public UpdateDishCommand(@NonNull final PovaryoshkaBot povaryoshkaBot) {
         super(povaryoshkaBot);
@@ -91,7 +90,7 @@ public class UpdateDishCommand extends AbstractCommand {
                     );
                     if (userContextDTO != null) {
                         final CommandStates commandState = userContextDTO.getCommandState();
-                        final CommandStateHandler commandStateHandler = stateHandlersMap.get(commandState);
+                        final ICommandStateHandler commandStateHandler = stateHandlersMap.get(commandState);
                         if (commandStateHandler == null) {
                             throw new Exception("Dont have needed handlers");
                         }

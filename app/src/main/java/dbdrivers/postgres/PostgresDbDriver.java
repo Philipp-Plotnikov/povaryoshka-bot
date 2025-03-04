@@ -19,8 +19,8 @@ import org.apache.ibatis.jdbc.ScriptRunner;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import dbdrivers.DbDriver;
-import models.db.drivers.SQLStatementBatch;
+import dbdrivers.IDbDriver;
+import models.db.drivers.ISQLStatementBatch;
 import static models.db.drivers.postgres.PostgresConnectionProperties.CURRENT_SCHEMA;
 import static models.db.drivers.postgres.PostgresConnectionProperties.PASSWORD;
 import static models.db.drivers.postgres.PostgresConnectionProperties.USER;
@@ -45,7 +45,7 @@ import models.exceptions.db.sqlops.NotFoundDishException;
 import models.exceptions.db.sqlops.NotFoundUserContextException;
 
 
-public class PostgresDbDriver implements DbDriver {
+public class PostgresDbDriver implements IDbDriver {
     @NonNull
     private final PostgresDbDriverOptions postgresDbDriverOptions;
 
@@ -81,7 +81,7 @@ public class PostgresDbDriver implements DbDriver {
     }
 
     @Override
-    public void executeAsTransaction(@NonNull SQLStatementBatch sqlStatementBatch) throws SQLException,
+    public void executeAsTransaction(@NonNull ISQLStatementBatch sqlStatementBatch) throws SQLException,
                                                                                           Exception
     {
         if (postgresDbDriverOptions.getIsDistributedDatabase()) {
@@ -90,7 +90,7 @@ public class PostgresDbDriver implements DbDriver {
         executeAsOnePhaseTransaction(sqlStatementBatch);
     }
 
-    private void executeAsOnePhaseTransaction(@NonNull SQLStatementBatch sqlStatementBatch) throws SQLException,
+    private void executeAsOnePhaseTransaction(@NonNull ISQLStatementBatch sqlStatementBatch) throws SQLException,
                                                                                                    Exception
     {
         boolean currentAutoCommitState = connection.getAutoCommit();

@@ -1,6 +1,6 @@
 package dbdrivers.factory;
 
-import dbdrivers.DbDriver;
+import dbdrivers.IDbDriver;
 import dbdrivers.postgres.PostgresDbDriver;
 import static models.system.EnvVars.ALTER_SQL_SCRIPT_PATH;
 import static models.system.EnvVars.DB_DATABASE;
@@ -18,10 +18,10 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 import models.db.drivers.postgres.PostgresDbDriverOptions;
 
-public class PostgresDbDriverFactory implements DbDriverFactory {
+public class PostgresDbDriverFactory implements IDbDriverFactory {
     @Override
     @NonNull
-    public DbDriver getDbDriver() throws SQLException
+    public IDbDriver getDbDriver() throws SQLException
     {
         final PostgresDbDriverOptions postgresDbDriverOptions = new PostgresDbDriverOptions(
             System.getenv(DB_HOST),
