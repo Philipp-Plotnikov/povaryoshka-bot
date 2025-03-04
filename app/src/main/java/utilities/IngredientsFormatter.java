@@ -8,16 +8,16 @@ import java.util.List;
 
 public class IngredientsFormatter implements IIngredientsFormatter {
 
-    @NonNull
     @Override
+    @NonNull
     public List<String> formatInput(@NonNull String input) {
         return Arrays.asList(input
                 .replaceAll("(\\r?\\n)+", "\n")
                 .split("\n"));
     }
 
-    @NonNull
     @Override
+    @NonNull
     public String formatOutput(@NonNull List<String> input) {
         return String.join("\n", input);
     }
