@@ -1,28 +1,8 @@
-package telegram.commands;
-
-import java.sql.SQLException;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.List;
-
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.telegram.telegrambots.abilitybots.api.objects.Ability;
-import org.telegram.telegrambots.abilitybots.api.objects.Flag;
-
-import static org.telegram.telegrambots.abilitybots.api.objects.Locality.ALL;
-import static org.telegram.telegrambots.abilitybots.api.objects.Privacy.PUBLIC;
-import org.telegram.telegrambots.meta.api.objects.Update;
+package telegram.abilities.commands;
 
 import language.ru.BotMessages;
-
-import static models.commands.CommandConfig.CREATE_DISH_COMMAND_SETTINGS;
-import static models.commands.CommandStates.DISH_NAME_UPDATE;
-import static models.commands.CommandStates.INGREDIENTS_UPDATE;
-import static models.commands.CommandStates.RECIPE_UPDATE;
-import static models.commands.MultiStateCommandTypes.CREATE;
-
-import models.commands.ICommandStateHandler;
 import models.commands.CommandStates;
+import models.commands.ICommandStateHandler;
 import models.db.sqlops.dish.DishInsertOptions;
 import models.db.sqlops.dish.DishSelectOptions;
 import models.db.sqlops.dish.DishUpdateOptions;
@@ -32,9 +12,24 @@ import models.db.sqlops.usercontext.UserContextSelectOptions;
 import models.db.sqlops.usercontext.UserContextUpdateOptions;
 import models.dtos.DishDTO;
 import models.dtos.UserContextDTO;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.telegram.telegrambots.abilitybots.api.objects.Ability;
+import org.telegram.telegrambots.abilitybots.api.objects.Flag;
+import org.telegram.telegrambots.meta.api.objects.Update;
 import telegram.bot.PovaryoshkaBot;
 import utilities.factory.FormatterFactory;
 import utilities.factory.IIngredientsFormatter;
+
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.List;
+
+import static models.commands.CommandConfig.CREATE_DISH_COMMAND_SETTINGS;
+import static models.commands.CommandStates.*;
+import static models.commands.MultiStateCommandTypes.CREATE;
+import static org.telegram.telegrambots.abilitybots.api.objects.Locality.ALL;
+import static org.telegram.telegrambots.abilitybots.api.objects.Privacy.PUBLIC;
 
 
 public class CreateDishCommand extends AbstractCommand {
@@ -128,7 +123,7 @@ public class CreateDishCommand extends AbstractCommand {
             );
             sendSilently(BotMessages.WRITE_INGREDIENTS, update);
         } catch (Exception e) {
-            sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
+            sendSilently(BotMessages.DISH_ALREADY_EXISTS, update);
             System.out.println(e);
         }
     }

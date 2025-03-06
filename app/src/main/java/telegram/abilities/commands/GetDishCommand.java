@@ -1,32 +1,27 @@
-package telegram.commands;
+package telegram.abilities.commands;
 
+import language.ru.BotMessages;
 import models.commons.SendOptions;
 import models.db.sqlops.dish.DishSelectOptions;
 import models.db.sqlops.usercontext.UserContextDeleteOptions;
 import models.db.sqlops.usercontext.UserContextInsertOptions;
 import models.dtos.DishDTO;
-
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.telegram.telegrambots.abilitybots.api.objects.Ability;
 import org.telegram.telegrambots.abilitybots.api.objects.Flag;
-
-import static models.commands.CommandStates.DISH_NAME;
-import static models.commands.MultiStateCommandTypes.GET;
-import static org.telegram.telegrambots.abilitybots.api.objects.Locality.ALL;
-import static org.telegram.telegrambots.abilitybots.api.objects.Privacy.PUBLIC;
-
-import org.checkerframework.checker.nullness.qual.NonNull;
-
-import static models.commands.CommandConfig.GET_DISH_COMMAND_SETTINGS;
-
 import org.telegram.telegrambots.meta.api.objects.Update;
-
-import language.ru.BotMessages;
 import telegram.bot.PovaryoshkaBot;
 import utilities.factory.FormatterFactory;
 import utilities.factory.IIngredientsFormatter;
 
 import java.sql.SQLException;
 import java.util.List;
+
+import static models.commands.CommandConfig.GET_DISH_COMMAND_SETTINGS;
+import static models.commands.CommandStates.DISH_NAME;
+import static models.commands.MultiStateCommandTypes.GET;
+import static org.telegram.telegrambots.abilitybots.api.objects.Locality.ALL;
+import static org.telegram.telegrambots.abilitybots.api.objects.Privacy.PUBLIC;
 
 
 public class GetDishCommand extends AbstractCommand {

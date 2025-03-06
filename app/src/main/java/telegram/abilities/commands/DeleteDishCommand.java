@@ -1,31 +1,23 @@
-package telegram.commands;
+package telegram.abilities.commands;
 
+import language.ru.BotMessages;
 import models.db.sqlops.dish.DishDeleteOptions;
 import models.db.sqlops.usercontext.UserContextDeleteOptions;
 import models.db.sqlops.usercontext.UserContextInsertOptions;
-import models.db.sqlops.usercontext.UserContextSelectOptions;
-import models.dtos.UserContextDTO;
 import models.exceptions.db.sqlops.NotFoundDishException;
-
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.telegram.telegrambots.abilitybots.api.objects.Ability;
 import org.telegram.telegrambots.abilitybots.api.objects.Flag;
+import org.telegram.telegrambots.meta.api.objects.Update;
+import telegram.bot.PovaryoshkaBot;
 
+import java.sql.SQLException;
+
+import static models.commands.CommandConfig.DELETE_DISH_COMMAND_SETTINGS;
 import static models.commands.CommandStates.DISH_NAME;
 import static models.commands.MultiStateCommandTypes.DELETE;
 import static org.telegram.telegrambots.abilitybots.api.objects.Locality.ALL;
 import static org.telegram.telegrambots.abilitybots.api.objects.Privacy.PUBLIC;
-
-import org.checkerframework.checker.nullness.qual.NonNull;
-
-import static models.commands.CommandConfig.DELETE_DISH_COMMAND_SETTINGS;
-
-import org.telegram.telegrambots.meta.api.objects.Update;
-
-import language.ru.BotMessages;
-import telegram.bot.PovaryoshkaBot;
-
-import java.sql.SQLException;
-import java.util.function.Predicate;
 
 
 public class DeleteDishCommand extends AbstractCommand {

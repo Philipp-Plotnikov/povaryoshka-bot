@@ -46,5 +46,7 @@ public class BotMessages {
     public static final String DISH_NAME_IS_NOT_UPDATED = "Хорошо, название блюда не меняем";
     public static final String INPUT_NEW_DISH_NAME = "Напиши новое название блюда";
     public static final String DISH_WAS_UPDATED_WITH_SUCCESS = "Блюдо успешно обновлено";
+    public static final String DISH_ALREADY_EXISTS = "Данное блюдо уже было создано";
+    public static final String UNKNOWN_COMMAND = "Прости, я тебя не совсем понял, выбери команду из меню";
 
 }
