@@ -9,7 +9,7 @@ public enum MultiStateCommandTypes {
     UPDATE("update"),
     DELETE("delete"),
     FEEDBACK("feedback"),
-    HELP("help");
+    UNKNOWN("unknown");
 
     @NonNull
     private final String value;

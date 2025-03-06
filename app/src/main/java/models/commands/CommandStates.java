@@ -11,7 +11,8 @@ public enum CommandStates {
     INGREDIENTS_UPDATE("ingredients_update"),
     RECIPE_UPDATE_CONFIRM("recipe_update_confirm"),
     RECIPE_UPDATE("recipe_update"),
-    FEEDBACK_UPDATE("feedback_update");
+    FEEDBACK_UPDATE("feedback_update"),
+    READY_FOR_UNKNOWN_TEXT("ready_for_unknown_text");
 
     @NonNull
     private final String value;

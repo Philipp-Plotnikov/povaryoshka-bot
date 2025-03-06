@@ -1,18 +1,15 @@
-package telegram.commands;
-
-import models.db.sqlops.usercontext.UserContextDeleteOptions;
-import org.telegram.telegrambots.abilitybots.api.objects.Ability;
-import org.telegram.telegrambots.meta.api.objects.Update;
+package telegram.abilities.commands;
 
 import language.ru.BotMessages;
-
-import static org.telegram.telegrambots.abilitybots.api.objects.Locality.ALL;
-import static org.telegram.telegrambots.abilitybots.api.objects.Privacy.PUBLIC;
-
+import models.db.sqlops.usercontext.UserContextDeleteOptions;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.telegram.telegrambots.abilitybots.api.objects.Ability;
+import org.telegram.telegrambots.meta.api.objects.Update;
+import telegram.bot.PovaryoshkaBot;
 
 import static models.commands.CommandConfig.END_COMMAND_SETTINGS;
-import telegram.bot.PovaryoshkaBot;
+import static org.telegram.telegrambots.abilitybots.api.objects.Locality.ALL;
+import static org.telegram.telegrambots.abilitybots.api.objects.Privacy.PUBLIC;
 
 
 public class EndCommand extends AbstractCommand {

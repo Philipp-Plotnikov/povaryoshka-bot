@@ -1,4 +1,4 @@
-package telegram.commands;
+package telegram.abilities.commands;
 
 import language.ru.BotMessages;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -7,7 +7,6 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import telegram.bot.PovaryoshkaBot;
 
 import static models.commands.CommandConfig.START_COMMAND_SETTINGS;
-
 import static org.telegram.telegrambots.abilitybots.api.objects.Locality.ALL;
 import static org.telegram.telegrambots.abilitybots.api.objects.Privacy.PUBLIC;
 

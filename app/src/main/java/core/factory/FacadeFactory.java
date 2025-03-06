@@ -13,12 +13,12 @@ import static models.system.EnvVars.DB_TYPE;
 import models.commands.CommandTypes;
 import models.db.DbTypes;
 import telegram.bot.PovaryoshkaBot;
-import telegram.commands.factory.ICommandFactory;
-import telegram.commands.factory.CommandFactoryProducer;
+import telegram.abilities.factory.IAbilityFactory;
+import telegram.abilities.factory.CommandFactoryProducer;
 
 public class FacadeFactory {
     private final IDbDriverFactory dbDriverFactory;
-    private final ICommandFactory commandFactory;
+    private final IAbilityFactory commandFactory;
 
     public FacadeFactory() throws Exception {
         final DbTypes dbType = DbTypes.valueOf(System.getenv(DB_TYPE).toUpperCase());

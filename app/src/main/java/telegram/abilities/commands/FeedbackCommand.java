@@ -1,28 +1,22 @@
-package telegram.commands;
+package telegram.abilities.commands;
 
-import java.util.function.Predicate;
-import java.sql.SQLException;
-
+import language.ru.BotMessages;
 import models.commands.CommandStates;
 import models.db.sqlops.feedback.FeedbackInsertOptions;
-
-import org.checkerframework.checker.nullness.qual.NonNull;
 import models.db.sqlops.usercontext.UserContextDeleteOptions;
-import models.db.sqlops.usercontext.UserContextSelectOptions;
-import models.dtos.UserContextDTO;
+import models.db.sqlops.usercontext.UserContextInsertOptions;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.telegram.telegrambots.abilitybots.api.objects.Ability;
 import org.telegram.telegrambots.abilitybots.api.objects.Flag;
+import org.telegram.telegrambots.meta.api.objects.Update;
+import telegram.bot.PovaryoshkaBot;
 
+import java.sql.SQLException;
+
+import static models.commands.CommandConfig.FEEDBACK_COMMAND_SETTINGS;
 import static models.commands.MultiStateCommandTypes.FEEDBACK;
 import static org.telegram.telegrambots.abilitybots.api.objects.Locality.ALL;
 import static org.telegram.telegrambots.abilitybots.api.objects.Privacy.PUBLIC;
-import org.telegram.telegrambots.meta.api.objects.Update;
-
-import language.ru.BotMessages;
-import models.db.sqlops.usercontext.UserContextInsertOptions;
-
-import static models.commands.CommandConfig.FEEDBACK_COMMAND_SETTINGS;
-import telegram.bot.PovaryoshkaBot;
 
 
 public class FeedbackCommand extends AbstractCommand {
