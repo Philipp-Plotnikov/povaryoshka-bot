@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface IAbilityFactory {
     @NonNull
-    List<@NonNull AbilityExtension> getCommandList(@NonNull final PovaryoshkaBot povaryoshkaBot);
+    List<@NonNull AbilityExtension> getAbilityList(@NonNull final PovaryoshkaBot povaryoshkaBot);
 }

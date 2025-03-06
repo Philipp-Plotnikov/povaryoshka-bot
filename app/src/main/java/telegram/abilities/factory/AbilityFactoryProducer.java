@@ -9,31 +9,31 @@ import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Map;
 
-public class CommandFactoryProducer {
+public class AbilityFactoryProducer {
     @NonNull
     private final Map<@NonNull CommandTypes, @Nullable IAbilityFactoryGenerator> abilityFactoryGeneratorMap;
 
-    public CommandFactoryProducer() {
+    public AbilityFactoryProducer() {
         abilityFactoryGeneratorMap = getAbilityFactoryGeneratorMap();
     }
 
     @NonNull
     private Map<@NonNull CommandTypes, @Nullable IAbilityFactoryGenerator> getAbilityFactoryGeneratorMap() {
-        final EnumMap<@NonNull CommandTypes, @Nullable IAbilityFactoryGenerator> localCommandFactoryGeneratorMap = new EnumMap<>(CommandTypes.class);
-        localCommandFactoryGeneratorMap.put(CommandTypes.SIMPLE, SimpleCommandFactory::new);
-        localCommandFactoryGeneratorMap.put(CommandTypes.REPLY, SimpleReplyFactory::new);
-        return Collections.unmodifiableMap(localCommandFactoryGeneratorMap);
+        final EnumMap<@NonNull CommandTypes, @Nullable IAbilityFactoryGenerator> localAbilityFactoryGeneratorMap = new EnumMap<>(CommandTypes.class);
+        localAbilityFactoryGeneratorMap.put(CommandTypes.SIMPLE, SimpleCommandFactory::new);
+        localAbilityFactoryGeneratorMap.put(CommandTypes.REPLY, SimpleReplyFactory::new);
+        return Collections.unmodifiableMap(localAbilityFactoryGeneratorMap);
     }
 
     @NonNull
-    public IAbilityFactory getCommandFactory(@NonNull final CommandTypes commandType) throws Exception {
+    public IAbilityFactory getAbilityFactory(@NonNull final CommandTypes commandType) throws Exception {
         if (!abilityFactoryGeneratorMap.containsKey(commandType)) {
             throw new Exception(String.format("%s was not found in commandFactoryGeneratorMap", commandType.name()));
         }
-        final IAbilityFactoryGenerator commandFactoryGenerator = abilityFactoryGeneratorMap.get(commandType);
-        if (commandFactoryGenerator == null) {
+        final IAbilityFactoryGenerator abilityFactoryGenerator = abilityFactoryGeneratorMap.get(commandType);
+        if (abilityFactoryGenerator == null) {
             throw new Exception(String.format("commandFactoryGenerator of commandType '%s' is null", commandType.name()));
         }
-        return commandFactoryGenerator.generate();
+        return abilityFactoryGenerator.generate();
     }
 }

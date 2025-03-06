@@ -13,6 +13,7 @@ public class EnvVars {
     public static final String IS_DISTRIBUTED_DATABASE = "IS_DISTRIBUTED_DATABASE";
 
     public static final String COMMAND_TYPE = "COMMAND_TYPE";
+    public static final String REPLY = "REPLY";
 
     public static final String TELEGRAM_BOT_API_TOKEN = "TELEGRAM_BOT_API_TOKEN";
     public static final String BOT_USERNAME = "BOT_USERNAME";

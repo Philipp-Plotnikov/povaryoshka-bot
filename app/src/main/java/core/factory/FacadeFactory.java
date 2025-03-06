@@ -8,25 +8,30 @@ import org.telegram.telegrambots.abilitybots.api.util.AbilityExtension;
 import dbdrivers.IDbDriver;
 import dbdrivers.factory.IDbDriverFactory;
 import dbdrivers.factory.DbDriverFactoryProducer;
-import static models.system.EnvVars.COMMAND_TYPE;
-import static models.system.EnvVars.DB_TYPE;
 import models.commands.CommandTypes;
 import models.db.DbTypes;
 import telegram.bot.PovaryoshkaBot;
 import telegram.abilities.factory.IAbilityFactory;
-import telegram.abilities.factory.CommandFactoryProducer;
+import telegram.abilities.factory.AbilityFactoryProducer;
+
+import static models.system.EnvVars.*;
 
 public class FacadeFactory {
     private final IDbDriverFactory dbDriverFactory;
-    private final IAbilityFactory commandFactory;
+    private final List<IAbilityFactory> abilityFactories;
 
     public FacadeFactory() throws Exception {
         final DbTypes dbType = DbTypes.valueOf(System.getenv(DB_TYPE).toUpperCase());
         final CommandTypes commandType = CommandTypes.valueOf(System.getenv(COMMAND_TYPE).toUpperCase());
+        final CommandTypes reply = CommandTypes.valueOf(System.getenv(REPLY).toUpperCase());
         final DbDriverFactoryProducer dbDriverFactoryProducer = new DbDriverFactoryProducer();
-        final CommandFactoryProducer commandFactoryProducer = new CommandFactoryProducer();
+        final AbilityFactoryProducer abilityFactoryProducer = new AbilityFactoryProducer();
         dbDriverFactory = dbDriverFactoryProducer.getDbDriverFactory(dbType);
-        commandFactory = commandFactoryProducer.getCommandFactory(commandType);
+
+        abilityFactories = List.of(
+                abilityFactoryProducer.getAbilityFactory(commandType),
+                abilityFactoryProducer.getAbilityFactory(reply)
+        );
     }
 
     public IDbDriver getDbDriver() throws SQLException {
@@ -34,6 +39,8 @@ public class FacadeFactory {
     }
 
     public List<AbilityExtension> getCommandList(final PovaryoshkaBot povaryoshkaBot) {
-        return commandFactory.getCommandList(povaryoshkaBot);
+        return abilityFactories.stream()
+                .flatMap(factory -> factory.getAbilityList(povaryoshkaBot).stream())
+                .toList();
     }
 }

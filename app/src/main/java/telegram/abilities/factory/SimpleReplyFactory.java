@@ -12,7 +12,7 @@ import java.util.List;
 public class SimpleReplyFactory implements IAbilityFactory {
     @Override
     @NonNull
-    public List<@NonNull AbilityExtension> getCommandList(@NonNull final PovaryoshkaBot povaryoshkaBot) {
+    public List<@NonNull AbilityExtension> getAbilityList(@NonNull final PovaryoshkaBot povaryoshkaBot) {
         final ArrayList<AbilityExtension> simpleCommandList = new ArrayList<>();
         simpleCommandList.add(new UnknownReply(povaryoshkaBot));
         return Collections.unmodifiableList(simpleCommandList);
