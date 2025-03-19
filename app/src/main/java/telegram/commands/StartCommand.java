@@ -11,6 +11,7 @@ import static models.commands.CommandConfig.START_COMMAND_SETTINGS;
 import static org.telegram.telegrambots.abilitybots.api.objects.Locality.ALL;
 import static org.telegram.telegrambots.abilitybots.api.objects.Privacy.PUBLIC;
 
+
 public class StartCommand extends AbstractCommand {
     public StartCommand(@NonNull final PovaryoshkaBot povaryoshkaBot) {
         super(povaryoshkaBot);
