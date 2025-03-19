@@ -28,7 +28,6 @@ import telegram.bot.PovaryoshkaBot;
 import telegram.commands.simple.createdish.postgres.SimplePostgresDishCommandTester;
 
 
-// TODO: why @Mock doesnt work
 public class SimpleCreateDishCommandTest {
     @NonNull
     private final DbTypes dbType = getDbType();
@@ -42,7 +41,7 @@ public class SimpleCreateDishCommandTest {
     @Nullable
     private MockedStatic<DriverManager> mockedDriverManager;
     
-    @NonNull
+    @Nullable
     private Connection mockedDbConnection;
 
     @BeforeClass
@@ -77,7 +76,10 @@ public class SimpleCreateDishCommandTest {
     @Test
     public void createDishTest() throws Exception {
         if (bot == null) {
-            throw new Exception("In CreateDishCommandTest bot is null");
+            throw new Exception("In CreateDishCommandTest: bot is null.");
+        }
+        if (mockedDbConnection == null) {
+            throw new Exception("In CreateDishCommandTest: mockedDbConnection is null.");
         }
         final SimpleTypedCreateDishCommandTester simpleTypedCreateDishCommandTester = getSimpleTypedCreateDishCommandTester();
         simpleTypedCreateDishCommandTester.createDishTest(bot, mockedDbConnection);
@@ -86,7 +88,10 @@ public class SimpleCreateDishCommandTest {
     @Test
     public void handleDishNameUpdateStateTest() throws Exception {
         if (bot == null) {
-            throw new Exception("In CreateDishCommandTest bot is null");
+            throw new Exception("In CreateDishCommandTest: bot is null.");
+        }
+        if (mockedDbConnection == null) {
+            throw new Exception("In CreateDishCommandTest: mockedDbConnection is null.");
         }
         final SimpleTypedCreateDishCommandTester simpleTypedCreateDishCommandTester = getSimpleTypedCreateDishCommandTester();
         simpleTypedCreateDishCommandTester.handleDishNameUpdateStateTest(bot, mockedDbConnection);
@@ -95,7 +100,10 @@ public class SimpleCreateDishCommandTest {
     @Test
     public void handleIngredientsUpdateStateTest() throws Exception {
         if (bot == null) {
-            throw new Exception("In CreateDishCommandTest bot is null");
+            throw new Exception("In CreateDishCommandTest: bot is null.");
+        }
+        if (mockedDbConnection == null) {
+            throw new Exception("In CreateDishCommandTest: mockedDbConnection is null.");
         }
         final SimpleTypedCreateDishCommandTester simpleTypedCreateDishCommandTester = getSimpleTypedCreateDishCommandTester();
         simpleTypedCreateDishCommandTester.handleIngredientsUpdateStateTest(bot, mockedDbConnection);
@@ -113,7 +121,10 @@ public class SimpleCreateDishCommandTest {
     @Test
     public void isInCreateDishContextTest() throws Exception {
         if (bot == null) {
-            throw new Exception("In CreateDishCommandTest bot is null");
+            throw new Exception("In CreateDishCommandTest: bot is null.");
+        }
+        if (mockedDbConnection == null) {
+            throw new Exception("In CreateDishCommandTest: mockedDbConnection is null.");
         }
         final SimpleTypedCreateDishCommandTester simpleTypedCreateDishCommandTester = getSimpleTypedCreateDishCommandTester();
         simpleTypedCreateDishCommandTester.isInCreateDishContextTest(bot, mockedDbConnection);
@@ -132,12 +143,14 @@ public class SimpleCreateDishCommandTest {
     }
 
     @After
-    public void tearDown() throws IOException {
-        if (mockedDriverManager == null) {
-            return;
+    public void tearDown() throws IOException, Exception {
+        if (bot == null) {
+            throw new Exception("in tearDown bot is null");
         }
-        // TODO: Refactor
-        mockedDriverManager.close();
+        if (mockedDriverManager == null) {
+            throw new Exception("in tearDown mockedDriverManager is null");
+        }
         bot.getDb().close();
+        mockedDriverManager.close();
     }
 }

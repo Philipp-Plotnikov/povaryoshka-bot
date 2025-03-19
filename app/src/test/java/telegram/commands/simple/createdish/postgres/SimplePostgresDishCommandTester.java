@@ -28,18 +28,12 @@ public class SimplePostgresDishCommandTester implements SimpleTypedCreateDishCom
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
     ) throws Exception {
-        final MessageContext messageContext = mock(MessageContext.class);
-        final Update update = mock(Update.class);
-        final User user = mock(User.class);
-        final Message message = mock(Message.class);
+        // Arrange
+        final MessageContext messageContext = getCreateDishMessageContext();
         final PreparedStatement preparedStatement = mock(PreparedStatement.class);
-        when(messageContext.update()).thenReturn(update);
-        when(messageContext.user()).thenReturn(user);
-        when(user.getId()).thenReturn((long)123);
-        when(update.getMessage()).thenReturn(message);
-        when(message.getChatId()).thenReturn((long)123);
         when(mockedDbConnection.prepareStatement(any())).thenReturn(preparedStatement);
         
+        // Act
         final Map<String, AbilityExtension> commandMap = bot.getCommandMap();
         if (commandMap == null) {
             throw new Exception("In SimplePostgresDishCommandTester commandMap is null");
@@ -50,7 +44,23 @@ public class SimplePostgresDishCommandTester implements SimpleTypedCreateDishCom
         }
         final CreateDishCommand typedCreateDishCommand = (CreateDishCommand)createDishCommand;
         typedCreateDishCommand.createDish().action().accept(messageContext);
+    
+        // Assert
         verify(messageContext, times(1)).update();
+    }
+
+    @NonNull
+    private MessageContext getCreateDishMessageContext() {
+        final MessageContext messageContext = mock(MessageContext.class);
+        final Update update = mock(Update.class);
+        final User user = mock(User.class);
+        final Message message = mock(Message.class);
+        when(messageContext.update()).thenReturn(update);
+        when(messageContext.user()).thenReturn(user);
+        when(user.getId()).thenReturn((long)123);
+        when(update.getMessage()).thenReturn(message);
+        when(message.getChatId()).thenReturn((long)123);
+        return messageContext;
     }
 
     public void handleDishNameUpdateStateTest(
