@@ -8,13 +8,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.telegram.telegrambots.abilitybots.api.util.AbilityExtension;
 
 import telegram.bot.PovaryoshkaBot;
-import telegram.commands.CreateDishCommand;
-import telegram.commands.DeleteDishCommand;
-import telegram.commands.EndCommand;
-import telegram.commands.FeedbackCommand;
-import telegram.commands.GetDishCommand;
-import telegram.commands.UpdateDishCommand;
-import telegram.commands.StartCommand;
+import telegram.commands.*;
 
 public class SimpleCommandFactory implements ICommandFactory {
     @Override
@@ -28,6 +22,7 @@ public class SimpleCommandFactory implements ICommandFactory {
         simpleCommandList.add(new GetDishCommand(povaryoshkaBot));
         simpleCommandList.add(new FeedbackCommand(povaryoshkaBot));
         simpleCommandList.add(new EndCommand(povaryoshkaBot));
+        simpleCommandList.add(new DefaultReplyCommand(povaryoshkaBot));
         return Collections.unmodifiableList(simpleCommandList);
     }
 }

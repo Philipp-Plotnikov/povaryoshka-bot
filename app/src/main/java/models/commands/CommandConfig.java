@@ -1,14 +1,7 @@
 package models.commands;
 
+import language.ru.command.settings.*;
 import org.checkerframework.checker.nullness.qual.NonNull;
-
-import language.ru.command.settings.CreateDish;
-import language.ru.command.settings.DeleteDish;
-import language.ru.command.settings.End;
-import language.ru.command.settings.Feedback;
-import language.ru.command.settings.GetDish;
-import language.ru.command.settings.UpdateDish;
-import language.ru.command.settings.Start;
 
 
 public class CommandConfig {
@@ -52,5 +45,11 @@ public class CommandConfig {
     public final static CommandSettings START_COMMAND_SETTINGS = new CommandSettings(
             Start.COMMAND_NAME,
             Start.COMMAND_DESCRIPTION
+    );
+
+    @NonNull
+    public final static CommandSettings DEFAULT_COMMAND_SETTINGS = new CommandSettings(
+            DefaultReply.COMMAND_NAME,
+            DefaultReply.COMMAND_DESCRIPTION
     );
 }
