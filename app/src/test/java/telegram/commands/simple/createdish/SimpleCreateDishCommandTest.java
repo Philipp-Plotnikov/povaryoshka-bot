@@ -28,12 +28,12 @@ import telegram.bot.PovaryoshkaBot;
 import telegram.commands.simple.createdish.postgres.SimplePostgresDishCommandTester;
 
 
-public class SimpleCreateDishCommandTest {
+final public class SimpleCreateDishCommandTest {
     @NonNull
     private final DbTypes dbType = getDbType();
     
     @NonNull
-    private final Map<@NonNull DbTypes, @Nullable SimpleTypedCreateDishCommandTester> simpleTypedCreateDishCommandTesterMap;
+    private final Map<@NonNull DbTypes, @Nullable ISimpleTypedCreateDishCommandTester> simpleTypedCreateDishCommandTesterMap;
 
     @Nullable
     private PovaryoshkaBot bot;
@@ -54,8 +54,8 @@ public class SimpleCreateDishCommandTest {
     }
 
     @NonNull
-    private Map<@NonNull DbTypes, @Nullable SimpleTypedCreateDishCommandTester> getSimpleTypedCreateDishCommandTesterMap() {
-        final EnumMap<@NonNull DbTypes, @Nullable SimpleTypedCreateDishCommandTester> localSimpleTypedCommandTesterMap = new EnumMap<>(DbTypes.class);
+    private Map<@NonNull DbTypes, @Nullable ISimpleTypedCreateDishCommandTester> getSimpleTypedCreateDishCommandTesterMap() {
+        final EnumMap<@NonNull DbTypes, @Nullable ISimpleTypedCreateDishCommandTester> localSimpleTypedCommandTesterMap = new EnumMap<>(DbTypes.class);
         localSimpleTypedCommandTesterMap.put(DbTypes.POSTGRES, new SimplePostgresDishCommandTester());
         return Collections.unmodifiableMap(localSimpleTypedCommandTesterMap);
     }
@@ -81,7 +81,7 @@ public class SimpleCreateDishCommandTest {
         if (mockedDbConnection == null) {
             throw new Exception("In CreateDishCommandTest: mockedDbConnection is null.");
         }
-        final SimpleTypedCreateDishCommandTester simpleTypedCreateDishCommandTester = getSimpleTypedCreateDishCommandTester();
+        final ISimpleTypedCreateDishCommandTester simpleTypedCreateDishCommandTester = getSimpleTypedCreateDishCommandTester();
         simpleTypedCreateDishCommandTester.createDishTest(bot, mockedDbConnection);
     }
 
@@ -93,7 +93,7 @@ public class SimpleCreateDishCommandTest {
         if (mockedDbConnection == null) {
             throw new Exception("In CreateDishCommandTest: mockedDbConnection is null.");
         }
-        final SimpleTypedCreateDishCommandTester simpleTypedCreateDishCommandTester = getSimpleTypedCreateDishCommandTester();
+        final ISimpleTypedCreateDishCommandTester simpleTypedCreateDishCommandTester = getSimpleTypedCreateDishCommandTester();
         simpleTypedCreateDishCommandTester.handleDishNameUpdateStateTest(bot, mockedDbConnection);
     }
 
@@ -105,7 +105,7 @@ public class SimpleCreateDishCommandTest {
         if (mockedDbConnection == null) {
             throw new Exception("In CreateDishCommandTest: mockedDbConnection is null.");
         }
-        final SimpleTypedCreateDishCommandTester simpleTypedCreateDishCommandTester = getSimpleTypedCreateDishCommandTester();
+        final ISimpleTypedCreateDishCommandTester simpleTypedCreateDishCommandTester = getSimpleTypedCreateDishCommandTester();
         simpleTypedCreateDishCommandTester.handleIngredientsUpdateStateTest(bot, mockedDbConnection);
     }
 
@@ -114,7 +114,7 @@ public class SimpleCreateDishCommandTest {
         if (bot == null) {
             throw new Exception("In CreateDishCommandTest bot is null");
         }
-        final SimpleTypedCreateDishCommandTester simpleTypedCreateDishCommandTester = getSimpleTypedCreateDishCommandTester();
+        final ISimpleTypedCreateDishCommandTester simpleTypedCreateDishCommandTester = getSimpleTypedCreateDishCommandTester();
         simpleTypedCreateDishCommandTester.handleRecipeUpdateStateTest(bot, mockedDbConnection);
     }
 
@@ -126,16 +126,16 @@ public class SimpleCreateDishCommandTest {
         if (mockedDbConnection == null) {
             throw new Exception("In CreateDishCommandTest: mockedDbConnection is null.");
         }
-        final SimpleTypedCreateDishCommandTester simpleTypedCreateDishCommandTester = getSimpleTypedCreateDishCommandTester();
+        final ISimpleTypedCreateDishCommandTester simpleTypedCreateDishCommandTester = getSimpleTypedCreateDishCommandTester();
         simpleTypedCreateDishCommandTester.isInCreateDishContextTest(bot, mockedDbConnection);
     }
 
     @NonNull
-    private SimpleTypedCreateDishCommandTester getSimpleTypedCreateDishCommandTester() throws Exception {
+    private ISimpleTypedCreateDishCommandTester getSimpleTypedCreateDishCommandTester() throws Exception {
         if (!simpleTypedCreateDishCommandTesterMap.containsKey(dbType)) {
             throw new Exception(String.format("dbType '%s' was not found in typedCommandTesterMap", dbType.name()));
         }
-        final SimpleTypedCreateDishCommandTester simpleTypedCreateDishCommandTester = simpleTypedCreateDishCommandTesterMap.get(dbType);
+        final ISimpleTypedCreateDishCommandTester simpleTypedCreateDishCommandTester = simpleTypedCreateDishCommandTesterMap.get(dbType);
         if (simpleTypedCreateDishCommandTester == null) {
             throw new Exception(String.format("typedCommandTesterMap of dbType '%s' is null", dbType.name()));
         }

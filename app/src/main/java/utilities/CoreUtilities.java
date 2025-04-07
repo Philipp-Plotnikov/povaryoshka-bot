@@ -17,7 +17,7 @@ import static models.system.EnvVars.COMMAND_TYPE;
 import telegram.bot.PovaryoshkaBot;
 
 
-public class CoreUtilities {
+final public class CoreUtilities {
     public static void loadEnvFileToSystemProperties() {
         Dotenv.configure().systemProperties().load();
     }

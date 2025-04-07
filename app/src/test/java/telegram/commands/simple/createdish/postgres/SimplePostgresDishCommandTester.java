@@ -3,9 +3,11 @@ package telegram.commands.simple.createdish.postgres;
 import static models.commands.CommandConfig.CREATE_DISH_COMMAND_SETTINGS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static utilities.CommandUtilities.isCreateDishCommand;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -18,12 +20,13 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
 
+import language.ru.BotMessages;
 import telegram.bot.PovaryoshkaBot;
 import telegram.commands.CreateDishCommand;
-import telegram.commands.simple.createdish.SimpleTypedCreateDishCommandTester;
+import telegram.commands.simple.createdish.ISimpleTypedCreateDishCommandTester;
 
 
-public class SimplePostgresDishCommandTester implements SimpleTypedCreateDishCommandTester {
+final public class SimplePostgresDishCommandTester implements ISimpleTypedCreateDishCommandTester {
     public void createDishTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
@@ -34,19 +37,11 @@ public class SimplePostgresDishCommandTester implements SimpleTypedCreateDishCom
         when(mockedDbConnection.prepareStatement(any())).thenReturn(preparedStatement);
         
         // Act
-        final Map<String, AbilityExtension> commandMap = bot.getCommandMap();
-        if (commandMap == null) {
-            throw new Exception("In SimplePostgresDishCommandTester commandMap is null");
-        }
-        final AbilityExtension createDishCommand = commandMap.get(CREATE_DISH_COMMAND_SETTINGS.commandName());
-        if (createDishCommand == null || !(createDishCommand instanceof CreateDishCommand)) {
-            throw new Exception("In SimplePostgresDishCommandTester createDishCommand is null or is not of expected type");
-        }
-        final CreateDishCommand typedCreateDishCommand = (CreateDishCommand)createDishCommand;
-        typedCreateDishCommand.createDish().action().accept(messageContext);
+        final CreateDishCommand createDishCommand = getCreateDishCommand(bot);
+        createDishCommand.createDish().action().accept(messageContext);
     
         // Assert
-        verify(messageContext, times(1)).update();
+        verify(bot.getSilent(), never()).send(BotMessages.SOMETHING_WENT_WRONG, messageContext.update().getUpdateId());
     }
 
     @NonNull
@@ -61,6 +56,19 @@ public class SimplePostgresDishCommandTester implements SimpleTypedCreateDishCom
         when(update.getMessage()).thenReturn(message);
         when(message.getChatId()).thenReturn((long)123);
         return messageContext;
+    }
+
+    @NonNull
+    private CreateDishCommand getCreateDishCommand(@NonNull final PovaryoshkaBot bot) throws Exception {
+        final Map<String, AbilityExtension> commandMap = bot.getCommandMap();
+        if (commandMap == null) {
+            throw new Exception("In SimplePostgresDishCommandTester commandMap is null");
+        }
+        final AbilityExtension untypedCommand = commandMap.get(CREATE_DISH_COMMAND_SETTINGS.commandName());
+        if (!isCreateDishCommand(untypedCommand)) {
+            throw new Exception("In SimplePostgresDishCommandTester createDishCommand is null or is not of expected type");
+        }
+        return (CreateDishCommand)untypedCommand;
     }
 
     public void handleDishNameUpdateStateTest(

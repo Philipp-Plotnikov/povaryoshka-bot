@@ -15,7 +15,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import models.db.drivers.postgres.PostgresDbDriverOptions;
 
 
-public class PostgresDbDriverUtilities {
+final public class PostgresDbDriverUtilities {
     @NonNull
     public static PostgresDbDriverOptions getPostgresDbDriverOptions() {
         final PostgresDbDriverOptions postgresDbDriverOptions = new PostgresDbDriverOptions(

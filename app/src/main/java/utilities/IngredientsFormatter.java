@@ -6,7 +6,7 @@ import utilities.factory.IIngredientsFormatter;
 import java.util.Arrays;
 import java.util.List;
 
-public class IngredientsFormatter implements IIngredientsFormatter {
+final public class IngredientsFormatter implements IIngredientsFormatter {
 
     @Override
     @NonNull

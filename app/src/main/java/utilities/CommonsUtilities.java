@@ -7,7 +7,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import models.db.DbTypes;
 
 
-public class CommonsUtilities {
+final public class CommonsUtilities {
     @NonNull
     public static DbTypes getDbType() {
         return DbTypes.valueOf(System.getProperty(DB_TYPE).toUpperCase());

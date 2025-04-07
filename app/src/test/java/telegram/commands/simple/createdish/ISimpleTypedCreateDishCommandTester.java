@@ -7,7 +7,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import telegram.bot.PovaryoshkaBot;
 
 
-public interface SimpleTypedCreateDishCommandTester {
+public interface ISimpleTypedCreateDishCommandTester {
     void createDishTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
