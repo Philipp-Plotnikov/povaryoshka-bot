@@ -11,7 +11,7 @@ import language.ru.command.settings.UpdateDish;
 import language.ru.command.settings.Start;
 
 
-public class CommandConfig {
+final public class CommandConfig {
     @NonNull
     public final static CommandSettings CREATE_DISH_COMMAND_SETTINGS = new CommandSettings(
         CreateDish.COMMAND_NAME,

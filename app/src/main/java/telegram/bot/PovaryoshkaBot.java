@@ -1,15 +1,18 @@
 package telegram.bot;
 
 import java.sql.SQLException;
-import java.util.List;
+import java.util.Map;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.telegram.telegrambots.abilitybots.api.bot.AbilityBot;
+import org.telegram.telegrambots.abilitybots.api.sender.SilentSender;
 import org.telegram.telegrambots.abilitybots.api.util.AbilityExtension;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import core.factory.FacadeFactory;
 import dbdrivers.IDbDriver;
+
 
 public class PovaryoshkaBot extends AbilityBot {
     private final long creatorId;
@@ -20,6 +23,9 @@ public class PovaryoshkaBot extends AbilityBot {
     @NonNull
     private final FacadeFactory facadeFactory;
 
+    @Nullable
+    private Map<String, @Nullable AbilityExtension> commandMap;
+
     public PovaryoshkaBot(
         @NonNull final TelegramClient telegramClient,
         @NonNull final String botUsername,
@@ -29,12 +35,12 @@ public class PovaryoshkaBot extends AbilityBot {
         this.creatorId = creatorId;
         facadeFactory = new FacadeFactory();
         dbDriver = facadeFactory.getDbDriver();
-        dbDriver.setup();
+        initCommandList();
     }
 
     public void initCommandList() {
-        final List<AbilityExtension> commandList = facadeFactory.getCommandList(this);
-        addExtensions(commandList);
+        commandMap = facadeFactory.getCommandMap(this);
+        addExtensions(commandMap.values());
         onRegister();
     }
 
@@ -43,8 +49,17 @@ public class PovaryoshkaBot extends AbilityBot {
         return dbDriver;
     }
 
+    @Nullable
+    public Map<String, @Nullable AbilityExtension> getCommandMap() {
+        return commandMap;
+    }
+
     @Override
     public long creatorId() {
         return creatorId;
+    }
+
+    public void setSilentSender(@NonNull SilentSender newSilentSender) {
+        silent = newSilentSender;
     }
 }

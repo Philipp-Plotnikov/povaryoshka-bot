@@ -1,6 +1,5 @@
 package telegram.commands;
 
-import java.util.function.Predicate;
 import java.sql.SQLException;
 
 import models.commands.CommandStates;
@@ -8,8 +7,6 @@ import models.db.sqlops.feedback.FeedbackInsertOptions;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import models.db.sqlops.usercontext.UserContextDeleteOptions;
-import models.db.sqlops.usercontext.UserContextSelectOptions;
-import models.dtos.UserContextDTO;
 import org.telegram.telegrambots.abilitybots.api.objects.Ability;
 import org.telegram.telegrambots.abilitybots.api.objects.Flag;
 
