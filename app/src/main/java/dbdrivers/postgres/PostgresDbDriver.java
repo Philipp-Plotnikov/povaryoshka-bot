@@ -637,6 +637,7 @@ public class PostgresDbDriver implements IDbDriver {
             final BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
         ) {
             final ScriptRunner scriptRunner = new ScriptRunner(connection);
+            scriptRunner.setLogWriter(null);
             scriptRunner.setSendFullScript(true);
             scriptRunner.runScript(bufferedReader);
         }
