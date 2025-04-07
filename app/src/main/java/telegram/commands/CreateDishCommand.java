@@ -102,7 +102,7 @@ public class CreateDishCommand extends AbstractCommand {
                 .build();
     }
 
-    private void handleDishNameUpdateState(
+    public void handleDishNameUpdateState(
         @NonNull final Update update,
         @NonNull final UserContextDTO userContextDTO
     ) {
@@ -135,7 +135,7 @@ public class CreateDishCommand extends AbstractCommand {
         }
     }
 
-    private void handleIngredientsUpdateState(
+    public void handleIngredientsUpdateState(
         @NonNull final Update update,
         @NonNull final UserContextDTO userContextDTO
     ) {
@@ -171,7 +171,7 @@ public class CreateDishCommand extends AbstractCommand {
         }
     }
 
-    private void handleRecipeUpdateState(
+    public void handleRecipeUpdateState(
         @NonNull final Update update,
         @NonNull final UserContextDTO userContextDTO
     ) {

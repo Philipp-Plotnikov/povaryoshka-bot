@@ -119,7 +119,7 @@ final public class SimpleCreateDishCommandTest {
     }
 
     @Test
-    public void isInCreateDishContextTest() throws Exception {
+    public void isInCreateDishContextTruthyTest() throws Exception {
         if (bot == null) {
             throw new Exception("In CreateDishCommandTest: bot is null.");
         }
@@ -127,7 +127,19 @@ final public class SimpleCreateDishCommandTest {
             throw new Exception("In CreateDishCommandTest: mockedDbConnection is null.");
         }
         final ISimpleTypedCreateDishCommandTester simpleTypedCreateDishCommandTester = getSimpleTypedCreateDishCommandTester();
-        simpleTypedCreateDishCommandTester.isInCreateDishContextTest(bot, mockedDbConnection);
+        simpleTypedCreateDishCommandTester.isInCreateDishContextTruthyTest(bot, mockedDbConnection);
+    }
+
+    @Test
+    public void isInCreateDishContextFalsyTest() throws Exception {
+        if (bot == null) {
+            throw new Exception("In CreateDishCommandTest: bot is null.");
+        }
+        if (mockedDbConnection == null) {
+            throw new Exception("In CreateDishCommandTest: mockedDbConnection is null.");
+        }
+        final ISimpleTypedCreateDishCommandTester simpleTypedCreateDishCommandTester = getSimpleTypedCreateDishCommandTester();
+        simpleTypedCreateDishCommandTester.isInCreateDishContextFalsyTest(bot, mockedDbConnection);
     }
 
     @NonNull
