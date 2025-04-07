@@ -18,13 +18,13 @@ import org.mockito.Mockito;
 
 import models.db.DbTypes;
 import models.db.drivers.postgres.PostgresDbDriverOptions;
-import models.drivers.TypedDbDriverMocker;
+import models.drivers.ITypedDbDriverMocker;
 import utilities.PostgresDbDriverUtilities;
 
 
 public class DbDriverMocker {
     @Nullable
-    private static Map<@NonNull DbTypes, @Nullable TypedDbDriverMocker> dbDriverMockerMap;
+    private static Map<@NonNull DbTypes, @Nullable ITypedDbDriverMocker> dbDriverMockerMap;
 
     @NonNull
     public static MockedStatic<DriverManager> getDbDriverMock(
@@ -32,7 +32,7 @@ public class DbDriverMocker {
         @NonNull final Connection mockedDbConnection
     ) throws Exception {
         dbDriverMockerMap = getDbDriverMockerMap();
-        final TypedDbDriverMocker typedDbDriverMocker = dbDriverMockerMap.get(dbType);
+        final ITypedDbDriverMocker typedDbDriverMocker = dbDriverMockerMap.get(dbType);
         if (typedDbDriverMocker == null) {
             throw new Exception("TypedDbDriverMocker is null");
         }
@@ -40,8 +40,8 @@ public class DbDriverMocker {
     }
 
     @NonNull
-    private static Map<@NonNull DbTypes, @Nullable TypedDbDriverMocker> getDbDriverMockerMap() {
-        final EnumMap<@NonNull DbTypes, @Nullable TypedDbDriverMocker> localDbDriverMockerMap = new EnumMap<>(DbTypes.class);
+    private static Map<@NonNull DbTypes, @Nullable ITypedDbDriverMocker> getDbDriverMockerMap() {
+        final EnumMap<@NonNull DbTypes, @Nullable ITypedDbDriverMocker> localDbDriverMockerMap = new EnumMap<>(DbTypes.class);
         localDbDriverMockerMap.put(DbTypes.POSTGRES, DbDriverMocker::postgresDbDriverMocker);
         return Collections.unmodifiableMap(localDbDriverMockerMap);
     }

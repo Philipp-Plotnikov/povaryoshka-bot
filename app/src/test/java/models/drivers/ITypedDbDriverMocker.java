@@ -7,7 +7,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.mockito.MockedStatic;
 
 @FunctionalInterface
-public interface TypedDbDriverMocker {
+public interface ITypedDbDriverMocker {
     @NonNull
     MockedStatic<DriverManager> getDbDriverMock(@NonNull final Connection dbConnection);
 }
