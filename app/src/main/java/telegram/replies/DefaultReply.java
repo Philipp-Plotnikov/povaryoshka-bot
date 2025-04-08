@@ -1,4 +1,4 @@
-package telegram.commands;
+package telegram.replies;
 
 import language.ru.BotMessages;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -10,11 +10,12 @@ import static org.telegram.telegrambots.abilitybots.api.objects.Privacy.PUBLIC;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
 import telegram.bot.PovaryoshkaBot;
+import telegram.commands.AbstractCommand;
 
-public class DefaultReplyCommand extends AbstractCommand {
+public class DefaultReply extends AbstractReply {
 
     @NonNull
-    public DefaultReplyCommand(@NonNull PovaryoshkaBot povaryoshkaBot) {
+    public DefaultReply(@NonNull PovaryoshkaBot povaryoshkaBot) {
         super(povaryoshkaBot);
     }
 

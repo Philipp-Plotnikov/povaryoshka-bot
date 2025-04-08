@@ -9,6 +9,7 @@ import org.telegram.telegrambots.abilitybots.api.util.AbilityExtension;
 
 import telegram.bot.PovaryoshkaBot;
 import telegram.commands.*;
+import telegram.replies.DefaultReply;
 
 public class SimpleCommandFactory implements ICommandFactory {
     @Override
@@ -22,7 +23,6 @@ public class SimpleCommandFactory implements ICommandFactory {
         simpleCommandList.add(new GetDishCommand(povaryoshkaBot));
         simpleCommandList.add(new FeedbackCommand(povaryoshkaBot));
         simpleCommandList.add(new EndCommand(povaryoshkaBot));
-        simpleCommandList.add(new DefaultReplyCommand(povaryoshkaBot));
         return Collections.unmodifiableList(simpleCommandList);
     }
 }
