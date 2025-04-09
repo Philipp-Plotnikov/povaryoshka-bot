@@ -1,7 +1,6 @@
 package core.factory;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.telegram.telegrambots.abilitybots.api.util.AbilityExtension;
@@ -20,6 +19,7 @@ import telegram.commands.factory.ICommandFactory;
 import telegram.commands.factory.CommandFactoryProducer;
 import telegram.replies.factory.IReplyFactory;
 import telegram.replies.factory.ReplyFactory;
+
 
 public class FacadeFactory {
     private final IDbDriverFactory dbDriverFactory;
@@ -40,11 +40,11 @@ public class FacadeFactory {
         return dbDriverFactory.getDbDriver();
     }
 
-    public List<AbilityExtension> getCombinedExtensionsList(final PovaryoshkaBot povaryoshkaBot) {
-        List<AbilityExtension> combinedList = new ArrayList<>();
-        combinedList.addAll(commandFactory.getCommandList(povaryoshkaBot));
-        combinedList.addAll(replyFactory.getReplyList(povaryoshkaBot));
-        return combinedList;
+    public List<AbilityExtension> getCommandList(final PovaryoshkaBot povaryoshkaBot) {
+        return commandFactory.getCommandList(povaryoshkaBot);
     }
 
+    public List<AbilityExtension> getReplyList(final PovaryoshkaBot povaryoshkaBot) {
+        return replyFactory.createReplyList(povaryoshkaBot);
+    }
 }

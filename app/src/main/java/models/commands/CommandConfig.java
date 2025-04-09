@@ -46,10 +46,4 @@ public class CommandConfig {
             Start.COMMAND_NAME,
             Start.COMMAND_DESCRIPTION
     );
-
-    @NonNull
-    public final static CommandSettings DEFAULT_COMMAND_SETTINGS = new CommandSettings(
-            DefaultReply.COMMAND_NAME,
-            DefaultReply.COMMAND_DESCRIPTION
-    );
 }

@@ -9,6 +9,7 @@ import telegram.bot.PovaryoshkaBot;
 
 import java.util.Optional;
 
+
 public abstract class AbstractReply implements AbilityExtension {
     @NonNull
     protected final PovaryoshkaBot povaryoshkaBot;

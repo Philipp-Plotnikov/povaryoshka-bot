@@ -33,8 +33,10 @@ public class PovaryoshkaBot extends AbilityBot {
     }
 
     public void initCommandList() {
-        final List<AbilityExtension> extensionsList = facadeFactory.getCombinedExtensionsList(this);
-        addExtensions(extensionsList);
+        final List<AbilityExtension> commandList = facadeFactory.getCommandList(this);
+        final List<AbilityExtension> replyList = facadeFactory.getReplyList(this);
+        addExtensions(commandList);
+        addExtensions(replyList);
         onRegister();
     }
 

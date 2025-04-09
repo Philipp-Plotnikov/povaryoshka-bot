@@ -6,7 +6,8 @@ import telegram.bot.PovaryoshkaBot;
 
 import java.util.List;
 
+
 public interface IReplyFactory {
     @NonNull
-    List<@NonNull AbilityExtension> getReplyList(@NonNull PovaryoshkaBot povaryoshkaBot);
+    List<@NonNull AbilityExtension> createReplyList(@NonNull PovaryoshkaBot povaryoshkaBot);
 }
