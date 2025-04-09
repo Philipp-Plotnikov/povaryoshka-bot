@@ -1,28 +1,63 @@
 package telegram.commands.factory;
 
-import java.util.ArrayList;
+import static models.commands.CommandConfig.CREATE_DISH_COMMAND_SETTINGS;
+import static models.commands.CommandConfig.DELETE_DISH_COMMAND_SETTINGS;
+import static models.commands.CommandConfig.END_COMMAND_SETTINGS;
+import static models.commands.CommandConfig.FEEDBACK_COMMAND_SETTINGS;
+import static models.commands.CommandConfig.GET_DISH_COMMAND_SETTINGS;
+import static models.commands.CommandConfig.START_COMMAND_SETTINGS;
+import static models.commands.CommandConfig.UPDATE_DISH_COMMAND_SETTINGS;
+
 import java.util.Collections;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.telegram.telegrambots.abilitybots.api.util.AbilityExtension;
 
 import telegram.bot.PovaryoshkaBot;
-import telegram.commands.*;
+import telegram.commands.CreateDishCommand;
+import telegram.commands.DeleteDishCommand;
+import telegram.commands.EndCommand;
+import telegram.commands.FeedbackCommand;
+import telegram.commands.GetDishCommand;
+import telegram.commands.UpdateDishCommand;
+import telegram.commands.StartCommand;
 
 
 public class SimpleCommandFactory implements ICommandFactory {
-    @Override
     @NonNull
-    public List<@NonNull AbilityExtension> getCommandList(@NonNull final PovaryoshkaBot povaryoshkaBot) {
-        final ArrayList<AbilityExtension> simpleCommandList = new ArrayList<>();
-        simpleCommandList.add(new StartCommand(povaryoshkaBot));
-        simpleCommandList.add(new CreateDishCommand(povaryoshkaBot));
-        simpleCommandList.add(new DeleteDishCommand(povaryoshkaBot));
-        simpleCommandList.add(new UpdateDishCommand(povaryoshkaBot));
-        simpleCommandList.add(new GetDishCommand(povaryoshkaBot));
-        simpleCommandList.add(new FeedbackCommand(povaryoshkaBot));
-        simpleCommandList.add(new EndCommand(povaryoshkaBot));
-        return Collections.unmodifiableList(simpleCommandList);
+    public Map<String, @Nullable AbilityExtension> createCommandMap(@NonNull final PovaryoshkaBot povaryoshkaBot) {
+        final HashMap<String, AbilityExtension> simpleCommandMap = new HashMap<>();
+        simpleCommandMap.put(
+                START_COMMAND_SETTINGS.commandName(),
+                new StartCommand(povaryoshkaBot)
+        );
+        simpleCommandMap.put(
+                CREATE_DISH_COMMAND_SETTINGS.commandName(),
+                new CreateDishCommand(povaryoshkaBot)
+        );
+        simpleCommandMap.put(
+                DELETE_DISH_COMMAND_SETTINGS.commandName(),
+                new DeleteDishCommand(povaryoshkaBot)
+        );
+        simpleCommandMap.put(
+                UPDATE_DISH_COMMAND_SETTINGS.commandName(),
+                new UpdateDishCommand(povaryoshkaBot)
+        );
+        simpleCommandMap.put(
+                GET_DISH_COMMAND_SETTINGS.commandName(),
+                new GetDishCommand(povaryoshkaBot)
+        );
+        simpleCommandMap.put(
+                FEEDBACK_COMMAND_SETTINGS.commandName(),
+                new FeedbackCommand(povaryoshkaBot)
+        );
+        simpleCommandMap.put(
+                END_COMMAND_SETTINGS.commandName(),
+                new EndCommand(povaryoshkaBot)
+        );
+        return Collections.unmodifiableMap(simpleCommandMap);
     }
 }

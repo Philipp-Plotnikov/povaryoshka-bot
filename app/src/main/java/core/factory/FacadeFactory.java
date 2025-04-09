@@ -2,7 +2,10 @@ package core.factory;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.telegram.telegrambots.abilitybots.api.util.AbilityExtension;
 
 import dbdrivers.IDbDriver;
@@ -40,11 +43,12 @@ public class FacadeFactory {
         return dbDriverFactory.getDbDriver();
     }
 
-    public List<AbilityExtension> getCommandList(final PovaryoshkaBot povaryoshkaBot) {
-        return commandFactory.getCommandList(povaryoshkaBot);
+    @NonNull
+    public Map<String, @Nullable AbilityExtension> getCommandMap(@NonNull final PovaryoshkaBot povaryoshkaBot) {
+        return commandFactory.createCommandMap(povaryoshkaBot);
     }
-
-    public List<AbilityExtension> getReplyList(final PovaryoshkaBot povaryoshkaBot) {
-        return replyFactory.createReplyList(povaryoshkaBot);
+    @NonNull
+    public Map<String, @Nullable AbilityExtension> getReplyMap(final PovaryoshkaBot povaryoshkaBot) {
+        return replyFactory.createReplyMap(povaryoshkaBot);
     }
 }

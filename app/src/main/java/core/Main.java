@@ -19,7 +19,6 @@ public class Main {
             final long creatorId = Long.parseLong(System.getenv(CREATOR_ID));
             final TelegramClient telegramClient = new OkHttpTelegramClient(botToken);
             final PovaryoshkaBot povaryoshkaBot = new PovaryoshkaBot(telegramClient, botUsername, creatorId);
-            povaryoshkaBot.initCommandList();
             botsApplication.registerBot(botToken, povaryoshkaBot);
             Thread.currentThread().join();
         } catch (Exception e) {

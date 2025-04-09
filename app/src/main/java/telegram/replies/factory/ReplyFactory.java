@@ -5,17 +5,20 @@ import org.telegram.telegrambots.abilitybots.api.util.AbilityExtension;
 import telegram.bot.PovaryoshkaBot;
 import telegram.replies.DefaultReply;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+
+import static models.replies.ReplyConfig.DEFAULT_REPLY_SETTINGS;
 
 
 public class ReplyFactory implements IReplyFactory {
     @Override
     @NonNull
-    public List<@NonNull AbilityExtension> createReplyList(@NonNull PovaryoshkaBot povaryoshkaBot) {
-        final ArrayList<AbilityExtension> replyList = new ArrayList<>();
-        replyList.add(new DefaultReply(povaryoshkaBot));
-        return Collections.unmodifiableList(replyList);
+    public Map<String, @NonNull AbilityExtension> createReplyMap(@NonNull PovaryoshkaBot povaryoshkaBot) {
+        final Map<String, AbilityExtension> replyMap = new HashMap<>();
+        replyMap.put(
+                DEFAULT_REPLY_SETTINGS.replyName(),
+                new DefaultReply(povaryoshkaBot)
+        );
+        return Collections.unmodifiableMap(replyMap);
     }
 }
