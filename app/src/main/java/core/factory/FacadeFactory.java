@@ -44,11 +44,11 @@ public class FacadeFactory {
     }
 
     @NonNull
-    public Map<String, @Nullable AbilityExtension> getCommandMap(@NonNull final PovaryoshkaBot povaryoshkaBot) {
+    public Map<String, @Nullable AbilityExtension> createCommandMap(@NonNull final PovaryoshkaBot povaryoshkaBot) {
         return commandFactory.createCommandMap(povaryoshkaBot);
     }
     @NonNull
-    public Map<String, @Nullable AbilityExtension> getReplyMap(final PovaryoshkaBot povaryoshkaBot) {
+    public Map<String, @Nullable AbilityExtension> createReplyMap(final PovaryoshkaBot povaryoshkaBot) {
         return replyFactory.createReplyMap(povaryoshkaBot);
     }
 }

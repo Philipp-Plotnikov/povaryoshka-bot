@@ -1,24 +1,22 @@
 package core;
 
-import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
-import org.telegram.telegrambots.meta.generics.TelegramClient;
 
-import static models.system.EnvVars.BOT_USERNAME;
-import static models.system.EnvVars.CREATOR_ID;
+import static utilities.CoreUtilities.getPovaryoshkaBot;
+import static utilities.CoreUtilities.loadEnvFileToSystemProperties;
 import static models.system.EnvVars.TELEGRAM_BOT_API_TOKEN;
 import telegram.bot.PovaryoshkaBot;
 
+
 public class Main {
     public static void main(String[] args) {
+        loadEnvFileToSystemProperties();
         try (
             TelegramBotsLongPollingApplication botsApplication = new TelegramBotsLongPollingApplication();
         ) {
-            final String botToken = System.getenv(TELEGRAM_BOT_API_TOKEN);
-            final String botUsername = System.getenv(BOT_USERNAME);
-            final long creatorId = Long.parseLong(System.getenv(CREATOR_ID));
-            final TelegramClient telegramClient = new OkHttpTelegramClient(botToken);
-            final PovaryoshkaBot povaryoshkaBot = new PovaryoshkaBot(telegramClient, botUsername, creatorId);
+            final PovaryoshkaBot povaryoshkaBot = getPovaryoshkaBot();
+            final String botToken = System.getProperty(TELEGRAM_BOT_API_TOKEN);
+            povaryoshkaBot.getDbDriver().setup();
             botsApplication.registerBot(botToken, povaryoshkaBot);
             Thread.currentThread().join();
         } catch (Exception e) {

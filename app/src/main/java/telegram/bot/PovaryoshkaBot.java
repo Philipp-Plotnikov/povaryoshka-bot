@@ -6,6 +6,7 @@ import java.util.Map;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.telegram.telegrambots.abilitybots.api.bot.AbilityBot;
+import org.telegram.telegrambots.abilitybots.api.sender.SilentSender;
 import org.telegram.telegrambots.abilitybots.api.util.AbilityExtension;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
@@ -42,8 +43,8 @@ public class PovaryoshkaBot extends AbilityBot {
     }
 
     public void initCommandList() {
-        commandMap = facadeFactory.getCommandMap(this);
-        replyMap = facadeFactory.getReplyMap(this);
+        commandMap = facadeFactory.createCommandMap(this);
+        replyMap = facadeFactory.createReplyMap(this);
         addExtensions(commandMap.values());
         addExtensions(replyMap.values());
         onRegister();
@@ -57,5 +58,19 @@ public class PovaryoshkaBot extends AbilityBot {
     @Override
     public long creatorId() {
         return creatorId;
+    }
+
+    @Nullable
+    public Map<String, @Nullable AbilityExtension> getCommandMap() {
+        return commandMap;
+    }
+
+    @Nullable
+    public Map<String, @Nullable AbilityExtension> getReplyMap() {
+        return replyMap;
+    }
+
+    public void setSilentSender(@NonNull SilentSender newSilentSender) {
+        silent = newSilentSender;
     }
 }

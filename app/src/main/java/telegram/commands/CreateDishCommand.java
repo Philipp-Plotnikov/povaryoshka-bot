@@ -103,8 +103,8 @@ public class CreateDishCommand extends AbstractCommand {
     }
 
     private void handleDishNameUpdateState(
-            @NonNull final Update update,
-            @NonNull final UserContextDTO userContextDTO
+        @NonNull final Update update,
+        @NonNull final UserContextDTO userContextDTO
     ) {
         try {
             dbDriver.executeAsTransaction(
@@ -136,8 +136,8 @@ public class CreateDishCommand extends AbstractCommand {
     }
 
     private void handleIngredientsUpdateState(
-            @NonNull final Update update,
-            @NonNull final UserContextDTO userContextDTO
+        @NonNull final Update update,
+        @NonNull final UserContextDTO userContextDTO
     ) {
         try {
             final String ingredients = update.getMessage().getText().trim();
