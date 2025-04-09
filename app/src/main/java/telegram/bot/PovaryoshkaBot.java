@@ -1,7 +1,6 @@
 package telegram.bot;
 
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Map;
 
 import org.checkerframework.checker.nullness.qual.NonNull;

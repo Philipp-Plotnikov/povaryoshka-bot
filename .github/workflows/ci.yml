@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - "main"
+  pull_request:
+    branches:
+      - "main"
+
+jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: "temurin"
+          java-version: "17"
+      
+      - name: Create .env file
+        run: |
+          touch app/.env
+          echo DB_TYPE="postgres" >> app/.env
+          echo TELEGRAM_BOT_API_TOKEN="1111" >> app/.env
+          echo DB_HOST="localhost" >> app/.env
+          echo DB_PORT="1111" >> app/.env
+          echo DB_DATABASE="test" >> app/.env
+          echo DB_SCHEMA="test" >> app/.env
+          echo DB_USERNAME="test" >> app/.env
+          echo DB_PASSWORD="" >> app/.env
+          echo IS_DISTRIBUTED_DATABASE="false" >> app/.env
+          echo INIT_SQL_SCRIPT_PATH="sql/postgres/init.sql" >> app/.env
+          echo ALTER_SQL_SCRIPT_PATH="sql/postgres/alter.sql" >> app/.env
+          echo COMMAND_TYPE="simple" >> app/.env
+          echo BOT_USERNAME="PovaryoshkaBot" >> app/.env
+          echo CREATOR_ID="1111" >> app/.env
+          echo LANGUAGE="ru" >> app/.env
+
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Run tests with coverage
+        run: ./gradlew test jacocoTestReport
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: app/build/reports/jacoco/test/jacocoTestReport.xml
+          flags: intergration
+          name: povaryoshka-bot-integration-tests-coverage
+          fail_ci_if_error: true

@@ -4,7 +4,7 @@ import language.ru.command.settings.*;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 
-public class CommandConfig {
+final public class CommandConfig {
     @NonNull
     public final static CommandSettings CREATE_DISH_COMMAND_SETTINGS = new CommandSettings(
         CreateDish.COMMAND_NAME,
