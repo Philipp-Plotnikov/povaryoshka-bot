@@ -172,8 +172,8 @@ public class CreateDishCommand extends AbstractCommand {
     }
 
     private void handleRecipeUpdateState(
-            @NonNull final Update update,
-            @NonNull final UserContextDTO userContextDTO
+        @NonNull final Update update,
+        @NonNull final UserContextDTO userContextDTO
     ) {
         try {
             final long userId = update.getMessage().getFrom().getId();

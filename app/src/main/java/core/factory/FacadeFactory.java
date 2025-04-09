@@ -15,6 +15,8 @@ import dbdrivers.factory.DbDriverFactoryProducer;
 import static models.system.EnvVars.COMMAND_TYPE;
 import static models.system.EnvVars.DB_TYPE;
 
+import static utilities.CommonsUtilities.getDbType;
+import static utilities.CoreUtilities.getCommandType;
 import models.commands.CommandTypes;
 import models.db.DbTypes;
 import telegram.bot.PovaryoshkaBot;
@@ -30,8 +32,8 @@ public class FacadeFactory {
     private final IReplyFactory replyFactory;
 
     public FacadeFactory() throws Exception {
-        final DbTypes dbType = DbTypes.valueOf(System.getenv(DB_TYPE).toUpperCase());
-        final CommandTypes commandType = CommandTypes.valueOf(System.getenv(COMMAND_TYPE).toUpperCase());
+        final CommandTypes commandType = getCommandType();
+        final DbTypes dbType = getDbType();
         final DbDriverFactoryProducer dbDriverFactoryProducer = new DbDriverFactoryProducer();
         final CommandFactoryProducer commandFactoryProducer = new CommandFactoryProducer();
         dbDriverFactory = dbDriverFactoryProducer.getDbDriverFactory(dbType);
@@ -47,6 +49,7 @@ public class FacadeFactory {
     public Map<String, @Nullable AbilityExtension> createCommandMap(@NonNull final PovaryoshkaBot povaryoshkaBot) {
         return commandFactory.createCommandMap(povaryoshkaBot);
     }
+
     @NonNull
     public Map<String, @Nullable AbilityExtension> createReplyMap(final PovaryoshkaBot povaryoshkaBot) {
         return replyFactory.createReplyMap(povaryoshkaBot);
