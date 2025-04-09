@@ -38,7 +38,6 @@ public class PovaryoshkaBot extends AbilityBot {
         this.creatorId = creatorId;
         facadeFactory = new FacadeFactory();
         dbDriver = facadeFactory.getDbDriver();
-        dbDriver.setup();
         initCommandList();
     }
 
