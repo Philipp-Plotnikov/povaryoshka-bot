@@ -68,7 +68,7 @@ public abstract class AbstractCommand implements AbilityExtension {
     }
 
     @NonNull
-    protected Predicate<Update> isSpecifiedContext(@NonNull MultiStateCommandTypes commandType) {
+    public Predicate<Update> isSpecifiedContext(@NonNull MultiStateCommandTypes commandType) {
         return update -> {
             if (isEndCommand(update)) {
                 return false;

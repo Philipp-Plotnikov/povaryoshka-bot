@@ -25,7 +25,7 @@ import telegram.bot.PovaryoshkaBot;
 import java.sql.SQLException;
 
 
-public class DeleteDishCommand extends AbstractCommand {
+final public class DeleteDishCommand extends AbstractCommand {
 
     public DeleteDishCommand(@NonNull final PovaryoshkaBot povaryoshkaBot) {
         super(povaryoshkaBot);

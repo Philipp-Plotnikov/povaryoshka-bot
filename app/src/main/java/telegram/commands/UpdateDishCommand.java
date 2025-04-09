@@ -32,7 +32,7 @@ import static org.telegram.telegrambots.abilitybots.api.objects.Locality.ALL;
 import static org.telegram.telegrambots.abilitybots.api.objects.Privacy.PUBLIC;
 
 
-public class UpdateDishCommand extends AbstractCommand {
+final public class UpdateDishCommand extends AbstractCommand {
     @NonNull
     private final EnumMap<@NonNull CommandStates, ICommandStateHandler> stateHandlersMap = new EnumMap<>(CommandStates.class);
 
@@ -107,7 +107,7 @@ public class UpdateDishCommand extends AbstractCommand {
             .build();
     }
 
-    private void handleDishNameState(@NonNull final Update update, @NonNull final UserContextDTO userContextDTO) {
+    public void handleDishNameState(@NonNull final Update update, @NonNull final UserContextDTO userContextDTO) {
         try {
             final long userId = update.getMessage().getFrom().getId();
             final String dishName = update.getMessage().getText().trim();
@@ -129,7 +129,7 @@ public class UpdateDishCommand extends AbstractCommand {
         }
     }
 
-    private void handleDishNameUpdateConfirmState(@NonNull final Update update, @NonNull final UserContextDTO userContextDTO) {
+    public void handleDishNameUpdateConfirmState(@NonNull final Update update, @NonNull final UserContextDTO userContextDTO) {
         try {
             final long userId = update.getMessage().getFrom().getId();
             final String userMessage = update.getMessage().getText().trim();
@@ -163,7 +163,7 @@ public class UpdateDishCommand extends AbstractCommand {
         }
     }
 
-    private void handleDishNameUpdateState(@NonNull final Update update, @NonNull final UserContextDTO userContextDTO) {
+    public void handleDishNameUpdateState(@NonNull final Update update, @NonNull final UserContextDTO userContextDTO) {
         try {
             final long userId = update.getMessage().getFrom().getId();
             final String newDishName = update.getMessage().getText().trim();
@@ -201,7 +201,7 @@ public class UpdateDishCommand extends AbstractCommand {
         return dishDTO != null ? true : false;
     }
 
-    private void handleIngredientsUpdateConfirmState(@NonNull final Update update, @NonNull final UserContextDTO userContextDTO) {
+    public void handleIngredientsUpdateConfirmState(@NonNull final Update update, @NonNull final UserContextDTO userContextDTO) {
         try {
             final long userId = update.getMessage().getFrom().getId();
             final String userMessage = update.getMessage().getText().trim();
@@ -235,7 +235,7 @@ public class UpdateDishCommand extends AbstractCommand {
         }
     }
 
-    private void handleIngredientsUpdateState(@NonNull final Update update, @NonNull final UserContextDTO userContextDTO) {
+    public void handleIngredientsUpdateState(@NonNull final Update update, @NonNull final UserContextDTO userContextDTO) {
         try {
             final long userId = update.getMessage().getFrom().getId();
             final List<String> ingredientList = Collections.unmodifiableList(
@@ -268,7 +268,7 @@ public class UpdateDishCommand extends AbstractCommand {
         }
     }
 
-    private void handleRecipeUpdateConfirmState(@NonNull final Update update, @NonNull final UserContextDTO userContextDTO) {
+    public void handleRecipeUpdateConfirmState(@NonNull final Update update, @NonNull final UserContextDTO userContextDTO) {
         try {
             final long userId = update.getMessage().getFrom().getId();
             final String userMessage = update.getMessage().getText().trim();
@@ -298,7 +298,7 @@ public class UpdateDishCommand extends AbstractCommand {
         }
     }
 
-    private void handleRecipeUpdateState(@NonNull final Update update, @NonNull final UserContextDTO userContextDTO) {
+    public void handleRecipeUpdateState(@NonNull final Update update, @NonNull final UserContextDTO userContextDTO) {
         try {
             final long userId = update.getMessage().getFrom().getId();
             final String recipe = update.getMessage().getText().trim();

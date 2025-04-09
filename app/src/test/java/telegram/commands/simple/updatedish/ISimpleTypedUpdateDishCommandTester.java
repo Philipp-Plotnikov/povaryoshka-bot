@@ -1,42 +1,51 @@
-package telegram.commands.simple.createdish;
+package telegram.commands.simple.updatedish;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-import models.exceptions.db.sqlops.NotFoundUserContextException;
 import telegram.bot.PovaryoshkaBot;
 
 
-public interface ISimpleTypedCreateDishCommandTester {
-    void createDishTest(
+public interface ISimpleTypedUpdateDishCommandTester {
+    void updateDishTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
     ) throws SQLException, Exception;
+    
+    void handleDishNameStateTest(
+        @NonNull final PovaryoshkaBot bot,
+        @NonNull final Connection mockedDbConnection
+    );
+    
+    void handleDishNameUpdateConfirmStateTest(
+        @NonNull final PovaryoshkaBot bot,
+        @NonNull final Connection mockedDbConnection
+    );
     
     void handleDishNameUpdateStateTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
-    ) throws SQLException, NotFoundUserContextException, Exception;
+    );
     
+    void handleIngredientsUpdateConfirmStateTest(
+        @NonNull final PovaryoshkaBot bot,
+        @NonNull final Connection mockedDbConnection
+    );
+
     void handleIngredientsUpdateStateTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
-    ) throws SQLException, NotFoundUserContextException, Exception;
-    
+    );
+
+    void handleRecipeUpdateConfirmStateTest(
+        @NonNull final PovaryoshkaBot bot,
+        @NonNull final Connection mockedDbConnection
+    );
+
     void handleRecipeUpdateStateTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
-    ) throws SQLException, NotFoundUserContextException, Exception;
-    
-    void isInCreateDishContextTruthyTest(
-        @NonNull final PovaryoshkaBot bot,
-        @NonNull final Connection mockedDbConnection
-    ) throws SQLException, Exception;
-
-    void isInCreateDishContextFalsyTest(
-        @NonNull final PovaryoshkaBot bot,
-        @NonNull final Connection mockedDbConnection
-    ) throws SQLException, Exception;
+    );
 }
