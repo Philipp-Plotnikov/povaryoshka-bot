@@ -2,10 +2,9 @@ package core;
 
 import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
 
-import static models.system.EnvVars.TELEGRAM_BOT_API_TOKEN;
 import static utilities.CoreUtilities.getPovaryoshkaBot;
 import static utilities.CoreUtilities.loadEnvFileToSystemProperties;
-
+import static models.system.EnvVars.TELEGRAM_BOT_API_TOKEN;
 import telegram.bot.PovaryoshkaBot;
 
 

@@ -28,35 +28,35 @@ import telegram.commands.StartCommand;
 
 public class SimpleCommandFactory implements ICommandFactory {
     @NonNull
-    public Map<String, @Nullable AbilityExtension> getCommandMap(@NonNull final PovaryoshkaBot povaryoshkaBot) {
+    public Map<String, @Nullable AbilityExtension> createCommandMap(@NonNull final PovaryoshkaBot povaryoshkaBot) {
         final HashMap<String, AbilityExtension> simpleCommandMap = new HashMap<>();
         simpleCommandMap.put(
-            START_COMMAND_SETTINGS.commandName(),
-            new StartCommand(povaryoshkaBot)
+                START_COMMAND_SETTINGS.commandName(),
+                new StartCommand(povaryoshkaBot)
         );
         simpleCommandMap.put(
-            CREATE_DISH_COMMAND_SETTINGS.commandName(),
-            new CreateDishCommand(povaryoshkaBot)
+                CREATE_DISH_COMMAND_SETTINGS.commandName(),
+                new CreateDishCommand(povaryoshkaBot)
         );
         simpleCommandMap.put(
-            DELETE_DISH_COMMAND_SETTINGS.commandName(),
-            new DeleteDishCommand(povaryoshkaBot)
+                DELETE_DISH_COMMAND_SETTINGS.commandName(),
+                new DeleteDishCommand(povaryoshkaBot)
         );
         simpleCommandMap.put(
-            UPDATE_DISH_COMMAND_SETTINGS.commandName(),
-            new UpdateDishCommand(povaryoshkaBot)
+                UPDATE_DISH_COMMAND_SETTINGS.commandName(),
+                new UpdateDishCommand(povaryoshkaBot)
         );
         simpleCommandMap.put(
-            GET_DISH_COMMAND_SETTINGS.commandName(),
-            new GetDishCommand(povaryoshkaBot)
+                GET_DISH_COMMAND_SETTINGS.commandName(),
+                new GetDishCommand(povaryoshkaBot)
         );
         simpleCommandMap.put(
-            FEEDBACK_COMMAND_SETTINGS.commandName(),
-            new FeedbackCommand(povaryoshkaBot)
+                FEEDBACK_COMMAND_SETTINGS.commandName(),
+                new FeedbackCommand(povaryoshkaBot)
         );
         simpleCommandMap.put(
-            END_COMMAND_SETTINGS.commandName(),
-            new EndCommand(povaryoshkaBot)
+                END_COMMAND_SETTINGS.commandName(),
+                new EndCommand(povaryoshkaBot)
         );
         return Collections.unmodifiableMap(simpleCommandMap);
     }

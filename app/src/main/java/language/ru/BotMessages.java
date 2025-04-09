@@ -24,27 +24,29 @@ public class BotMessages {
     public static final String NO_INFO = "Нет информации";
     public static final String USER_DISH_IS = "Вот блюдо, которое ты ищешь:";
     public static final String CONFIRM_INGREDIENTS_UPDATE = String.format(
-        "Хочешь обновить ингредиенты блюда? (%s/%s)",
-        UserMessages.YES,
-        UserMessages.NO
+            "Хочешь обновить ингредиенты блюда? (%s/%s)",
+            UserMessages.YES,
+            UserMessages.NO
     );
-    public static final String  ENTER_YES_OR_NO= "Прости, я тебя не совсем понял, напиши «Да» или «Нет»";
+    public static final String ENTER_YES_OR_NO = "Прости, я тебя не совсем понял, напиши «Да» или «Нет»";
     public static final String INGREDIENTS_ARE_NOT_UPDATED = "Хорошо, ингредиенты не меняем";
     public static final String INPUT_NEW_INGREDIENTS = "Перечисли новые ингредиенты";
     public static final String CONFIRM_RECIPE_UPDATE = String.format(
-        "Хочешь обновить рецепт блюда? (%s/%s)",
-        UserMessages.YES,
-        UserMessages.NO
+            "Хочешь обновить рецепт блюда? (%s/%s)",
+            UserMessages.YES,
+            UserMessages.NO
     );
     public static final String RECIPE_IS_NOT_UPDATED = "Хорошо, рецепт не меняем";
     public static final String INPUT_NEW_RECIPE = "Напиши новый рецепт";
     public static final String CONFIRM_DISH_NAME_UPDATE = String.format(
-        "Хочешь обновить название блюда? (%s/%s)",
-        UserMessages.YES,
-        UserMessages.NO
+            "Хочешь обновить название блюда? (%s/%s)",
+            UserMessages.YES,
+            UserMessages.NO
     );
     public static final String DISH_NAME_IS_NOT_UPDATED = "Хорошо, название блюда не меняем";
     public static final String INPUT_NEW_DISH_NAME = "Напиши новое название блюда";
     public static final String DISH_WAS_UPDATED_WITH_SUCCESS = "Блюдо успешно обновлено";
+    public static final String DISH_ALREADY_EXISTS = "Данное блюдо уже было создано";
+    public static final String DEFAULT_REPLY_MESSAGE = "Прости, я тебя не совсем понял, выбери команду из меню";
 
 }

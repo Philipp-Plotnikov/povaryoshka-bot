@@ -1,14 +1,7 @@
 package models.commands;
 
+import language.ru.command.settings.*;
 import org.checkerframework.checker.nullness.qual.NonNull;
-
-import language.ru.command.settings.CreateDish;
-import language.ru.command.settings.DeleteDish;
-import language.ru.command.settings.End;
-import language.ru.command.settings.Feedback;
-import language.ru.command.settings.GetDish;
-import language.ru.command.settings.UpdateDish;
-import language.ru.command.settings.Start;
 
 
 final public class CommandConfig {

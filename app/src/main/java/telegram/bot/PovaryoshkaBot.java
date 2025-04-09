@@ -26,6 +26,9 @@ public class PovaryoshkaBot extends AbilityBot {
     @Nullable
     private Map<String, @Nullable AbilityExtension> commandMap;
 
+    @Nullable
+    private Map<String, @Nullable AbilityExtension> replyMap;
+
     public PovaryoshkaBot(
         @NonNull final TelegramClient telegramClient,
         @NonNull final String botUsername,
@@ -39,8 +42,10 @@ public class PovaryoshkaBot extends AbilityBot {
     }
 
     public void initCommandList() {
-        commandMap = facadeFactory.getCommandMap(this);
+        commandMap = facadeFactory.createCommandMap(this);
+        replyMap = facadeFactory.createReplyMap(this);
         addExtensions(commandMap.values());
+        addExtensions(replyMap.values());
         onRegister();
     }
 
@@ -49,14 +54,19 @@ public class PovaryoshkaBot extends AbilityBot {
         return dbDriver;
     }
 
+    @Override
+    public long creatorId() {
+        return creatorId;
+    }
+
     @Nullable
     public Map<String, @Nullable AbilityExtension> getCommandMap() {
         return commandMap;
     }
 
-    @Override
-    public long creatorId() {
-        return creatorId;
+    @Nullable
+    public Map<String, @Nullable AbilityExtension> getReplyMap() {
+        return replyMap;
     }
 
     public void setSilentSender(@NonNull SilentSender newSilentSender) {
