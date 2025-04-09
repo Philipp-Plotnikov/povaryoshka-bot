@@ -8,7 +8,6 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static utilities.CommandUtilities.isCreateDishCommand;
@@ -41,7 +40,7 @@ import telegram.commands.CreateDishCommand;
 import telegram.commands.simple.createdish.ISimpleTypedCreateDishCommandTester;
 
 
-final public class SimplePostgresDishCommandTester implements ISimpleTypedCreateDishCommandTester {
+final public class SimplePostgresCreateDishCommandTester implements ISimpleTypedCreateDishCommandTester {
     public void createDishTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection

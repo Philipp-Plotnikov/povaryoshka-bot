@@ -15,7 +15,7 @@ import static models.commands.CommandConfig.END_COMMAND_SETTINGS;
 import telegram.bot.PovaryoshkaBot;
 
 
-public class EndCommand extends AbstractCommand {
+final public class EndCommand extends AbstractCommand {
 
     public EndCommand(@NonNull final PovaryoshkaBot povaryoshkaBot) {
         super(povaryoshkaBot);

@@ -25,7 +25,7 @@ import org.telegram.telegrambots.abilitybots.api.sender.SilentSender;
 
 import models.db.DbTypes;
 import telegram.bot.PovaryoshkaBot;
-import telegram.commands.simple.createdish.postgres.SimplePostgresDishCommandTester;
+import telegram.commands.simple.createdish.postgres.SimplePostgresCreateDishCommandTester;
 
 
 final public class SimpleCreateDishCommandTest {
@@ -56,7 +56,7 @@ final public class SimpleCreateDishCommandTest {
     @NonNull
     private Map<@NonNull DbTypes, @Nullable ISimpleTypedCreateDishCommandTester> getSimpleTypedCreateDishCommandTesterMap() {
         final EnumMap<@NonNull DbTypes, @Nullable ISimpleTypedCreateDishCommandTester> localSimpleTypedCommandTesterMap = new EnumMap<>(DbTypes.class);
-        localSimpleTypedCommandTesterMap.put(DbTypes.POSTGRES, new SimplePostgresDishCommandTester());
+        localSimpleTypedCommandTesterMap.put(DbTypes.POSTGRES, new SimplePostgresCreateDishCommandTester());
         return Collections.unmodifiableMap(localSimpleTypedCommandTesterMap);
     }
 

@@ -29,7 +29,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 
-public class GetDishCommand extends AbstractCommand {
+final public class GetDishCommand extends AbstractCommand {
 
     public GetDishCommand(@NonNull final PovaryoshkaBot povaryoshkaBot) {
         super(povaryoshkaBot);

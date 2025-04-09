@@ -22,7 +22,7 @@ import static models.commands.CommandConfig.FEEDBACK_COMMAND_SETTINGS;
 import telegram.bot.PovaryoshkaBot;
 
 
-public class FeedbackCommand extends AbstractCommand {
+final public class FeedbackCommand extends AbstractCommand {
 
     public FeedbackCommand(@NonNull final PovaryoshkaBot povaryoshkaBot) {
         super(povaryoshkaBot);

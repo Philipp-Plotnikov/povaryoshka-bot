@@ -39,7 +39,7 @@ import utilities.factory.FormatterFactory;
 import utilities.factory.IIngredientsFormatter;
 
 
-public class CreateDishCommand extends AbstractCommand {
+final public class CreateDishCommand extends AbstractCommand {
     @NonNull
     private final EnumMap<@NonNull CommandStates, ICommandStateHandler> stateHandlersMap = new EnumMap<>(CommandStates.class);
 
