@@ -1,14 +1,5 @@
 package telegram.commands.simple.updatedish.postgres;
 
-import static models.commands.CommandConfig.UPDATE_DISH_COMMAND_SETTINGS;
-import static models.commands.CommandStates.DISH_NAME_UPDATE;
-import static models.commands.CommandStates.DISH_NAME_UPDATE_CONFIRM;
-import static models.commands.CommandStates.INGREDIENTS_UPDATE;
-import static models.commands.CommandStates.INGREDIENTS_UPDATE_CONFIRM;
-import static models.commands.MultiStateCommandTypes.UPDATE;
-import static models.db.schemas.postgres.PostgresUserContextSchema.COMMAND_STATE;
-import static models.db.schemas.postgres.PostgresUserContextSchema.DISH_NAME;
-import static models.db.schemas.postgres.PostgresUserContextSchema.MULTI_STATE_COMMAND_TYPE;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -16,6 +7,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static utilities.CommandUtilities.isUpdateDishCommand;
+import static utilities.CommonUtilities.getIngredientResultSetMock;
+import static utilities.CommonUtilities.getMessageContextMock;
+import static utilities.CommonUtilities.getRecipeResultSetMock;
+import static utilities.CommonUtilities.getUpdateMock;
+import static utilities.CommonUtilities.getUserContextDTOMock;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -24,25 +20,19 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Map;
 
-import org.bouncycastle.jcajce.provider.asymmetric.EXTERNAL;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.telegram.telegrambots.abilitybots.api.objects.MessageContext;
 import org.telegram.telegrambots.abilitybots.api.util.AbilityExtension;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.User;
-import org.telegram.telegrambots.meta.api.objects.message.Message;
 
 import language.ru.BotMessages;
 import language.ru.UserMessages;
 import mocks.DishMock;
 import mocks.MessageMock;
-import mocks.UserMock;
+import models.commands.CommandConfig;
 import models.commands.CommandStates;
 import models.commands.MultiStateCommandTypes;
-import models.db.schemas.postgres.PostgresIngredientSchema;
-import models.db.schemas.postgres.PostgresRecipeSchema;
 import models.dtos.UserContextDTO;
-import models.exceptions.db.sqlops.NotFoundUserContextException;
 import telegram.bot.PovaryoshkaBot;
 import telegram.commands.UpdateDishCommand;
 import telegram.commands.simple.updatedish.ISimpleTypedUpdateDishCommandTester;
@@ -54,11 +44,11 @@ final public class SimplePostgresUpdateDishCommandTester implements ISimpleTyped
         @NonNull final Connection mockedDbConnection
     ) throws SQLException, Exception {
         // Arrange
-        final MessageContext messageContext = getUpdateDishMessageContext();
+        final MessageContext messageContext = getMessageContextMock();
         final PreparedStatement recipeListPreparedStatement = mock(PreparedStatement.class);
         final PreparedStatement ingredientListPreparedStatement = mock(PreparedStatement.class);
-        final ResultSet recipeResultSet = getRecipeResultSet();
-        final ResultSet ingredientListResultSet = getIngredientResultSet();
+        final ResultSet recipeResultSet = getRecipeResultSetMock();
+        final ResultSet ingredientListResultSet = getIngredientResultSetMock();
         when(mockedDbConnection.prepareStatement(any())).thenReturn(
             recipeListPreparedStatement,
             ingredientListPreparedStatement
@@ -79,14 +69,14 @@ final public class SimplePostgresUpdateDishCommandTester implements ISimpleTyped
         @NonNull final Connection mockedDbConnection
     ) throws SQLException, Exception {
         // Arrange
-        final Update update = getUpdateDishUpdate();
+        final Update update = getUpdateMock();
         final PreparedStatement recipeListPreparedStatement = mock(PreparedStatement.class);
         final PreparedStatement ingredientListPreparedStatement = mock(PreparedStatement.class);
         final Statement selectDishStatement = mock(Statement.class);
-        final ResultSet recipeResultSet = getRecipeResultSet();
-        final ResultSet ingredientListResultSet = getIngredientResultSet();
-        final UserContextDTO userContextDTO = getUserContextDTO(
-            UPDATE,
+        final ResultSet recipeResultSet = getRecipeResultSetMock();
+        final ResultSet ingredientListResultSet = getIngredientResultSetMock();
+        final UserContextDTO userContextDTO = getUserContextDTOMock(
+            MultiStateCommandTypes.UPDATE,
             CommandStates.DISH_NAME,
             DishMock.DISH_NAME
         );
@@ -116,11 +106,11 @@ final public class SimplePostgresUpdateDishCommandTester implements ISimpleTyped
         @NonNull final Connection mockedDbConnection
     ) throws SQLException, Exception {
         // Arrange
-        final Update update = getUpdateDishUpdate(UserMessages.YES);
+        final Update update = getUpdateMock(UserMessages.YES);
         final PreparedStatement updateUserContextCommandStatePreparedStatement = mock(PreparedStatement.class);
-        final UserContextDTO userContextDTO = getUserContextDTO(
-            UPDATE,
-            DISH_NAME_UPDATE_CONFIRM,
+        final UserContextDTO userContextDTO = getUserContextDTOMock(
+            MultiStateCommandTypes.UPDATE,
+            CommandStates.DISH_NAME_UPDATE_CONFIRM,
             DishMock.DISH_NAME
         );
         when(mockedDbConnection.prepareStatement(any())).thenReturn(updateUserContextCommandStatePreparedStatement);
@@ -138,11 +128,11 @@ final public class SimplePostgresUpdateDishCommandTester implements ISimpleTyped
         @NonNull final Connection mockedDbConnection
     ) throws SQLException, Exception {
         // Arrange
-        final Update update = getUpdateDishUpdate(UserMessages.NO);
+        final Update update = getUpdateMock(UserMessages.NO);
         final PreparedStatement updateUserContextCommandStatePreparedStatement = mock(PreparedStatement.class);
-        final UserContextDTO userContextDTO = getUserContextDTO(
-            UPDATE,
-            DISH_NAME_UPDATE_CONFIRM,
+        final UserContextDTO userContextDTO = getUserContextDTOMock(
+            MultiStateCommandTypes.UPDATE,
+            CommandStates.DISH_NAME_UPDATE_CONFIRM,
             DishMock.DISH_NAME
         );
         when(mockedDbConnection.prepareStatement(any())).thenReturn(updateUserContextCommandStatePreparedStatement);
@@ -160,11 +150,11 @@ final public class SimplePostgresUpdateDishCommandTester implements ISimpleTyped
         @NonNull final Connection mockedDbConnection
     ) throws SQLException, Exception {
         // Arrange
-        final Update update = getUpdateDishUpdate();
+        final Update update = getUpdateMock();
         final PreparedStatement updateUserContextCommandStatePreparedStatement = mock(PreparedStatement.class);
-        final UserContextDTO userContextDTO = getUserContextDTO(
-            UPDATE,
-            DISH_NAME_UPDATE_CONFIRM,
+        final UserContextDTO userContextDTO = getUserContextDTOMock(
+            MultiStateCommandTypes.UPDATE,
+            CommandStates.DISH_NAME_UPDATE_CONFIRM,
             DishMock.DISH_NAME
         );
         when(mockedDbConnection.prepareStatement(any())).thenReturn(updateUserContextCommandStatePreparedStatement);
@@ -182,12 +172,12 @@ final public class SimplePostgresUpdateDishCommandTester implements ISimpleTyped
         @NonNull final Connection mockedDbConnection
     ) throws SQLException, Exception {
         // Arrange
-        final Update update = getUpdateDishUpdate();
+        final Update update = getUpdateMock();
         final PreparedStatement updateDishNamePreparedStatement = mock(PreparedStatement.class);
         final PreparedStatement updateUserContextPreparedStatement = mock(PreparedStatement.class);
-        final UserContextDTO userContextDTO = getUserContextDTO(
-            UPDATE,
-            DISH_NAME_UPDATE,
+        final UserContextDTO userContextDTO = getUserContextDTOMock(
+            MultiStateCommandTypes.UPDATE,
+            CommandStates.DISH_NAME_UPDATE,
             DishMock.DISH_NAME
         );
         when(mockedDbConnection.prepareStatement(any())).thenReturn(
@@ -208,11 +198,11 @@ final public class SimplePostgresUpdateDishCommandTester implements ISimpleTyped
         @NonNull final Connection mockedDbConnection
     ) throws SQLException, Exception {
         // Arrange
-        final Update update = getUpdateDishUpdate(UserMessages.YES);
+        final Update update = getUpdateMock(UserMessages.YES);
         final PreparedStatement updateUserContextCommandStatePreparedStatement = mock(PreparedStatement.class);
-        final UserContextDTO userContextDTO = getUserContextDTO(
-            UPDATE,
-            INGREDIENTS_UPDATE_CONFIRM,
+        final UserContextDTO userContextDTO = getUserContextDTOMock(
+            MultiStateCommandTypes.UPDATE,
+            CommandStates.INGREDIENTS_UPDATE_CONFIRM,
             DishMock.DISH_NAME
         );
         when(mockedDbConnection.prepareStatement(any())).thenReturn(updateUserContextCommandStatePreparedStatement);
@@ -230,11 +220,11 @@ final public class SimplePostgresUpdateDishCommandTester implements ISimpleTyped
         @NonNull final Connection mockedDbConnection
     ) throws SQLException, Exception {
         // Arrange
-        final Update update = getUpdateDishUpdate(UserMessages.NO);
+        final Update update = getUpdateMock(UserMessages.NO);
         final PreparedStatement updateUserContextCommandStatePreparedStatement = mock(PreparedStatement.class);
-        final UserContextDTO userContextDTO = getUserContextDTO(
-            UPDATE,
-            INGREDIENTS_UPDATE_CONFIRM,
+        final UserContextDTO userContextDTO = getUserContextDTOMock(
+            MultiStateCommandTypes.UPDATE,
+            CommandStates.INGREDIENTS_UPDATE_CONFIRM,
             DishMock.DISH_NAME
         );
         when(mockedDbConnection.prepareStatement(any())).thenReturn(updateUserContextCommandStatePreparedStatement);
@@ -252,11 +242,11 @@ final public class SimplePostgresUpdateDishCommandTester implements ISimpleTyped
         @NonNull final Connection mockedDbConnection
     ) throws SQLException, Exception {
         // Arrange
-        final Update update = getUpdateDishUpdate();
+        final Update update = getUpdateMock();
         final PreparedStatement updateUserContextCommandStatePreparedStatement = mock(PreparedStatement.class);
-        final UserContextDTO userContextDTO = getUserContextDTO(
-            UPDATE,
-            INGREDIENTS_UPDATE_CONFIRM,
+        final UserContextDTO userContextDTO = getUserContextDTOMock(
+            MultiStateCommandTypes.UPDATE,
+            CommandStates.INGREDIENTS_UPDATE_CONFIRM,
             DishMock.DISH_NAME
         );
         when(mockedDbConnection.prepareStatement(any())).thenReturn(updateUserContextCommandStatePreparedStatement);
@@ -274,13 +264,13 @@ final public class SimplePostgresUpdateDishCommandTester implements ISimpleTyped
         @NonNull final Connection mockedDbConnection
     ) throws SQLException, Exception {
         // Arrange
-        final Update update = getUpdateDishUpdate();
+        final Update update = getUpdateMock();
         final Statement dishStatement = mock(Statement.class);
         final PreparedStatement deleteIngredientPreparedStatement = mock(PreparedStatement.class);
         final PreparedStatement insertIngredientPreparedStatement = mock(PreparedStatement.class);
-        final UserContextDTO userContextDTO = getUserContextDTO(
-            UPDATE,
-            INGREDIENTS_UPDATE,
+        final UserContextDTO userContextDTO = getUserContextDTOMock(
+            MultiStateCommandTypes.UPDATE,
+            CommandStates.INGREDIENTS_UPDATE,
             DishMock.DISH_NAME
         );
         when(mockedDbConnection.createStatement()).thenReturn(dishStatement);
@@ -318,104 +308,10 @@ final public class SimplePostgresUpdateDishCommandTester implements ISimpleTyped
         if (commandMap == null) {
             throw new Exception("In SimplePostgresDishCommandTester commandMap is null");
         }
-        final AbilityExtension untypedCommand = commandMap.get(UPDATE_DISH_COMMAND_SETTINGS.commandName());
+        final AbilityExtension untypedCommand = commandMap.get(CommandConfig.UPDATE_DISH_COMMAND_SETTINGS.commandName());
         if (!isUpdateDishCommand(untypedCommand)) {
             throw new Exception("In SimplePostgresDishCommandTester updateDishCommand is null or is not of expected type");
         }
         return (UpdateDishCommand)untypedCommand;
-    }
-
-     @NonNull
-    private MessageContext getUpdateDishMessageContext() {
-        final MessageContext messageContext = mock(MessageContext.class);
-        final Update update = getUpdateDishUpdate();
-        final User user = mock(User.class);
-        when(messageContext.update()).thenReturn(update);
-        when(messageContext.user()).thenReturn(user);
-        when(messageContext.chatId()).thenReturn(MessageMock.CHAT_ID);
-        when(user.getId()).thenReturn(UserMock.USER_ID);
-        return messageContext;
-    }
-
-    @NonNull
-    private Update getUpdateDishUpdate() {
-        final Update update = mock(Update.class);
-        final Message message = getUpdateDishMessage();
-        when(update.getMessage()).thenReturn(message);
-        when(message.getText()).thenReturn(MessageMock.TEXT);
-        when(update.hasMessage()).thenReturn(true);
-        return update;
-    }
-
-    @NonNull
-    private Update getUpdateDishUpdate(@NonNull final String text) {
-        final Update update = mock(Update.class);
-        final Message message = getUpdateDishMessage();
-        when(update.getMessage()).thenReturn(message);
-        when(message.getText()).thenReturn(text);
-        when(update.hasMessage()).thenReturn(true);
-        return update;
-    }
-
-    @NonNull
-    private Message getUpdateDishMessage() {
-        final Message message = mock(Message.class);
-        final User user = getUpdateDishUser();
-        when(message.getFrom()).thenReturn(user);
-        when(message.getText()).thenReturn(MessageMock.TEXT);
-        when(message.getChatId()).thenReturn(MessageMock.CHAT_ID);
-        return message;
-    }
-
-    @NonNull
-    private User getUpdateDishUser() {
-        final User user = mock(User.class);
-        when(user.getId()).thenReturn(UserMock.USER_ID);
-        return user;
-    }
-
-    @NonNull
-    private UserContextDTO getUserContextDTO(
-        @NonNull final MultiStateCommandTypes multiStateCommandType,
-        @NonNull final CommandStates commandState,
-        @NonNull final String dishName
-    ) throws SQLException, NotFoundUserContextException {
-        final ResultSet resultSet = getUserContextDTOResultSet(
-            multiStateCommandType,
-            commandState,
-            dishName
-        );
-        return new UserContextDTO(resultSet);
-    }
-
-    @NonNull
-    private ResultSet getUserContextDTOResultSet(
-        @NonNull final MultiStateCommandTypes multiStateCommandType,
-        @NonNull final CommandStates commandState,
-        @NonNull final String dishName
-    ) throws SQLException {
-        final ResultSet resultSet = mock(ResultSet.class);
-        when(resultSet.next()).thenReturn(true);
-        when(resultSet.getString(MULTI_STATE_COMMAND_TYPE)).thenReturn(multiStateCommandType.getValue());
-        when(resultSet.getString(COMMAND_STATE)).thenReturn(commandState.getValue());
-        when(resultSet.getString(DISH_NAME)).thenReturn(dishName);
-        return resultSet;
-    }
-
-    @NonNull
-    private ResultSet getRecipeResultSet() throws SQLException {
-        final ResultSet recipeResultSet = mock(ResultSet.class);
-        when(recipeResultSet.next()).thenReturn(true, false);
-        when(recipeResultSet.getString(PostgresRecipeSchema.DISH_NAME)).thenReturn(DishMock.DISH_NAME);
-        when(recipeResultSet.getString(PostgresRecipeSchema.RECIPE)).thenReturn(DishMock.RECIPE);
-        return recipeResultSet;
-    }
-
-    @NonNull
-    private ResultSet getIngredientResultSet() throws SQLException {
-        final ResultSet ingredientListResultSet = mock(ResultSet.class);
-        when(ingredientListResultSet.next()).thenReturn(true, false);
-        when(ingredientListResultSet.getString(PostgresIngredientSchema.INGREDIENT)).thenReturn(DishMock.INGREDIENT);
-        return ingredientListResultSet;
     }
 }
