@@ -4,18 +4,16 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import utilities.IngredientsFormatter;
 
-public class FormatterFactory {
 
+final public class FormatterFactory {
     @Nullable
-    private static IIngredientsFormatter iIngredientsFormatter;
-
-    private FormatterFactory() {}
+    private static IIngredientsFormatter ingredientsFormatter;
 
     @NonNull
-    public static IIngredientsFormatter getIngredientsFormat() {
-        if (iIngredientsFormatter == null) {
-            iIngredientsFormatter = new IngredientsFormatter();
+    public static IIngredientsFormatter createIngredientsFormat() {
+        if (ingredientsFormatter == null) {
+            ingredientsFormatter = new IngredientsFormatter();
         }
-        return iIngredientsFormatter;
+        return ingredientsFormatter;
     }
 }

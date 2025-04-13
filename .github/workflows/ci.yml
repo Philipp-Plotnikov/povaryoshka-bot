@@ -9,6 +9,55 @@ on:
       - "main"
 
 jobs:
+  code-analyze:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: java
+          queries: +security-and-quality
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Create .env file
+        run: |
+          touch app/.env
+          echo DB_TYPE="postgres" >> app/.env
+          echo TELEGRAM_BOT_API_TOKEN="1111" >> app/.env
+          echo DB_HOST="localhost" >> app/.env
+          echo DB_PORT="1111" >> app/.env
+          echo DB_DATABASE="test" >> app/.env
+          echo DB_SCHEMA="test" >> app/.env
+          echo DB_USERNAME="test" >> app/.env
+          echo DB_PASSWORD="" >> app/.env
+          echo IS_DISTRIBUTED_DATABASE="false" >> app/.env
+          echo INIT_SQL_SCRIPT_PATH="sql/postgres/init.sql" >> app/.env
+          echo ALTER_SQL_SCRIPT_PATH="sql/postgres/alter.sql" >> app/.env
+          echo COMMAND_TYPE="simple" >> app/.env
+          echo BOT_USERNAME="PovaryoshkaBot" >> app/.env
+          echo CREATOR_ID="1111" >> app/.env
+          echo LANGUAGE="ru" >> app/.env
+
+      - name: Build code
+        run: |
+          ./gradlew build
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+
   e2e-tests:
     runs-on: ubuntu-latest
 
@@ -21,7 +70,7 @@ jobs:
         with:
           distribution: "temurin"
           java-version: "17"
-      
+
       - name: Create .env file
         run: |
           touch app/.env
@@ -60,3 +109,4 @@ jobs:
           flags: intergration
           name: povaryoshka-bot-integration-tests-coverage
           fail_ci_if_error: true
+          verbose: true

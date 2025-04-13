@@ -12,8 +12,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import telegram.bot.PovaryoshkaBot;
 
 
-public class DefaultReply extends AbstractReply {
-    @NonNull
+final public class DefaultReply extends AbstractReply {
     public DefaultReply(@NonNull PovaryoshkaBot povaryoshkaBot) {
         super(povaryoshkaBot);
     }

@@ -45,7 +45,7 @@ import models.exceptions.db.sqlops.NotFoundDishException;
 import models.exceptions.db.sqlops.NotFoundUserContextException;
 
 
-public class PostgresDbDriver implements IDbDriver {
+final public class PostgresDbDriver implements IDbDriver {
     @NonNull
     private final PostgresDbDriverOptions postgresDbDriverOptions;
 
@@ -117,14 +117,14 @@ public class PostgresDbDriver implements IDbDriver {
         DishDTO dishDTO;
         try (
             final Statement selectDishStatement = connection.createStatement();
-            final PreparedStatement selectPreparedRecipeStatement = getSelectPreparedRecipeStatement(selectOptions);
-            final PreparedStatement selectPreparedDishIngredientListStatement = getSelectPreparedDishIngredientListStatement(selectOptions);
+            final PreparedStatement selectRecipePreparedStatement = getSelectPreparedRecipeStatement(selectOptions);
+            final PreparedStatement selectDishIngredientListPreparedStatement = getSelectPreparedDishIngredientListStatement(selectOptions);
         ) {
             selectDishStatement.execute(
                 String.format(
                     "%s; %s",
-                    selectPreparedRecipeStatement.toString(),
-                    selectPreparedDishIngredientListStatement.toString()
+                    selectRecipePreparedStatement.toString(),
+                    selectDishIngredientListPreparedStatement.toString()
                 )
             );      
             dishDTO = new DishDTO(selectDishStatement);
@@ -141,10 +141,10 @@ public class PostgresDbDriver implements IDbDriver {
             "SELECT dish_name, recipe FROM %s.recipe WHERE user_id = ? AND dish_name = ?;",
             postgresDbDriverOptions.getDbSchema()
         );
-        final PreparedStatement selectPreparedRecipeStatement = connection.prepareStatement(recipeSelect);
-        selectPreparedRecipeStatement.setLong(1, selectOptions.userId());
-        selectPreparedRecipeStatement.setString(2, selectOptions.dishName());
-        return selectPreparedRecipeStatement;
+        final PreparedStatement selectRecipePreparedStatement = connection.prepareStatement(recipeSelect);
+        selectRecipePreparedStatement.setLong(1, selectOptions.userId());
+        selectRecipePreparedStatement.setString(2, selectOptions.dishName());
+        return selectRecipePreparedStatement;
     }
 
     @NonNull
@@ -154,10 +154,10 @@ public class PostgresDbDriver implements IDbDriver {
             "SELECT ingredient FROM %s.ingredient WHERE user_id = ? AND dish_name = ?;",
             postgresDbDriverOptions.getDbSchema()
         );
-        final PreparedStatement selectPreparedDishIngredientListStatement = connection.prepareStatement(dishIngredientListSelect);
-        selectPreparedDishIngredientListStatement.setLong(1, selectOptions.userId());
-        selectPreparedDishIngredientListStatement.setString(2, selectOptions.dishName());
-        return selectPreparedDishIngredientListStatement;
+        final PreparedStatement selectDishIngredientListPreparedStatement = connection.prepareStatement(dishIngredientListSelect);
+        selectDishIngredientListPreparedStatement.setLong(1, selectOptions.userId());
+        selectDishIngredientListPreparedStatement.setString(2, selectOptions.dishName());
+        return selectDishIngredientListPreparedStatement;
     }
 
     @Override
@@ -166,17 +166,17 @@ public class PostgresDbDriver implements IDbDriver {
     {
         final ArrayList<DishDTO> dishList = new ArrayList<>();
         try (
-            final PreparedStatement selectPreparedRecipeListStatement = getSelectPreparedRecipeListStatement(selectOptions);
-            final PreparedStatement selectPreparedIngredientListStatement = getSelectPreparedIngredientListStatement(selectOptions);
-            final ResultSet recipeListResultSet = selectPreparedRecipeListStatement.executeQuery();
+            final PreparedStatement selectRecipeListPreparedStatement = getSelectPreparedRecipeListStatement(selectOptions);
+            final PreparedStatement selectIngredientListPreparedStatement = getSelectPreparedIngredientListStatement(selectOptions);
+            final ResultSet recipeListResultSet = selectRecipeListPreparedStatement.executeQuery();
         ) {
             String dishName, recipe;
             List<String> ingredientList;
             while (recipeListResultSet.next()) {
                 dishName = recipeListResultSet.getString(PostgresRecipeSchema.DISH_NAME);
                 recipe = recipeListResultSet.getString(PostgresRecipeSchema.RECIPE);
-                selectPreparedIngredientListStatement.setString(2, dishName);
-                ingredientList = getDishIngredientList(selectPreparedIngredientListStatement);
+                selectIngredientListPreparedStatement.setString(2, dishName);
+                ingredientList = getDishIngredientList(selectIngredientListPreparedStatement);
                 dishList.add(new DishDTO(
                     dishName,
                     ingredientList,
@@ -191,11 +191,11 @@ public class PostgresDbDriver implements IDbDriver {
     }
 
     @Nullable
-    private List<String> getDishIngredientList(@NonNull final PreparedStatement selectPreparedIngredientListStatement) throws SQLException
+    private List<String> getDishIngredientList(@NonNull final PreparedStatement selectIngredientListPreparedStatement) throws SQLException
     {
         final List<String> ingredientList = new ArrayList<>();
         try (
-            final ResultSet dishIngredientResultSet = selectPreparedIngredientListStatement.executeQuery();
+            final ResultSet dishIngredientResultSet = selectIngredientListPreparedStatement.executeQuery();
         ) {
             while (dishIngredientResultSet.next()) {
                 final String ingredient = dishIngredientResultSet.getString(PostgresIngredientSchema.INGREDIENT);
@@ -215,9 +215,9 @@ public class PostgresDbDriver implements IDbDriver {
             "SELECT dish_name, recipe FROM %s.recipe WHERE user_id = ?;",
             postgresDbDriverOptions.getDbSchema()
         );
-        final PreparedStatement selectPreparedRecipeStatement = connection.prepareStatement(recipeSelect);
-        selectPreparedRecipeStatement.setLong(1, selectOptions.userId());
-        return selectPreparedRecipeStatement;
+        final PreparedStatement selectRecipePreparedStatement = connection.prepareStatement(recipeSelect);
+        selectRecipePreparedStatement.setLong(1, selectOptions.userId());
+        return selectRecipePreparedStatement;
     }
 
     @NonNull
@@ -227,9 +227,9 @@ public class PostgresDbDriver implements IDbDriver {
             "SELECT ingredient FROM %s.ingredient WHERE user_id = ? AND dish_name = ?;",
             postgresDbDriverOptions.getDbSchema()
         );
-        final PreparedStatement selectPreparedIngredientListStatement = connection.prepareStatement(ingredientListSelect);
-        selectPreparedIngredientListStatement.setLong(1, selectOptions.userId());
-        return selectPreparedIngredientListStatement;
+        final PreparedStatement selectIngredientListPreparedStatement = connection.prepareStatement(ingredientListSelect);
+        selectIngredientListPreparedStatement.setLong(1, selectOptions.userId());
+        return selectIngredientListPreparedStatement;
     }
 
     @Override
@@ -244,15 +244,15 @@ public class PostgresDbDriver implements IDbDriver {
     { 
         try (
             final Statement dishStatement = connection.createStatement();
-            final PreparedStatement insertPreparedRecipeStatement = getInsertPreparedRecipeStatement(insertOptions);
-            final PreparedStatement insertPreparedIngredientStatement = getInsertPreparedIngredientStatement(insertOptions);
+            final PreparedStatement insertRecipePreparedStatement = getInsertPreparedRecipeStatement(insertOptions);
+            final PreparedStatement insertIngredientPreparedStatement = getInsertPreparedIngredientStatement(insertOptions);
         ) {
-            dishStatement.addBatch(insertPreparedRecipeStatement.toString());
+            dishStatement.addBatch(insertRecipePreparedStatement.toString());
             final List<String> ingredientList = insertOptions.ingredientList();
             if (ingredientList != null) {
                 for (String ingredient : ingredientList) {
-                    insertPreparedIngredientStatement.setString(3, ingredient);
-                    dishStatement.addBatch(insertPreparedIngredientStatement.toString());
+                    insertIngredientPreparedStatement.setString(3, ingredient);
+                    dishStatement.addBatch(insertIngredientPreparedStatement.toString());
                 }
             }
             dishStatement.executeBatch();
@@ -269,11 +269,11 @@ public class PostgresDbDriver implements IDbDriver {
             PostgresRecipeSchema.DISH_NAME,
             PostgresRecipeSchema.RECIPE
         );
-        final PreparedStatement insertPreparedRecipeStatement = connection.prepareStatement(recipeInsert);
-        insertPreparedRecipeStatement.setLong(1, insertOptions.userId());
-        insertPreparedRecipeStatement.setString(2, insertOptions.dishName());
-        insertPreparedRecipeStatement.setString(3, insertOptions.recipe());
-        return insertPreparedRecipeStatement;
+        final PreparedStatement insertRecipePreparedStatement = connection.prepareStatement(recipeInsert);
+        insertRecipePreparedStatement.setLong(1, insertOptions.userId());
+        insertRecipePreparedStatement.setString(2, insertOptions.dishName());
+        insertRecipePreparedStatement.setString(3, insertOptions.recipe());
+        return insertRecipePreparedStatement;
     }
 
     @NonNull
@@ -286,10 +286,10 @@ public class PostgresDbDriver implements IDbDriver {
             PostgresIngredientSchema.DISH_NAME,
             PostgresIngredientSchema.INGREDIENT
         );
-        final PreparedStatement insertPreparedIngredientStatement = connection.prepareStatement(ingredientInsert);
-        insertPreparedIngredientStatement.setLong(1, insertOptions.userId());
-        insertPreparedIngredientStatement.setString(2, insertOptions.dishName());
-        return insertPreparedIngredientStatement;
+        final PreparedStatement insertIngredientPreparedStatement = connection.prepareStatement(ingredientInsert);
+        insertIngredientPreparedStatement.setLong(1, insertOptions.userId());
+        insertIngredientPreparedStatement.setString(2, insertOptions.dishName());
+        return insertIngredientPreparedStatement;
     }
 
     @Override
@@ -301,9 +301,9 @@ public class PostgresDbDriver implements IDbDriver {
     private void deleteRecipe(@NonNull final DishDeleteOptions deleteOptions) throws SQLException
     {
         try (
-            final PreparedStatement deletePreparedRecipeStatement = getDeletePreparedRecipeStatement(deleteOptions);
+            final PreparedStatement deleteRecipePreparedStatement = getDeletePreparedRecipeStatement(deleteOptions);
         ) {
-            int deletedRowAmount = deletePreparedRecipeStatement.executeUpdate();
+            int deletedRowAmount = deleteRecipePreparedStatement.executeUpdate();
             if (deletedRowAmount == 0) {
                 throw new NotFoundDishException("");
             }
@@ -317,10 +317,10 @@ public class PostgresDbDriver implements IDbDriver {
             "DELETE FROM %s.recipe WHERE user_id = ? AND dish_name = ?;",
             postgresDbDriverOptions.getDbSchema()
         );
-        final PreparedStatement deletePreparedRecipeStatement = connection.prepareStatement(recipeDelete);
-        deletePreparedRecipeStatement.setLong(1, deleteOptions.userId());
-        deletePreparedRecipeStatement.setString(2, deleteOptions.dishName());
-        return deletePreparedRecipeStatement;
+        final PreparedStatement deleteRecipePreparedStatement = connection.prepareStatement(recipeDelete);
+        deleteRecipePreparedStatement.setLong(1, deleteOptions.userId());
+        deleteRecipePreparedStatement.setString(2, deleteOptions.dishName());
+        return deleteRecipePreparedStatement;
     }
 
     @Override
@@ -341,17 +341,17 @@ public class PostgresDbDriver implements IDbDriver {
         );
         try (
             final Statement dishStatement = connection.createStatement();
-            final PreparedStatement updatePreparedRecipeStatement = getUpdatePreparedRecipeStatement(updateOptions);
-            final PreparedStatement deletePreparedIngredientStatement = getDeletePreparedIngredientStatement(updateOptions);
-            final PreparedStatement insertPreparedIngredientStatement = getInsertPreparedIngredientStatement(insertOptions);
+            final PreparedStatement updateRecipePreparedStatement = getUpdatePreparedRecipeStatement(updateOptions);
+            final PreparedStatement deleteIngredientPreparedStatement = getDeletePreparedIngredientStatement(updateOptions);
+            final PreparedStatement insertIngredientPreparedStatement = getInsertPreparedIngredientStatement(insertOptions);
         ) {
-            dishStatement.addBatch(updatePreparedRecipeStatement.toString());
-            dishStatement.addBatch(deletePreparedIngredientStatement.toString());
+            dishStatement.addBatch(updateRecipePreparedStatement.toString());
+            dishStatement.addBatch(deleteIngredientPreparedStatement.toString());
             final List<String> ingredientList = insertOptions.ingredientList();
             if (ingredientList != null) {
                 for (String ingredient : ingredientList) {
-                    insertPreparedIngredientStatement.setString(3, ingredient);
-                    dishStatement.addBatch(insertPreparedIngredientStatement.toString());
+                    insertIngredientPreparedStatement.setString(3, ingredient);
+                    dishStatement.addBatch(insertIngredientPreparedStatement.toString());
                 }
             }
             dishStatement.executeBatch();
@@ -365,11 +365,11 @@ public class PostgresDbDriver implements IDbDriver {
             "UPDATE %s.recipe SET recipe = ? WHERE user_id = ? AND dish_name = ?;",
             postgresDbDriverOptions.getDbSchema()
         );
-        final PreparedStatement updatePreparedRecipeStatement = connection.prepareStatement(recipeUpdate);
-        updatePreparedRecipeStatement.setString(1, updateOptions.recipe());
-        updatePreparedRecipeStatement.setLong(2, updateOptions.userId());
-        updatePreparedRecipeStatement.setString(3, updateOptions.dishName());
-        return updatePreparedRecipeStatement;
+        final PreparedStatement updateRecipePreparedStatement = connection.prepareStatement(recipeUpdate);
+        updateRecipePreparedStatement.setString(1, updateOptions.recipe());
+        updateRecipePreparedStatement.setLong(2, updateOptions.userId());
+        updateRecipePreparedStatement.setString(3, updateOptions.dishName());
+        return updateRecipePreparedStatement;
     }
 
     @Override
@@ -383,9 +383,9 @@ public class PostgresDbDriver implements IDbDriver {
     private void internalUpdateDishName(@NonNull final DishUpdateOptions updateOptions) throws SQLException
     {
         try (
-            final PreparedStatement updatePreparedDishNameStatement = getUpdatePreparedDishNameStatement(updateOptions)
+            final PreparedStatement updateDishNamePreparedStatement = getUpdatePreparedDishNameStatement(updateOptions)
         ) {
-            updatePreparedDishNameStatement.executeUpdate();
+            updateDishNamePreparedStatement.executeUpdate();
         }
     }
 
@@ -395,11 +395,11 @@ public class PostgresDbDriver implements IDbDriver {
             "UPDATE %s.recipe SET dish_name = ? WHERE user_id = ? AND dish_name = ?;",
             postgresDbDriverOptions.getDbSchema()
         );
-        final PreparedStatement updatePreparedDishNameStatement = connection.prepareStatement(dishNameUpdate);
-        updatePreparedDishNameStatement.setString(1, updateOptions.newDishName());
-        updatePreparedDishNameStatement.setLong(2, updateOptions.userId());
-        updatePreparedDishNameStatement.setString(3, updateOptions.dishName());
-        return updatePreparedDishNameStatement;
+        final PreparedStatement updateDishNamePreparedStatement = connection.prepareStatement(dishNameUpdate);
+        updateDishNamePreparedStatement.setString(1, updateOptions.newDishName());
+        updateDishNamePreparedStatement.setLong(2, updateOptions.userId());
+        updateDishNamePreparedStatement.setString(3, updateOptions.dishName());
+        return updateDishNamePreparedStatement;
     }
 
     @Override
@@ -420,10 +420,10 @@ public class PostgresDbDriver implements IDbDriver {
         );
         try (
             final Statement dishStatement = connection.createStatement();
-            final PreparedStatement deletePreparedIngredientStatement = getDeletePreparedIngredientStatement(updateOptions);
+            final PreparedStatement deleteIngredientPreparedStatement = getDeletePreparedIngredientStatement(updateOptions);
             final PreparedStatement insertPreparedIngredientStatement = getInsertPreparedIngredientStatement(insertOptions);
         ) {
-            dishStatement.addBatch(deletePreparedIngredientStatement.toString());
+            dishStatement.addBatch(deleteIngredientPreparedStatement.toString());
             final List<String> ingredientList = insertOptions.ingredientList();
             if (ingredientList != null) {
                 for (String ingredient : ingredientList) {
@@ -442,10 +442,10 @@ public class PostgresDbDriver implements IDbDriver {
             "DELETE FROM %s.ingredient WHERE user_id = ? AND dish_name = ?;",
             postgresDbDriverOptions.getDbSchema()
         );
-        final PreparedStatement deletePreparedIngredientStatement = connection.prepareStatement(ingredientDelete);
-        deletePreparedIngredientStatement.setLong(1, updateOptions.userId());
-        deletePreparedIngredientStatement.setString(2, updateOptions.dishName());
-        return deletePreparedIngredientStatement;
+        final PreparedStatement deleteIngredientPreparedStatement = connection.prepareStatement(ingredientDelete);
+        deleteIngredientPreparedStatement.setLong(1, updateOptions.userId());
+        deleteIngredientPreparedStatement.setString(2, updateOptions.dishName());
+        return deleteIngredientPreparedStatement;
     }
 
     @Override
@@ -457,9 +457,9 @@ public class PostgresDbDriver implements IDbDriver {
     private void internalUpdateDishRecipe(@NonNull final DishUpdateOptions updateOptions) throws SQLException
     {
         try (
-            final PreparedStatement updatePreparedRecipeStatement = getUpdatePreparedRecipeStatement(updateOptions);
+            final PreparedStatement updateRecipePreparedStatement = getUpdatePreparedRecipeStatement(updateOptions);
         ) {
-            updatePreparedRecipeStatement.executeUpdate();
+            updateRecipePreparedStatement.executeUpdate();
         }
     }
 
@@ -469,8 +469,8 @@ public class PostgresDbDriver implements IDbDriver {
     {
         UserContextDTO userContextDTO;
         try (
-            final PreparedStatement selectPreparedUserContextStatement = getSelectPreparedUserContextStatement(selectOptions);
-            final ResultSet userContextResultSet = selectPreparedUserContextStatement.executeQuery();
+            final PreparedStatement selectUserContextPreparedStatement = getSelectPreparedUserContextStatement(selectOptions);
+            final ResultSet userContextResultSet = selectUserContextPreparedStatement.executeQuery();
         ) {
             userContextDTO = new UserContextDTO(userContextResultSet);
         } catch (NotFoundUserContextException e) {
@@ -486,17 +486,17 @@ public class PostgresDbDriver implements IDbDriver {
             "SELECT multi_state_command_type, command_state, dish_name FROM %s.user_context WHERE user_id = ?;",
             postgresDbDriverOptions.getDbSchema()
         );
-        final PreparedStatement selectPreparedUserContextStatement = connection.prepareStatement(userContextSelect);
-        selectPreparedUserContextStatement.setLong(1, selectOptions.userId());
-        return selectPreparedUserContextStatement;
+        final PreparedStatement selectUserContextPreparedStatement = connection.prepareStatement(userContextSelect);
+        selectUserContextPreparedStatement.setLong(1, selectOptions.userId());
+        return selectUserContextPreparedStatement;
     }
 
     @Override
     public void insertUserContext(@NonNull final UserContextInsertOptions insertOptions) throws SQLException {
         try (
-            final PreparedStatement insertPreparedUserContextStatement = getInsertPreparedUserContextStatement(insertOptions);
+            final PreparedStatement insertUserContextPreparedStatement = getInsertPreparedUserContextStatement(insertOptions);
         ) {
-            insertPreparedUserContextStatement.executeUpdate();
+            insertUserContextPreparedStatement.executeUpdate();
         }
     }
 
@@ -511,21 +511,21 @@ public class PostgresDbDriver implements IDbDriver {
             PostgresUserContextSchema.COMMAND_STATE,
             PostgresUserContextSchema.DISH_NAME
         );
-        final PreparedStatement insertPreparedUserContextStatement = connection.prepareStatement(userContextInsert);
-        insertPreparedUserContextStatement.setLong(1, insertOptions.userId());
-        insertPreparedUserContextStatement.setString(2, insertOptions.multiStateCommandType().getValue());
-        insertPreparedUserContextStatement.setString(3, insertOptions.commandState().getValue());
-        insertPreparedUserContextStatement.setString(4, insertOptions.dishName());
-        return insertPreparedUserContextStatement;
+        final PreparedStatement insertUserContextPreparedStatement = connection.prepareStatement(userContextInsert);
+        insertUserContextPreparedStatement.setLong(1, insertOptions.userId());
+        insertUserContextPreparedStatement.setString(2, insertOptions.multiStateCommandType().getValue());
+        insertUserContextPreparedStatement.setString(3, insertOptions.commandState().getValue());
+        insertUserContextPreparedStatement.setString(4, insertOptions.dishName());
+        return insertUserContextPreparedStatement;
     }
 
     @Override
     public void deleteUserContext(@NonNull final UserContextDeleteOptions deleteOptions) throws SQLException
     {
         try (
-            final PreparedStatement deletePreparedUserContextStatement = getDeletePreparedUserContextStatement(deleteOptions);
+            final PreparedStatement deleteUserContextPreparedStatement = getDeletePreparedUserContextStatement(deleteOptions);
         ) {
-            deletePreparedUserContextStatement.executeUpdate();
+            deleteUserContextPreparedStatement.executeUpdate();
         }
     }
 
@@ -536,18 +536,18 @@ public class PostgresDbDriver implements IDbDriver {
             "DELETE FROM %s.user_context WHERE user_id = ?;",
             postgresDbDriverOptions.getDbSchema()
         );
-        final PreparedStatement deletePreparedUserContextStatement = connection.prepareStatement(userContextDelete);
-        deletePreparedUserContextStatement.setLong(1, deleteOptions.userId());
-        return deletePreparedUserContextStatement;
+        final PreparedStatement deleteUserContextPreparedStatement = connection.prepareStatement(userContextDelete);
+        deleteUserContextPreparedStatement.setLong(1, deleteOptions.userId());
+        return deleteUserContextPreparedStatement;
     }
 
     @Override
     public void updateUserContext(@NonNull final UserContextUpdateOptions updateOptions) throws SQLException
     {
         try (
-            final PreparedStatement updatePreparedUserContextStatement = getUpdatePreparedUserContextStatement(updateOptions);
+            final PreparedStatement updateUserContextPreparedStatement = getUpdatePreparedUserContextStatement(updateOptions);
         ) {
-            updatePreparedUserContextStatement.executeUpdate();
+            updateUserContextPreparedStatement.executeUpdate();
         }
     }
 
@@ -558,20 +558,20 @@ public class PostgresDbDriver implements IDbDriver {
             "UPDATE %s.user_context SET command_state = ?::command_states, dish_name = ? WHERE user_id = ?;",
             postgresDbDriverOptions.getDbSchema()
         );
-        final PreparedStatement updatePreparedUserContextStatement = connection.prepareStatement(userContextUpdate);
-        updatePreparedUserContextStatement.setString(1, updateOptions.commandState().getValue());
-        updatePreparedUserContextStatement.setString(2, updateOptions.dishName());
-        updatePreparedUserContextStatement.setLong(3, updateOptions.userId());
-        return updatePreparedUserContextStatement;
+        final PreparedStatement updateUserContextPreparedStatement = connection.prepareStatement(userContextUpdate);
+        updateUserContextPreparedStatement.setString(1, updateOptions.commandState().getValue());
+        updateUserContextPreparedStatement.setString(2, updateOptions.dishName());
+        updateUserContextPreparedStatement.setLong(3, updateOptions.userId());
+        return updateUserContextPreparedStatement;
     }
 
     @Override
     public void updateUserContextCommandState(@NonNull final UserContextUpdateOptions updateOptions) throws SQLException
     {
         try (
-            final PreparedStatement updatePreparedUserContextCommandStateStatement = getUpdatePreparedUserContextCommandStateStatement(updateOptions);
+            final PreparedStatement updateUserContextCommandStatePreparedStatement = getUpdatePreparedUserContextCommandStateStatement(updateOptions);
         ) {
-            updatePreparedUserContextCommandStateStatement.executeUpdate();
+            updateUserContextCommandStatePreparedStatement.executeUpdate();
         }
     }
 
@@ -582,19 +582,19 @@ public class PostgresDbDriver implements IDbDriver {
             "UPDATE %s.user_context SET command_state = ?::command_states WHERE user_id = ?;",
             postgresDbDriverOptions.getDbSchema()
         );
-        final PreparedStatement updatePreparedUserContextStatement = connection.prepareStatement(userContextUpdate);
-        updatePreparedUserContextStatement.setString(1, updateOptions.commandState().getValue());
-        updatePreparedUserContextStatement.setLong(2, updateOptions.userId());
-        return updatePreparedUserContextStatement;
+        final PreparedStatement updateUserContextPreparedStatement = connection.prepareStatement(userContextUpdate);
+        updateUserContextPreparedStatement.setString(1, updateOptions.commandState().getValue());
+        updateUserContextPreparedStatement.setLong(2, updateOptions.userId());
+        return updateUserContextPreparedStatement;
     }
 
     @Override
     public void insertFeedback(@NonNull final FeedbackInsertOptions insertOptions) throws SQLException
     {
         try (
-            final PreparedStatement insertPreparedFeedbackStatement = getInsertPreparedFeedbackStatement(insertOptions);
+            final PreparedStatement insertFeedbackPreparedStatement = getInsertPreparedFeedbackStatement(insertOptions);
         ) {
-            insertPreparedFeedbackStatement.execute();
+            insertFeedbackPreparedStatement.execute();
         }
     }
 
@@ -607,10 +607,10 @@ public class PostgresDbDriver implements IDbDriver {
             PostgresFeedbackSchema.USER_ID,
             PostgresFeedbackSchema.FEEDBACK
         );
-        final PreparedStatement insertPreparedFeedbackStatement = connection.prepareStatement(feedbackInsert);
-        insertPreparedFeedbackStatement.setLong(1, insertOptions.userId());
-        insertPreparedFeedbackStatement.setString(2, insertOptions.feedback());
-        return insertPreparedFeedbackStatement;
+        final PreparedStatement insertFeedbackPreparedStatement = connection.prepareStatement(feedbackInsert);
+        insertFeedbackPreparedStatement.setLong(1, insertOptions.userId());
+        insertFeedbackPreparedStatement.setString(2, insertOptions.feedback());
+        return insertFeedbackPreparedStatement;
     }
 
     @Override

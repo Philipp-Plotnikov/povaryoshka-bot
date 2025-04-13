@@ -11,22 +11,22 @@ import models.db.DbTypes;
 import models.db.drivers.IDbDriverFactoryGenerator;
 
 
-public class DbDriverFactoryProducer {
+final public class DbDriverFactoryProducer {
     @NonNull private final Map<@NonNull DbTypes, @Nullable IDbDriverFactoryGenerator> dbDriverFactoryGeneratorMap;
 
     public DbDriverFactoryProducer() {
-        dbDriverFactoryGeneratorMap = getDbDriverFactoryGeneratorMap();
+        dbDriverFactoryGeneratorMap = produceDbDriverFactoryGeneratorMap();
     }
 
     @NonNull
-    private Map<@NonNull DbTypes, @Nullable IDbDriverFactoryGenerator> getDbDriverFactoryGeneratorMap() {
+    private Map<@NonNull DbTypes, @Nullable IDbDriverFactoryGenerator> produceDbDriverFactoryGeneratorMap() {
         final EnumMap<@NonNull DbTypes, @Nullable IDbDriverFactoryGenerator> localDbDriverFactoryGeneratorMap = new EnumMap<>(DbTypes.class);
         localDbDriverFactoryGeneratorMap.put(DbTypes.POSTGRES, () -> new PostgresDbDriverFactory());
         return Collections.unmodifiableMap(localDbDriverFactoryGeneratorMap);
     }
 
     @NonNull
-    public IDbDriverFactory getDbDriverFactory(@NonNull final DbTypes dbType) throws Exception {
+    public IDbDriverFactory produceDbDriverFactory(@NonNull final DbTypes dbType) throws Exception {
         if (!dbDriverFactoryGeneratorMap.containsKey(dbType)) {
             throw new Exception(String.format("dbType '%s' was not found in dbDriverFactoryGeneratorMap", dbType.name()));
         }

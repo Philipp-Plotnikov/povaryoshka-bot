@@ -9,5 +9,5 @@ import dbdrivers.IDbDriver;
 
 public interface IDbDriverFactory {
     @NonNull
-    IDbDriver getDbDriver() throws SQLException;
+    IDbDriver createDbDriver() throws SQLException;
 }

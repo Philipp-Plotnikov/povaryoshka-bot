@@ -26,7 +26,7 @@ import telegram.commands.UpdateDishCommand;
 import telegram.commands.StartCommand;
 
 
-public class SimpleCommandFactory implements ICommandFactory {
+final public class SimpleCommandFactory implements ICommandFactory {
     @NonNull
     public Map<String, @Nullable AbilityExtension> createCommandMap(@NonNull final PovaryoshkaBot povaryoshkaBot) {
         final HashMap<String, AbilityExtension> simpleCommandMap = new HashMap<>();

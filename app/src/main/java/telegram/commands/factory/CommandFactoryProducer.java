@@ -11,23 +11,23 @@ import models.commands.ICommandFactoryGenerator;
 import models.commands.CommandTypes;
 
 
-public class CommandFactoryProducer {
+final public class CommandFactoryProducer {
     @NonNull
     private final Map<@NonNull CommandTypes, @Nullable ICommandFactoryGenerator> commandFactoryGeneratorMap;
 
     public CommandFactoryProducer() {
-        commandFactoryGeneratorMap = getCommandFactoryGeneratorMap();
+        commandFactoryGeneratorMap = produceCommandFactoryGeneratorMap();
     }
 
     @NonNull
-    private Map<@NonNull CommandTypes, @Nullable ICommandFactoryGenerator> getCommandFactoryGeneratorMap() {
+    private Map<@NonNull CommandTypes, @Nullable ICommandFactoryGenerator> produceCommandFactoryGeneratorMap() {
         final EnumMap<@NonNull CommandTypes, @Nullable ICommandFactoryGenerator> localCommandFactoryGeneratorMap = new EnumMap<>(CommandTypes.class);
         localCommandFactoryGeneratorMap.put(CommandTypes.SIMPLE, () -> new SimpleCommandFactory());
         return Collections.unmodifiableMap(localCommandFactoryGeneratorMap);
     }
 
     @NonNull
-    public ICommandFactory getCommandFactory(@NonNull final CommandTypes commandType) throws Exception {
+    public ICommandFactory produceCommandFactory(@NonNull final CommandTypes commandType) throws Exception {
         if (!commandFactoryGeneratorMap.containsKey(commandType)) {
             throw new Exception(String.format("%s was not found in commandFactoryGeneratorMap", commandType.name()));
         }

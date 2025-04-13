@@ -39,7 +39,7 @@ import utilities.factory.FormatterFactory;
 import utilities.factory.IIngredientsFormatter;
 
 
-public class CreateDishCommand extends AbstractCommand {
+final public class CreateDishCommand extends AbstractCommand {
     @NonNull
     private final EnumMap<@NonNull CommandStates, ICommandStateHandler> stateHandlersMap = new EnumMap<>(CommandStates.class);
 
@@ -66,12 +66,12 @@ public class CreateDishCommand extends AbstractCommand {
                     try {
                         sendSilently(BotMessages.WRITE_DISH_NAME, update);
                         dbDriver.insertUserContext(
-                                new UserContextInsertOptions(
-                                        ctx.user().getId(),
-                                        CREATE,
-                                        DISH_NAME_UPDATE,
-                                        null
-                                )
+                            new UserContextInsertOptions(
+                                ctx.user().getId(),
+                                CREATE,
+                                DISH_NAME_UPDATE,
+                                null
+                            )
                         );
                     } catch (SQLException e) {
                         sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
@@ -80,9 +80,9 @@ public class CreateDishCommand extends AbstractCommand {
                 .reply((action, update) -> {
                             try {
                                 final UserContextDTO userContextDTO = dbDriver.selectUserContext(
-                                        new UserContextSelectOptions(
-                                                update.getMessage().getFrom().getId()
-                                        )
+                                    new UserContextSelectOptions(
+                                        update.getMessage().getFrom().getId()
+                                    )
                                 );
                                 if (userContextDTO != null) {
                                     final CommandStates commandState = userContextDTO.getCommandState();
@@ -102,7 +102,7 @@ public class CreateDishCommand extends AbstractCommand {
                 .build();
     }
 
-    private void handleDishNameUpdateState(
+    public void handleDishNameUpdateState(
         @NonNull final Update update,
         @NonNull final UserContextDTO userContextDTO
     ) {
@@ -112,19 +112,19 @@ public class CreateDishCommand extends AbstractCommand {
                         final long userId = update.getMessage().getFrom().getId();
                         final String dishName = update.getMessage().getText().trim();
                         dbDriver.insertDish(
-                                new DishInsertOptions(
-                                        userId,
-                                        dishName,
-                                        null,
-                                        null
-                                )
+                            new DishInsertOptions(
+                                userId,
+                                dishName,
+                                null,
+                                null
+                            )
                         );
                         dbDriver.updateUserContext(
-                                new UserContextUpdateOptions(
-                                        userId,
-                                        INGREDIENTS_UPDATE,
-                                        dishName
-                                )
+                            new UserContextUpdateOptions(
+                                userId,
+                                INGREDIENTS_UPDATE,
+                                dishName
+                            )
                         );
                     }
             );
@@ -135,32 +135,36 @@ public class CreateDishCommand extends AbstractCommand {
         }
     }
 
-    private void handleIngredientsUpdateState(
+    public void handleIngredientsUpdateState(
         @NonNull final Update update,
         @NonNull final UserContextDTO userContextDTO
     ) {
         try {
             final String ingredients = update.getMessage().getText().trim();
-            final IIngredientsFormatter ingredientsFormatter = FormatterFactory.getIngredientsFormat();
+            final IIngredientsFormatter ingredientsFormatter = FormatterFactory.createIngredientsFormat();
             final List<String> ingredientList = Collections.unmodifiableList(ingredientsFormatter.formatInput(ingredients));
             dbDriver.executeAsTransaction(
                     () -> {
                         final long userId = update.getMessage().getFrom().getId();
+                        final String userDishName = userContextDTO.getDishName();
+                        if (userDishName == null) {
+                            throw new Exception("in handleIngredientsUpdateState userDishName is null");
+                        }
                         dbDriver.updateDish(
-                                new DishUpdateOptions(
-                                        userId,
-                                        userContextDTO.getDishName(),
-                                        null,
-                                        ingredientList,
-                                        null
-                                )
+                            new DishUpdateOptions(
+                                userId,
+                                userDishName,
+                                null,
+                                ingredientList,
+                                null
+                            )
                         );
                         dbDriver.updateUserContext(
-                                new UserContextUpdateOptions(
-                                        userId,
-                                        RECIPE_UPDATE,
-                                        userContextDTO.getDishName()
-                                )
+                            new UserContextUpdateOptions(
+                                userId,
+                                RECIPE_UPDATE,
+                                userDishName
+                            )
                         );
                     }
             );
@@ -171,28 +175,28 @@ public class CreateDishCommand extends AbstractCommand {
         }
     }
 
-    private void handleRecipeUpdateState(
+    public void handleRecipeUpdateState(
         @NonNull final Update update,
         @NonNull final UserContextDTO userContextDTO
     ) {
         try {
             final long userId = update.getMessage().getFrom().getId();
             final DishDTO dishDTO = dbDriver.selectDish(
-                    new DishSelectOptions(userId, userContextDTO.getDishName())
+                new DishSelectOptions(userId, userContextDTO.getDishName())
             );
             dbDriver.executeAsTransaction(
                     () -> {
                         dbDriver.updateDish(
                                 new DishUpdateOptions(
-                                        userId,
-                                        userContextDTO.getDishName(),
-                                        null,
-                                        dishDTO.getIngredientList(),
-                                        update.getMessage().getText().trim()
-                                )
+                                userId,
+                                userContextDTO.getDishName(),
+                                null,
+                                dishDTO.getIngredientList(),
+                                update.getMessage().getText().trim()
+                            )
                         );
                         dbDriver.deleteUserContext(
-                                new UserContextDeleteOptions(userId)
+                            new UserContextDeleteOptions(userId)
                         );
                     }
             );

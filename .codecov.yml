@@ -1,0 +1,10 @@
+coverage:
+  status:
+    patch:
+      default:
+        threshold: 0.1
+    project:
+      default:
+        threshold: 0.1
+ignore:
+  - 'app/src/test'

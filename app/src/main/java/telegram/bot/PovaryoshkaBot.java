@@ -14,7 +14,7 @@ import core.factory.FacadeFactory;
 import dbdrivers.IDbDriver;
 
 
-public class PovaryoshkaBot extends AbilityBot {
+final public class PovaryoshkaBot extends AbilityBot {
     private final long creatorId;
 
     @NonNull
