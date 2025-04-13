@@ -22,7 +22,7 @@ import models.drivers.ITypedDbDriverMocker;
 import utilities.PostgresDbDriverUtilities;
 
 
-public class DbDriverMocker {
+final public class DbDriverMocker {
     @Nullable
     private static Map<@NonNull DbTypes, @Nullable ITypedDbDriverMocker> dbDriverMockerMap;
 

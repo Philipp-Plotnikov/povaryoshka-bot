@@ -11,10 +11,10 @@ import models.db.drivers.postgres.PostgresDbDriverOptions;
 import utilities.PostgresDbDriverUtilities;
 
 
-public class PostgresDbDriverFactory implements IDbDriverFactory {
+final public class PostgresDbDriverFactory implements IDbDriverFactory {
     @Override
     @NonNull
-    public IDbDriver getDbDriver() throws SQLException {
+    public IDbDriver createDbDriver() throws SQLException {
         final PostgresDbDriverOptions postgresDbDriverOptions = PostgresDbDriverUtilities.getPostgresDbDriverOptions();
         return new PostgresDbDriver(postgresDbDriverOptions);
     }

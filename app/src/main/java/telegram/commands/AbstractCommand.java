@@ -89,9 +89,9 @@ public abstract class AbstractCommand implements AbilityExtension {
 
     private boolean isSpecifiedMultiStateCommandType(@NonNull Update update, @NonNull MultiStateCommandTypes commandType) throws SQLException {
         final UserContextDTO userContextDTO = dbDriver.selectUserContext(
-                new UserContextSelectOptions(
-                        update.getMessage().getFrom().getId()
-                )
+            new UserContextSelectOptions(
+                update.getMessage().getFrom().getId()
+            )
         );
         return userContextDTO != null && userContextDTO.getMultiStateCommandTypes() == commandType;
     }

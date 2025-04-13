@@ -5,12 +5,12 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import utilities.IngredientsFormatter;
 
 
-public class FormatterFactory {
+final public class FormatterFactory {
     @Nullable
     private static IIngredientsFormatter ingredientsFormatter;
 
     @NonNull
-    public static IIngredientsFormatter getIngredientsFormat() {
+    public static IIngredientsFormatter createIngredientsFormat() {
         if (ingredientsFormatter == null) {
             ingredientsFormatter = new IngredientsFormatter();
         }

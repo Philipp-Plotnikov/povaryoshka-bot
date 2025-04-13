@@ -41,14 +41,15 @@ import telegram.commands.simple.createdish.ISimpleTypedCreateDishCommandTester;
 
 
 final public class SimplePostgresCreateDishCommandTester implements ISimpleTypedCreateDishCommandTester {
+    @Override
     public void createDishTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
     ) throws SQLException, Exception {
         // Arrange
         final MessageContext messageContext = getMessageContextMock();
-        final PreparedStatement preparedStatement = mock(PreparedStatement.class);
-        when(mockedDbConnection.prepareStatement(any())).thenReturn(preparedStatement);
+        final PreparedStatement insertUserContextPreparedStatement = mock(PreparedStatement.class);
+        when(mockedDbConnection.prepareStatement(any())).thenReturn(insertUserContextPreparedStatement);
         
         // Act
         final CreateDishCommand createDishCommand = getCreateDishCommand(bot);
@@ -58,19 +59,26 @@ final public class SimplePostgresCreateDishCommandTester implements ISimpleTyped
         verify(bot.getSilent(), never()).send(BotMessages.SOMETHING_WENT_WRONG, MessageMock.CHAT_ID);
     }
 
+    @Override
     public void handleDishNameUpdateStateTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
-    )throws SQLException, NotFoundUserContextException, Exception {
+    )throws NotFoundUserContextException, SQLException, Exception {
         // Arrange
         final Update update = getUpdateMock();
-        final PreparedStatement preparedStatement = mock(PreparedStatement.class);
+        final Statement dishStatement = mock(Statement.class);
+        final PreparedStatement insertRecipePreparedStatement = mock(PreparedStatement.class);
+        final PreparedStatement insertIngredientPreparedStatement = mock(PreparedStatement.class);
         final UserContextDTO userContextDTO = getUserContextDTOMock(
             MultiStateCommandTypes.CREATE,
             CommandStates.DISH_NAME_UPDATE,
             DishMock.DISH_NAME
         );
-        when(mockedDbConnection.prepareStatement(any())).thenReturn(preparedStatement);
+        when(mockedDbConnection.createStatement()).thenReturn(dishStatement);
+        when(mockedDbConnection.prepareStatement(any())).thenReturn(
+            insertRecipePreparedStatement,
+            insertIngredientPreparedStatement
+        );
         
         // Act
         final CreateDishCommand createDishCommand = getCreateDishCommand(bot);
@@ -80,10 +88,11 @@ final public class SimplePostgresCreateDishCommandTester implements ISimpleTyped
         verify(bot.getSilent(), never()).send(BotMessages.SOMETHING_WENT_WRONG, MessageMock.CHAT_ID);
     }
 
+    @Override
     public void handleIngredientsUpdateStateTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
-    ) throws SQLException, NotFoundUserContextException, Exception {
+    ) throws NotFoundUserContextException, SQLException, Exception {
         // Arrange
         final Update update = getUpdateMock();
         final PreparedStatement recipeListPreparedStatement = mock(PreparedStatement.class);
@@ -112,10 +121,11 @@ final public class SimplePostgresCreateDishCommandTester implements ISimpleTyped
         verify(bot.getSilent(), never()).send(BotMessages.SOMETHING_WENT_WRONG, MessageMock.CHAT_ID);
     }
 
+    @Override
     public void handleRecipeUpdateStateTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
-    ) throws SQLException, NotFoundUserContextException, Exception {
+    ) throws NotFoundUserContextException, SQLException, Exception {
         // Arrange
         final Update update = getUpdateMock();
         final PreparedStatement recipeListPreparedStatement = mock(PreparedStatement.class);
@@ -147,20 +157,21 @@ final public class SimplePostgresCreateDishCommandTester implements ISimpleTyped
         verify(bot.getSilent(), never()).send(BotMessages.SOMETHING_WENT_WRONG, MessageMock.CHAT_ID);
     }
 
+    @Override
     public void isInCreateDishContextTruthyTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
     ) throws SQLException, Exception {
         // Arrange
         final Update update = getUpdateMock();
-        final PreparedStatement preparedStatement = mock(PreparedStatement.class);
+        final PreparedStatement selectUserContextPreparedStatement = mock(PreparedStatement.class);
         final ResultSet userContextDTOResultSet = getUserContextDTOResultSetMock(
             MultiStateCommandTypes.CREATE,
             CommandStates.RECIPE_UPDATE,
             DishMock.DISH_NAME
         );
-        when(mockedDbConnection.prepareStatement(any())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(userContextDTOResultSet);
+        when(mockedDbConnection.prepareStatement(any())).thenReturn(selectUserContextPreparedStatement);
+        when(selectUserContextPreparedStatement.executeQuery()).thenReturn(userContextDTOResultSet);
         
         // Act
         final CreateDishCommand createDishCommand = getCreateDishCommand(bot);
@@ -172,20 +183,21 @@ final public class SimplePostgresCreateDishCommandTester implements ISimpleTyped
         assertEquals(expectedValue, actualValue);
     }
 
+    @Override
     public void isInCreateDishContextFalsyTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
     ) throws SQLException, Exception {
         // Arrange
         final Update update = getUpdateMock();
-        final PreparedStatement preparedStatement = mock(PreparedStatement.class);
+        final PreparedStatement selectUserContextPreparedStatement = mock(PreparedStatement.class);
         final ResultSet userContextDTOResultSet = getUserContextDTOResultSetMock(
             MultiStateCommandTypes.GET,
             CommandStates.RECIPE_UPDATE,
             DishMock.DISH_NAME
         );
-        when(mockedDbConnection.prepareStatement(any())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(userContextDTOResultSet);
+        when(mockedDbConnection.prepareStatement(any())).thenReturn(selectUserContextPreparedStatement);
+        when(selectUserContextPreparedStatement.executeQuery()).thenReturn(userContextDTOResultSet);
         
         // Act
         final CreateDishCommand createDishCommand = getCreateDishCommand(bot);

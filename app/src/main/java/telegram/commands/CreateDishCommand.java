@@ -66,12 +66,12 @@ final public class CreateDishCommand extends AbstractCommand {
                     try {
                         sendSilently(BotMessages.WRITE_DISH_NAME, update);
                         dbDriver.insertUserContext(
-                                new UserContextInsertOptions(
-                                        ctx.user().getId(),
-                                        CREATE,
-                                        DISH_NAME_UPDATE,
-                                        null
-                                )
+                            new UserContextInsertOptions(
+                                ctx.user().getId(),
+                                CREATE,
+                                DISH_NAME_UPDATE,
+                                null
+                            )
                         );
                     } catch (SQLException e) {
                         sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
@@ -80,9 +80,9 @@ final public class CreateDishCommand extends AbstractCommand {
                 .reply((action, update) -> {
                             try {
                                 final UserContextDTO userContextDTO = dbDriver.selectUserContext(
-                                        new UserContextSelectOptions(
-                                                update.getMessage().getFrom().getId()
-                                        )
+                                    new UserContextSelectOptions(
+                                        update.getMessage().getFrom().getId()
+                                    )
                                 );
                                 if (userContextDTO != null) {
                                     final CommandStates commandState = userContextDTO.getCommandState();
@@ -112,19 +112,19 @@ final public class CreateDishCommand extends AbstractCommand {
                         final long userId = update.getMessage().getFrom().getId();
                         final String dishName = update.getMessage().getText().trim();
                         dbDriver.insertDish(
-                                new DishInsertOptions(
-                                        userId,
-                                        dishName,
-                                        null,
-                                        null
-                                )
+                            new DishInsertOptions(
+                                userId,
+                                dishName,
+                                null,
+                                null
+                            )
                         );
                         dbDriver.updateUserContext(
-                                new UserContextUpdateOptions(
-                                        userId,
-                                        INGREDIENTS_UPDATE,
-                                        dishName
-                                )
+                            new UserContextUpdateOptions(
+                                userId,
+                                INGREDIENTS_UPDATE,
+                                dishName
+                            )
                         );
                     }
             );
@@ -141,7 +141,7 @@ final public class CreateDishCommand extends AbstractCommand {
     ) {
         try {
             final String ingredients = update.getMessage().getText().trim();
-            final IIngredientsFormatter ingredientsFormatter = FormatterFactory.getIngredientsFormat();
+            final IIngredientsFormatter ingredientsFormatter = FormatterFactory.createIngredientsFormat();
             final List<String> ingredientList = Collections.unmodifiableList(ingredientsFormatter.formatInput(ingredients));
             dbDriver.executeAsTransaction(
                     () -> {

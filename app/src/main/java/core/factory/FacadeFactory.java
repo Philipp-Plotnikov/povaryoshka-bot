@@ -22,7 +22,7 @@ import telegram.replies.factory.IReplyFactory;
 import telegram.replies.factory.ReplyFactory;
 
 
-public class FacadeFactory {
+final public class FacadeFactory {
     private final IDbDriverFactory dbDriverFactory;
     private final ICommandFactory commandFactory;
     private final IReplyFactory replyFactory;
@@ -32,13 +32,13 @@ public class FacadeFactory {
         final DbTypes dbType = getDbType();
         final DbDriverFactoryProducer dbDriverFactoryProducer = new DbDriverFactoryProducer();
         final CommandFactoryProducer commandFactoryProducer = new CommandFactoryProducer();
-        dbDriverFactory = dbDriverFactoryProducer.getDbDriverFactory(dbType);
-        commandFactory = commandFactoryProducer.getCommandFactory(commandType);
+        dbDriverFactory = dbDriverFactoryProducer.produceDbDriverFactory(dbType);
+        commandFactory = commandFactoryProducer.produceCommandFactory(commandType);
         replyFactory = new ReplyFactory();
     }
 
     public IDbDriver getDbDriver() throws SQLException {
-        return dbDriverFactory.getDbDriver();
+        return dbDriverFactory.createDbDriver();
     }
 
     @NonNull

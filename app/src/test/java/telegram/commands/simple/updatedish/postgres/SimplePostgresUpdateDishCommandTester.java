@@ -33,12 +33,14 @@ import models.commands.CommandConfig;
 import models.commands.CommandStates;
 import models.commands.MultiStateCommandTypes;
 import models.dtos.UserContextDTO;
+import models.exceptions.db.sqlops.NotFoundUserContextException;
 import telegram.bot.PovaryoshkaBot;
 import telegram.commands.UpdateDishCommand;
 import telegram.commands.simple.updatedish.ISimpleTypedUpdateDishCommandTester;
 
 
 final public class SimplePostgresUpdateDishCommandTester implements ISimpleTypedUpdateDishCommandTester {
+    @Override
     public void updateDishTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
@@ -64,10 +66,11 @@ final public class SimplePostgresUpdateDishCommandTester implements ISimpleTyped
         verify(bot.getSilent(), never()).send(BotMessages.SOMETHING_WENT_WRONG, MessageMock.CHAT_ID);
     }
     
+    @Override
     public void handleDishNameStateTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
-    ) throws SQLException, Exception {
+    ) throws NotFoundUserContextException, SQLException, Exception {
         // Arrange
         final Update update = getUpdateMock();
         final PreparedStatement recipeListPreparedStatement = mock(PreparedStatement.class);
@@ -101,10 +104,11 @@ final public class SimplePostgresUpdateDishCommandTester implements ISimpleTyped
         verify(bot.getSilent(), never()).send(BotMessages.SOMETHING_WENT_WRONG, MessageMock.CHAT_ID);
     }
     
+    @Override
     public void handleDishNameUpdateConfirmStateYesTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
-    ) throws SQLException, Exception {
+    ) throws NotFoundUserContextException, SQLException, Exception {
         // Arrange
         final Update update = getUpdateMock(UserMessages.YES);
         final PreparedStatement updateUserContextCommandStatePreparedStatement = mock(PreparedStatement.class);
@@ -123,10 +127,11 @@ final public class SimplePostgresUpdateDishCommandTester implements ISimpleTyped
         verify(bot.getSilent(), times(1)).send(BotMessages.INPUT_NEW_DISH_NAME, MessageMock.CHAT_ID);
     }
 
+    @Override
     public void handleDishNameUpdateConfirmStateNoTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
-    ) throws SQLException, Exception {
+    ) throws NotFoundUserContextException, SQLException, Exception {
         // Arrange
         final Update update = getUpdateMock(UserMessages.NO);
         final PreparedStatement updateUserContextCommandStatePreparedStatement = mock(PreparedStatement.class);
@@ -145,10 +150,11 @@ final public class SimplePostgresUpdateDishCommandTester implements ISimpleTyped
         verify(bot.getSilent(), times(1)).send(BotMessages.CONFIRM_INGREDIENTS_UPDATE, MessageMock.CHAT_ID);
     }
 
+    @Override
     public void handleDishNameUpdateConfirmStateInvalidTextTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
-    ) throws SQLException, Exception {
+    ) throws NotFoundUserContextException, SQLException, Exception {
         // Arrange
         final Update update = getUpdateMock();
         final PreparedStatement updateUserContextCommandStatePreparedStatement = mock(PreparedStatement.class);
@@ -167,10 +173,11 @@ final public class SimplePostgresUpdateDishCommandTester implements ISimpleTyped
         verify(bot.getSilent(), times(1)).send(BotMessages.ENTER_YES_OR_NO, MessageMock.CHAT_ID);
     }
     
+    @Override
     public void handleDishNameUpdateStateTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
-    ) throws SQLException, Exception {
+    ) throws NotFoundUserContextException, SQLException, Exception {
         // Arrange
         final Update update = getUpdateMock();
         final PreparedStatement updateDishNamePreparedStatement = mock(PreparedStatement.class);
@@ -193,10 +200,11 @@ final public class SimplePostgresUpdateDishCommandTester implements ISimpleTyped
         verify(bot.getSilent(), never()).send(BotMessages.SOMETHING_WENT_WRONG, MessageMock.CHAT_ID);
     }
     
+    @Override
     public void handleIngredientsUpdateConfirmStateYesTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
-    ) throws SQLException, Exception {
+    ) throws NotFoundUserContextException, SQLException, Exception {
         // Arrange
         final Update update = getUpdateMock(UserMessages.YES);
         final PreparedStatement updateUserContextCommandStatePreparedStatement = mock(PreparedStatement.class);
@@ -215,10 +223,11 @@ final public class SimplePostgresUpdateDishCommandTester implements ISimpleTyped
         verify(bot.getSilent(), times(1)).send(BotMessages.INPUT_NEW_INGREDIENTS, MessageMock.CHAT_ID);
     }
 
+    @Override
     public void handleIngredientsUpdateConfirmStateNoTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
-    ) throws SQLException, Exception {
+    ) throws NotFoundUserContextException, SQLException, Exception {
         // Arrange
         final Update update = getUpdateMock(UserMessages.NO);
         final PreparedStatement updateUserContextCommandStatePreparedStatement = mock(PreparedStatement.class);
@@ -237,10 +246,11 @@ final public class SimplePostgresUpdateDishCommandTester implements ISimpleTyped
         verify(bot.getSilent(), times(1)).send(BotMessages.CONFIRM_RECIPE_UPDATE, MessageMock.CHAT_ID);
     }
 
+    @Override
     public void handleIngredientsUpdateConfirmStateInvalidTextTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
-    ) throws SQLException, Exception {
+    ) throws NotFoundUserContextException, SQLException, Exception {
         // Arrange
         final Update update = getUpdateMock();
         final PreparedStatement updateUserContextCommandStatePreparedStatement = mock(PreparedStatement.class);
@@ -259,10 +269,11 @@ final public class SimplePostgresUpdateDishCommandTester implements ISimpleTyped
         verify(bot.getSilent(), times(1)).send(BotMessages.ENTER_YES_OR_NO, MessageMock.CHAT_ID);
     }
 
+    @Override
     public void handleIngredientsUpdateStateTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
-    ) throws SQLException, Exception {
+    ) throws NotFoundUserContextException, SQLException, Exception {
         // Arrange
         final Update update = getUpdateMock();
         final Statement dishStatement = mock(Statement.class);
@@ -287,16 +298,19 @@ final public class SimplePostgresUpdateDishCommandTester implements ISimpleTyped
         verify(bot.getSilent(), never()).send(BotMessages.SOMETHING_WENT_WRONG, MessageMock.CHAT_ID);
     }
 
+    @Override
     public void handleRecipeUpdateConfirmStateYesTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
     ) {}
 
+    @Override
     public void handleRecipeUpdateConfirmStateNoTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
     ) {}
 
+    @Override
     public void handleRecipeUpdateStateTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection

@@ -5,6 +5,7 @@ import java.sql.SQLException;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import models.exceptions.db.sqlops.NotFoundUserContextException;
 import telegram.bot.PovaryoshkaBot;
 
 
@@ -17,47 +18,47 @@ public interface ISimpleTypedUpdateDishCommandTester {
     void handleDishNameStateTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
-    ) throws SQLException, Exception;
+    ) throws NotFoundUserContextException, SQLException, Exception;
     
     void handleDishNameUpdateConfirmStateYesTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
-    ) throws SQLException, Exception;
+    ) throws NotFoundUserContextException, SQLException, Exception;
 
     void handleDishNameUpdateConfirmStateNoTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
-    ) throws SQLException, Exception;
+    ) throws NotFoundUserContextException, SQLException, Exception;
 
     void handleDishNameUpdateConfirmStateInvalidTextTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
-    ) throws SQLException, Exception;
+    ) throws NotFoundUserContextException, SQLException, Exception;
     
     void handleDishNameUpdateStateTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
-    ) throws SQLException, Exception;
+    ) throws NotFoundUserContextException, SQLException, Exception;
     
     void handleIngredientsUpdateConfirmStateYesTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
-    ) throws SQLException, Exception;
+    ) throws NotFoundUserContextException, SQLException, Exception;
 
     void handleIngredientsUpdateConfirmStateNoTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
-    ) throws SQLException, Exception;
+    ) throws NotFoundUserContextException, SQLException, Exception;
 
     void handleIngredientsUpdateConfirmStateInvalidTextTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
-    ) throws SQLException, Exception;
+    ) throws NotFoundUserContextException, SQLException, Exception;
 
     void handleIngredientsUpdateStateTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
-    ) throws SQLException, Exception;
+    ) throws NotFoundUserContextException, SQLException, Exception;
 
     void handleRecipeUpdateConfirmStateYesTest(
         @NonNull final PovaryoshkaBot bot,

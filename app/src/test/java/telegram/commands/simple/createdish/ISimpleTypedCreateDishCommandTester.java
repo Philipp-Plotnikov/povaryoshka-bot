@@ -18,17 +18,17 @@ public interface ISimpleTypedCreateDishCommandTester {
     void handleDishNameUpdateStateTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
-    ) throws SQLException, NotFoundUserContextException, Exception;
+    ) throws NotFoundUserContextException, SQLException, Exception;
     
     void handleIngredientsUpdateStateTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
-    ) throws SQLException, NotFoundUserContextException, Exception;
+    ) throws NotFoundUserContextException, SQLException, Exception;
     
     void handleRecipeUpdateStateTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
-    ) throws SQLException, NotFoundUserContextException, Exception;
+    ) throws NotFoundUserContextException, SQLException, Exception;
     
     void isInCreateDishContextTruthyTest(
         @NonNull final PovaryoshkaBot bot,

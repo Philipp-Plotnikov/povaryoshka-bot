@@ -113,7 +113,7 @@ final public class GetDishCommand extends AbstractCommand {
     @NonNull
     private String getFormatIngredientListInfo(@NonNull DishDTO selectedDish) {
         final List<String> ingredientList = selectedDish.getIngredientList();
-        final IIngredientsFormatter ingredientsFormatter = FormatterFactory.getIngredientsFormat();
+        final IIngredientsFormatter ingredientsFormatter = FormatterFactory.createIngredientsFormat();
         return ingredientList != null
             ? ingredientsFormatter.formatOutput(ingredientList)
             : BotMessages.NO_INFO;
