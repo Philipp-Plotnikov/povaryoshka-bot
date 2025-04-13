@@ -16,6 +16,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Map;
 import java.util.function.Predicate;
 
@@ -29,10 +30,11 @@ import org.telegram.telegrambots.meta.api.objects.message.Message;
 import language.ru.BotMessages;
 import mocks.DishMock;
 import mocks.MessageMock;
-import mocks.UpdateMock;
 import mocks.UserMock;
 import models.commands.CommandStates;
 import models.commands.MultiStateCommandTypes;
+import models.db.schemas.postgres.PostgresIngredientSchema;
+import models.db.schemas.postgres.PostgresRecipeSchema;
 import models.dtos.UserContextDTO;
 import models.exceptions.db.sqlops.NotFoundUserContextException;
 import telegram.bot.PovaryoshkaBot;
@@ -55,22 +57,7 @@ final public class SimplePostgresCreateDishCommandTester implements ISimpleTyped
         createDishCommand.createDish().action().accept(messageContext);
     
         // Assert
-        verify(bot.getSilent(), never()).send(BotMessages.SOMETHING_WENT_WRONG, messageContext.update().getUpdateId());
-    }
-
-    @NonNull
-    private MessageContext getCreateDishMessageContext() {
-        final MessageContext messageContext = mock(MessageContext.class);
-        final Update update = mock(Update.class);
-        final User user = mock(User.class);
-        final Message message = mock(Message.class);
-        when(messageContext.update()).thenReturn(update);
-        when(messageContext.user()).thenReturn(user);
-        when(user.getId()).thenReturn(UserMock.USER_ID);
-        when(update.getMessage()).thenReturn(message);
-        when(update.getUpdateId()).thenReturn(UpdateMock.UPDATE_ID);
-        when(message.getChatId()).thenReturn(MessageMock.CHAT_ID);
-        return messageContext;
+        verify(bot.getSilent(), never()).send(BotMessages.SOMETHING_WENT_WRONG, MessageMock.CHAT_ID);
     }
 
     public void handleDishNameUpdateStateTest(
@@ -92,7 +79,7 @@ final public class SimplePostgresCreateDishCommandTester implements ISimpleTyped
         createDishCommand.handleDishNameUpdateState(update, userContextDTO);
     
         // Assert
-        verify(bot.getSilent(), never()).send(BotMessages.SOMETHING_WENT_WRONG, update.getUpdateId());
+        verify(bot.getSilent(), never()).send(BotMessages.SOMETHING_WENT_WRONG, MessageMock.CHAT_ID);
     }
 
     public void handleIngredientsUpdateStateTest(
@@ -101,20 +88,30 @@ final public class SimplePostgresCreateDishCommandTester implements ISimpleTyped
     ) throws SQLException, NotFoundUserContextException, Exception {
         // Arrange
         final Update update = getCreateDishUpdate();
-        final PreparedStatement preparedStatement = mock(PreparedStatement.class);
+        final PreparedStatement recipeListPreparedStatement = mock(PreparedStatement.class);
+        final PreparedStatement ingredientListPreparedStatement = mock(PreparedStatement.class);
+        final Statement dishStatement = mock(Statement.class);
+        final ResultSet recipeResultSet = getRecipeResultSet();
+        final ResultSet ingredientListResultSet = getIngredientResultSet();
         final UserContextDTO userContextDTO = getUserContextDTO(
             MultiStateCommandTypes.CREATE,
-            CommandStates.INGREDIENTS_UPDATE,
+            CommandStates.RECIPE_UPDATE,
             DishMock.DISH_NAME
         );
-        when(mockedDbConnection.prepareStatement(any())).thenReturn(preparedStatement);
+        when(mockedDbConnection.prepareStatement(any())).thenReturn(
+            recipeListPreparedStatement,
+            ingredientListPreparedStatement
+        );
+        when(mockedDbConnection.createStatement()).thenReturn(dishStatement);
+        when(recipeListPreparedStatement.executeQuery()).thenReturn(recipeResultSet);
+        when(ingredientListPreparedStatement.executeQuery()).thenReturn(ingredientListResultSet);
         
         // Act
         final CreateDishCommand createDishCommand = getCreateDishCommand(bot);
         createDishCommand.handleIngredientsUpdateState(update, userContextDTO);
     
         // Assert
-        verify(bot.getSilent(), never()).send(BotMessages.SOMETHING_WENT_WRONG, update.getUpdateId());
+        verify(bot.getSilent(), never()).send(BotMessages.SOMETHING_WENT_WRONG, MessageMock.CHAT_ID);
     }
 
     public void handleRecipeUpdateStateTest(
@@ -123,20 +120,33 @@ final public class SimplePostgresCreateDishCommandTester implements ISimpleTyped
     ) throws SQLException, NotFoundUserContextException, Exception {
         // Arrange
         final Update update = getCreateDishUpdate();
-        final PreparedStatement preparedStatement = mock(PreparedStatement.class);
+        final PreparedStatement recipeListPreparedStatement = mock(PreparedStatement.class);
+        final PreparedStatement ingredientListPreparedStatement = mock(PreparedStatement.class);
+        final Statement selectDishStatement = mock(Statement.class);
+        final ResultSet recipeResultSet = getRecipeResultSet();
+        final ResultSet ingredientListResultSet = getIngredientResultSet();
         final UserContextDTO userContextDTO = getUserContextDTO(
             MultiStateCommandTypes.CREATE,
             CommandStates.RECIPE_UPDATE,
             DishMock.DISH_NAME
         );
-        when(mockedDbConnection.prepareStatement(any())).thenReturn(preparedStatement);
+        when(mockedDbConnection.prepareStatement(any())).thenReturn(
+            recipeListPreparedStatement,
+            ingredientListPreparedStatement
+        );
+        when(mockedDbConnection.createStatement()).thenReturn(selectDishStatement);
+        when(selectDishStatement.getMoreResults()).thenReturn(true);
+        when(selectDishStatement.getResultSet()).thenReturn(
+            recipeResultSet,
+            ingredientListResultSet
+        );
         
         // Act
         final CreateDishCommand createDishCommand = getCreateDishCommand(bot);
         createDishCommand.handleRecipeUpdateState(update, userContextDTO);
     
         // Assert
-        verify(bot.getSilent(), never()).send(BotMessages.SOMETHING_WENT_WRONG, update.getUpdateId());
+        verify(bot.getSilent(), never()).send(BotMessages.SOMETHING_WENT_WRONG, MessageMock.CHAT_ID);
     }
 
     public void isInCreateDishContextTruthyTest(
@@ -203,16 +213,42 @@ final public class SimplePostgresCreateDishCommandTester implements ISimpleTyped
     }
 
     @NonNull
+    private MessageContext getCreateDishMessageContext() {
+        final MessageContext messageContext = mock(MessageContext.class);
+        final Update update = getCreateDishUpdate();
+        final User user = mock(User.class);
+        when(messageContext.update()).thenReturn(update);
+        when(messageContext.user()).thenReturn(user);
+        when(messageContext.chatId()).thenReturn(MessageMock.CHAT_ID);
+        when(user.getId()).thenReturn(UserMock.USER_ID);
+        return messageContext;
+    }
+
+    @NonNull
     private Update getCreateDishUpdate() {
         final Update update = mock(Update.class);
-        final Message message = mock(Message.class);
-        final User user = mock(User.class);
+        final Message message = getCreateDishMessage();
         when(update.getMessage()).thenReturn(message);
-        when(update.getUpdateId()).thenReturn(UpdateMock.UPDATE_ID);
-        when(message.getFrom()).thenReturn(user);
         when(message.getText()).thenReturn(MessageMock.TEXT);
         when(update.hasMessage()).thenReturn(true);
         return update;
+    }
+
+    @NonNull
+    private Message getCreateDishMessage() {
+        final Message message = mock(Message.class);
+        final User user = getCreateDishUser();
+        when(message.getFrom()).thenReturn(user);
+        when(message.getText()).thenReturn(MessageMock.TEXT);
+        when(message.getChatId()).thenReturn(MessageMock.CHAT_ID);
+        return message;
+    }
+
+    @NonNull
+    private User getCreateDishUser() {
+        final User user = mock(User.class);
+        when(user.getId()).thenReturn(UserMock.USER_ID);
+        return user;
     }
 
     @NonNull
@@ -241,5 +277,22 @@ final public class SimplePostgresCreateDishCommandTester implements ISimpleTyped
         when(resultSet.getString(COMMAND_STATE)).thenReturn(commandState.getValue());
         when(resultSet.getString(DISH_NAME)).thenReturn(dishName);
         return resultSet;
+    }
+
+    @NonNull
+    private ResultSet getRecipeResultSet() throws SQLException {
+        final ResultSet recipeResultSet = mock(ResultSet.class);
+        when(recipeResultSet.next()).thenReturn(true, false);
+        when(recipeResultSet.getString(PostgresRecipeSchema.DISH_NAME)).thenReturn(DishMock.DISH_NAME);
+        when(recipeResultSet.getString(PostgresRecipeSchema.RECIPE)).thenReturn(DishMock.RECIPE);
+        return recipeResultSet;
+    }
+
+    @NonNull
+    private ResultSet getIngredientResultSet() throws SQLException {
+        final ResultSet ingredientListResultSet = mock(ResultSet.class);
+        when(ingredientListResultSet.next()).thenReturn(true, false);
+        when(ingredientListResultSet.getString(PostgresIngredientSchema.INGREDIENT)).thenReturn(DishMock.INGREDIENT);
+        return ingredientListResultSet;
     }
 }

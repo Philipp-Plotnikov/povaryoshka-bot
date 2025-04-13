@@ -17,29 +17,54 @@ public interface ISimpleTypedUpdateDishCommandTester {
     void handleDishNameStateTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
-    );
+    ) throws SQLException, Exception;
     
-    void handleDishNameUpdateConfirmStateTest(
+    void handleDishNameUpdateConfirmStateYesTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
-    );
+    ) throws SQLException, Exception;
+
+    void handleDishNameUpdateConfirmStateNoTest(
+        @NonNull final PovaryoshkaBot bot,
+        @NonNull final Connection mockedDbConnection
+    ) throws SQLException, Exception;
+
+    void handleDishNameUpdateConfirmStateInvalidTextTest(
+        @NonNull final PovaryoshkaBot bot,
+        @NonNull final Connection mockedDbConnection
+    ) throws SQLException, Exception;
     
     void handleDishNameUpdateStateTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
-    );
+    ) throws SQLException, Exception;
     
-    void handleIngredientsUpdateConfirmStateTest(
+    void handleIngredientsUpdateConfirmStateYesTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
-    );
+    ) throws SQLException, Exception;
+
+    void handleIngredientsUpdateConfirmStateNoTest(
+        @NonNull final PovaryoshkaBot bot,
+        @NonNull final Connection mockedDbConnection
+    ) throws SQLException, Exception;
+
+    void handleIngredientsUpdateConfirmStateInvalidTextTest(
+        @NonNull final PovaryoshkaBot bot,
+        @NonNull final Connection mockedDbConnection
+    ) throws SQLException, Exception;
 
     void handleIngredientsUpdateStateTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
+    ) throws SQLException, Exception;
+
+    void handleRecipeUpdateConfirmStateYesTest(
+        @NonNull final PovaryoshkaBot bot,
+        @NonNull final Connection mockedDbConnection
     );
 
-    void handleRecipeUpdateConfirmStateTest(
+    void handleRecipeUpdateConfirmStateNoTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
     );

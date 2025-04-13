@@ -109,3 +109,4 @@ jobs:
           flags: intergration
           name: povaryoshka-bot-integration-tests-coverage
           fail_ci_if_error: true
+          verbose: true

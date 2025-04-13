@@ -146,21 +146,25 @@ final public class CreateDishCommand extends AbstractCommand {
             dbDriver.executeAsTransaction(
                     () -> {
                         final long userId = update.getMessage().getFrom().getId();
+                        final String userDishName = userContextDTO.getDishName();
+                        if (userDishName == null) {
+                            throw new Exception("in handleIngredientsUpdateState userDishName is null");
+                        }
                         dbDriver.updateDish(
-                                new DishUpdateOptions(
-                                        userId,
-                                        userContextDTO.getDishName(),
-                                        null,
-                                        ingredientList,
-                                        null
-                                )
+                            new DishUpdateOptions(
+                                userId,
+                                userDishName,
+                                null,
+                                ingredientList,
+                                null
+                            )
                         );
                         dbDriver.updateUserContext(
-                                new UserContextUpdateOptions(
-                                        userId,
-                                        RECIPE_UPDATE,
-                                        userContextDTO.getDishName()
-                                )
+                            new UserContextUpdateOptions(
+                                userId,
+                                RECIPE_UPDATE,
+                                userDishName
+                            )
                         );
                     }
             );
@@ -178,21 +182,21 @@ final public class CreateDishCommand extends AbstractCommand {
         try {
             final long userId = update.getMessage().getFrom().getId();
             final DishDTO dishDTO = dbDriver.selectDish(
-                    new DishSelectOptions(userId, userContextDTO.getDishName())
+                new DishSelectOptions(userId, userContextDTO.getDishName())
             );
             dbDriver.executeAsTransaction(
                     () -> {
                         dbDriver.updateDish(
                                 new DishUpdateOptions(
-                                        userId,
-                                        userContextDTO.getDishName(),
-                                        null,
-                                        dishDTO.getIngredientList(),
-                                        update.getMessage().getText().trim()
-                                )
+                                userId,
+                                userContextDTO.getDishName(),
+                                null,
+                                dishDTO.getIngredientList(),
+                                update.getMessage().getText().trim()
+                            )
                         );
                         dbDriver.deleteUserContext(
-                                new UserContextDeleteOptions(userId)
+                            new UserContextDeleteOptions(userId)
                         );
                     }
             );

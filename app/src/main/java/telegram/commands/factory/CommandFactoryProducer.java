@@ -11,7 +11,7 @@ import models.commands.ICommandFactoryGenerator;
 import models.commands.CommandTypes;
 
 
-public class CommandFactoryProducer {
+final public class CommandFactoryProducer {
     @NonNull
     private final Map<@NonNull CommandTypes, @Nullable ICommandFactoryGenerator> commandFactoryGeneratorMap;
 

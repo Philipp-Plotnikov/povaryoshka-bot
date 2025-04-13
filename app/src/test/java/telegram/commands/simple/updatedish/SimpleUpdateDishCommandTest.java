@@ -75,97 +75,133 @@ final public class SimpleUpdateDishCommandTest {
     @Test
     public void updateDishTest() throws Exception {
         if (bot == null) {
-            throw new Exception("In CreateDishCommandTest: bot is null.");
+            throw new Exception("In UpdateDishCommandTest: bot is null.");
         }
         if (mockedDbConnection == null) {
-            throw new Exception("In CreateDishCommandTest: mockedDbConnection is null.");
+            throw new Exception("In UpdateDishCommandTest: mockedDbConnection is null.");
         }
-        final ISimpleTypedUpdateDishCommandTester simpleTypedCreateDishCommandTester = getSimpleTypedUpdateDishCommandTester();
-        simpleTypedCreateDishCommandTester.updateDishTest(bot, mockedDbConnection);
+        final ISimpleTypedUpdateDishCommandTester simpleTypedUpdateDishCommandTester = getSimpleTypedUpdateDishCommandTester();
+        simpleTypedUpdateDishCommandTester.updateDishTest(bot, mockedDbConnection);
     }
 
     @Test
     public void handleDishNameStateTest() throws Exception {
         if (bot == null) {
-            throw new Exception("In CreateDishCommandTest: bot is null.");
+            throw new Exception("In UpdateDishCommandTest: bot is null.");
         }
         if (mockedDbConnection == null) {
-            throw new Exception("In CreateDishCommandTest: mockedDbConnection is null.");
+            throw new Exception("In UpdateDishCommandTest: mockedDbConnection is null.");
         }
-        final ISimpleTypedUpdateDishCommandTester simpleTypedCreateDishCommandTester = getSimpleTypedUpdateDishCommandTester();
-        simpleTypedCreateDishCommandTester.handleDishNameStateTest(bot, mockedDbConnection);
+        final ISimpleTypedUpdateDishCommandTester simpleTypedUpdateDishCommandTester = getSimpleTypedUpdateDishCommandTester();
+        simpleTypedUpdateDishCommandTester.handleDishNameStateTest(bot, mockedDbConnection);
     }
 
     @Test
-    public void handleDishNameUpdateConfirmStateTest() throws Exception {
+    public void handleDishNameUpdateConfirmStateYesTest() throws Exception {
         if (bot == null) {
-            throw new Exception("In CreateDishCommandTest: bot is null.");
+            throw new Exception("In UpdateDishCommandTest: bot is null.");
         }
         if (mockedDbConnection == null) {
-            throw new Exception("In CreateDishCommandTest: mockedDbConnection is null.");
+            throw new Exception("In UpdateDishCommandTest: mockedDbConnection is null.");
         }
-        final ISimpleTypedUpdateDishCommandTester simpleTypedCreateDishCommandTester = getSimpleTypedUpdateDishCommandTester();
-        simpleTypedCreateDishCommandTester.handleDishNameUpdateConfirmStateTest(bot, mockedDbConnection);
+        final ISimpleTypedUpdateDishCommandTester simpleTypedUpdateDishCommandTester = getSimpleTypedUpdateDishCommandTester();
+        simpleTypedUpdateDishCommandTester.handleDishNameUpdateConfirmStateYesTest(bot, mockedDbConnection);
+    }
+
+    @Test
+    public void handleDishNameUpdateConfirmStateNoTest() throws Exception {
+        if (bot == null) {
+            throw new Exception("In UpdateDishCommandTest: bot is null.");
+        }
+        if (mockedDbConnection == null) {
+            throw new Exception("In UpdateDishCommandTest: mockedDbConnection is null.");
+        }
+        final ISimpleTypedUpdateDishCommandTester simpleTypedUpdateDishCommandTester = getSimpleTypedUpdateDishCommandTester();
+        simpleTypedUpdateDishCommandTester.handleDishNameUpdateConfirmStateNoTest(bot, mockedDbConnection);
     }
 
     @Test
     public void handleDishNameUpdateStateTest() throws Exception {
         if (bot == null) {
-            throw new Exception("In CreateDishCommandTest: bot is null.");
+            throw new Exception("In UpdateDishCommandTest: bot is null.");
         }
         if (mockedDbConnection == null) {
-            throw new Exception("In CreateDishCommandTest: mockedDbConnection is null.");
+            throw new Exception("In UpdateDishCommandTest: mockedDbConnection is null.");
         }
-        final ISimpleTypedUpdateDishCommandTester simpleTypedCreateDishCommandTester = getSimpleTypedUpdateDishCommandTester();
-        simpleTypedCreateDishCommandTester.handleDishNameUpdateStateTest(bot, mockedDbConnection);
+        final ISimpleTypedUpdateDishCommandTester simpleTypedUpdateDishCommandTester = getSimpleTypedUpdateDishCommandTester();
+        simpleTypedUpdateDishCommandTester.handleDishNameUpdateStateTest(bot, mockedDbConnection);
     }
 
     @Test
-    public void handleIngredientsUpdateConfirmStateTest() throws Exception {
+    public void handleIngredientsUpdateConfirmStateYesTest() throws Exception {
         if (bot == null) {
-            throw new Exception("In CreateDishCommandTest: bot is null.");
+            throw new Exception("In UpdateDishCommandTest: bot is null.");
         }
         if (mockedDbConnection == null) {
-            throw new Exception("In CreateDishCommandTest: mockedDbConnection is null.");
+            throw new Exception("In UpdateDishCommandTest: mockedDbConnection is null.");
         }
-        final ISimpleTypedUpdateDishCommandTester simpleTypedCreateDishCommandTester = getSimpleTypedUpdateDishCommandTester();
-        simpleTypedCreateDishCommandTester.handleIngredientsUpdateConfirmStateTest(bot, mockedDbConnection);
+        final ISimpleTypedUpdateDishCommandTester simpleTypedUpdateDishCommandTester = getSimpleTypedUpdateDishCommandTester();
+        simpleTypedUpdateDishCommandTester.handleIngredientsUpdateConfirmStateYesTest(bot, mockedDbConnection);
+    }
+
+    @Test
+    public void handleIngredientsUpdateConfirmStateNoTest() throws Exception {
+        if (bot == null) {
+            throw new Exception("In UpdateDishCommandTest: bot is null.");
+        }
+        if (mockedDbConnection == null) {
+            throw new Exception("In UpdateDishCommandTest: mockedDbConnection is null.");
+        }
+        final ISimpleTypedUpdateDishCommandTester simpleTypedUpdateDishCommandTester = getSimpleTypedUpdateDishCommandTester();
+        simpleTypedUpdateDishCommandTester.handleIngredientsUpdateConfirmStateNoTest(bot, mockedDbConnection);
     }
 
     @Test
     public void handleIngredientsUpdateStateTest() throws Exception {
         if (bot == null) {
-            throw new Exception("In CreateDishCommandTest: bot is null.");
+            throw new Exception("In UpdateDishCommandTest: bot is null.");
         }
         if (mockedDbConnection == null) {
-            throw new Exception("In CreateDishCommandTest: mockedDbConnection is null.");
+            throw new Exception("In UpdateDishCommandTest: mockedDbConnection is null.");
         }
-        final ISimpleTypedUpdateDishCommandTester simpleTypedCreateDishCommandTester = getSimpleTypedUpdateDishCommandTester();
-        simpleTypedCreateDishCommandTester.handleIngredientsUpdateStateTest(bot, mockedDbConnection);
+        final ISimpleTypedUpdateDishCommandTester simpleTypedUpdateDishCommandTester = getSimpleTypedUpdateDishCommandTester();
+        simpleTypedUpdateDishCommandTester.handleIngredientsUpdateStateTest(bot, mockedDbConnection);
     }
 
     @Test
-    public void handleRecipeUpdateConfirmStateTest() throws Exception {
+    public void handleRecipeUpdateConfirmStateYesTest() throws Exception {
         if (bot == null) {
-            throw new Exception("In CreateDishCommandTest: bot is null.");
+            throw new Exception("In UpdateDishCommandTest: bot is null.");
         }
         if (mockedDbConnection == null) {
-            throw new Exception("In CreateDishCommandTest: mockedDbConnection is null.");
+            throw new Exception("In UpdateDishCommandTest: mockedDbConnection is null.");
         }
-        final ISimpleTypedUpdateDishCommandTester simpleTypedCreateDishCommandTester = getSimpleTypedUpdateDishCommandTester();
-        simpleTypedCreateDishCommandTester.handleRecipeUpdateConfirmStateTest(bot, mockedDbConnection);
+        final ISimpleTypedUpdateDishCommandTester simpleTypedUpdateDishCommandTester = getSimpleTypedUpdateDishCommandTester();
+        simpleTypedUpdateDishCommandTester.handleRecipeUpdateConfirmStateYesTest(bot, mockedDbConnection);
+    }
+
+    @Test
+    public void handleRecipeUpdateConfirmStateNoTest() throws Exception {
+        if (bot == null) {
+            throw new Exception("In UpdateDishCommandTest: bot is null.");
+        }
+        if (mockedDbConnection == null) {
+            throw new Exception("In UpdateDishCommandTest: mockedDbConnection is null.");
+        }
+        final ISimpleTypedUpdateDishCommandTester simpleTypedUpdateDishCommandTester = getSimpleTypedUpdateDishCommandTester();
+        simpleTypedUpdateDishCommandTester.handleRecipeUpdateConfirmStateNoTest(bot, mockedDbConnection);
     }
 
     @Test
     public void handleRecipeUpdateStateTest() throws Exception {
         if (bot == null) {
-            throw new Exception("In CreateDishCommandTest: bot is null.");
+            throw new Exception("In UpdateDishCommandTest: bot is null.");
         }
         if (mockedDbConnection == null) {
-            throw new Exception("In CreateDishCommandTest: mockedDbConnection is null.");
+            throw new Exception("In UpdateDishCommandTest: mockedDbConnection is null.");
         }
-        final ISimpleTypedUpdateDishCommandTester simpleTypedCreateDishCommandTester = getSimpleTypedUpdateDishCommandTester();
-        simpleTypedCreateDishCommandTester.handleRecipeUpdateStateTest(bot, mockedDbConnection);
+        final ISimpleTypedUpdateDishCommandTester simpleTypedUpdateDishCommandTester = getSimpleTypedUpdateDishCommandTester();
+        simpleTypedUpdateDishCommandTester.handleRecipeUpdateStateTest(bot, mockedDbConnection);
     }
 
     @NonNull

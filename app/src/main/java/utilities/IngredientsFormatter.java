@@ -6,8 +6,8 @@ import utilities.factory.IIngredientsFormatter;
 import java.util.Arrays;
 import java.util.List;
 
-final public class IngredientsFormatter implements IIngredientsFormatter {
 
+final public class IngredientsFormatter implements IIngredientsFormatter {
     @Override
     @NonNull
     public List<String> formatInput(@NonNull String input) {

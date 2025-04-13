@@ -218,7 +218,6 @@ final public class UpdateDishCommand extends AbstractCommand {
                 return;
             }
             if (userMessage.equalsIgnoreCase(UserMessages.YES)){
-                sendSilently(BotMessages.INPUT_NEW_INGREDIENTS, update);
                 dbDriver.updateUserContextCommandState(
                     new UserContextUpdateOptions(
                         userId,
@@ -226,6 +225,7 @@ final public class UpdateDishCommand extends AbstractCommand {
                         null
                     )
                 );
+                sendSilently(BotMessages.INPUT_NEW_INGREDIENTS, update);
                 return;
             }
             sendSilently(BotMessages.ENTER_YES_OR_NO, update);
