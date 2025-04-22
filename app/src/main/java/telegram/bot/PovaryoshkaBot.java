@@ -47,6 +47,7 @@ final public class PovaryoshkaBot extends AbilityBot {
         addExtensions(commandMap.values());
         addExtensions(replyMap.values());
         onRegister();
+
     }
 
     @NonNull
