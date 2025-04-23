@@ -30,9 +30,9 @@ final public class PovaryoshkaBot extends AbilityBot {
     private Map<String, @Nullable AbilityExtension> replyMap;
 
     public PovaryoshkaBot(
-        @NonNull final TelegramClient telegramClient,
-        @NonNull final String botUsername,
-        final long creatorId
+            @NonNull final TelegramClient telegramClient,
+            @NonNull final String botUsername,
+            final long creatorId
     ) throws SQLException, Exception {
         super(telegramClient, botUsername);
         this.creatorId = creatorId;
@@ -47,7 +47,6 @@ final public class PovaryoshkaBot extends AbilityBot {
         addExtensions(commandMap.values());
         addExtensions(replyMap.values());
         onRegister();
-
     }
 
     @NonNull
