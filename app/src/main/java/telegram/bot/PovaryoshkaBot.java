@@ -5,6 +5,8 @@ import java.util.Map;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.abilitybots.api.bot.AbilityBot;
 import org.telegram.telegrambots.abilitybots.api.sender.SilentSender;
 import org.telegram.telegrambots.abilitybots.api.util.AbilityExtension;
@@ -16,6 +18,9 @@ import dbdrivers.IDbDriver;
 
 final public class PovaryoshkaBot extends AbilityBot {
     private final long creatorId;
+
+    @NonNull
+    private final Logger logger = LoggerFactory.getLogger(PovaryoshkaBot.class);
 
     @NonNull
     private final IDbDriver dbDriver;
@@ -30,15 +35,16 @@ final public class PovaryoshkaBot extends AbilityBot {
     private Map<String, @Nullable AbilityExtension> replyMap;
 
     public PovaryoshkaBot(
-            @NonNull final TelegramClient telegramClient,
-            @NonNull final String botUsername,
-            final long creatorId
+        @NonNull final TelegramClient telegramClient,
+        @NonNull final String botUsername,
+        final long creatorId
     ) throws SQLException, Exception {
         super(telegramClient, botUsername);
         this.creatorId = creatorId;
         facadeFactory = new FacadeFactory();
         dbDriver = facadeFactory.getDbDriver();
         initCommandList();
+        logger.info("PovaryoshkaBot has started working");
     }
 
     public void initCommandList() {

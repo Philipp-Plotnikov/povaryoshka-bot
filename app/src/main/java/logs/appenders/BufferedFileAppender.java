@@ -1,4 +1,4 @@
-package logs;
+package logs.appenders;
 
 import ch.qos.logback.core.FileAppender;
 import ch.qos.logback.core.spi.DeferredProcessingAware;

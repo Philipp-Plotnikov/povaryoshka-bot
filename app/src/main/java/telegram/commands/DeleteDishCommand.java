@@ -5,11 +5,17 @@ import models.db.sqlops.usercontext.UserContextDeleteOptions;
 import models.db.sqlops.usercontext.UserContextInsertOptions;
 import models.exceptions.db.sqlops.NotFoundDishException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.telegram.telegrambots.abilitybots.api.objects.Ability;
 import org.telegram.telegrambots.abilitybots.api.objects.Flag;
 
 import static models.commands.CommandStates.DISH_NAME;
-import static models.commands.MultiStateCommandTypes.DELETE;
+import static models.commands.CommandStates.FEEDBACK_UPDATE;
+import static models.commands.MultiStateCommandTypes.*;
+import static models.logger.LoggerFields.*;
+import static models.logger.LoggerFields.LOG_DISH_NAME;
 import static org.telegram.telegrambots.abilitybots.api.objects.Locality.ALL;
 import static org.telegram.telegrambots.abilitybots.api.objects.Privacy.PUBLIC;
 
@@ -26,6 +32,8 @@ import java.sql.SQLException;
 
 
 final public class DeleteDishCommand extends AbstractCommand {
+    @NonNull
+    private final Logger logger = LoggerFactory.getLogger(DeleteDishCommand.class);
 
     public DeleteDishCommand(@NonNull final PovaryoshkaBot povaryoshkaBot) {
         super(povaryoshkaBot);
@@ -40,6 +48,11 @@ final public class DeleteDishCommand extends AbstractCommand {
             .locality(ALL)
             .action(ctx -> {
                 final Update update = ctx.update();
+                final long userId = ctx.user().getId();
+
+                MDC.put(LOG_USER_ID, String.valueOf(userId));
+                logger.info("User: {} used DeleteDishCommand", userId);
+
                 try {
                     final String message = getUserDishList(ctx);
                     if (message == null) {
@@ -56,9 +69,16 @@ final public class DeleteDishCommand extends AbstractCommand {
                             null
                         )
                     );
+
+                    MDC.put(LOG_COMMAND_TYPE, DELETE.getValue());
+                    MDC.put(LOG_COMMAND_STATE, DISH_NAME.getValue());
+                    MDC.put(LOG_DISH_NAME, null);
+                    logger.info("User: {} inserted context in DeleteDishCommand", userId);
+                    MDC.clear();
+
                 } catch(SQLException e) {
                     sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
-                    System.out.println("Ошибка при вставке: " + e.getMessage());
+                    logger.error(e.getMessage());
                 }
             })
             .reply((action, update) -> {
@@ -73,19 +93,30 @@ final public class DeleteDishCommand extends AbstractCommand {
                                         dishName
                                     )
                                 );
+
+                                MDC.put(LOG_USER_ID, String.valueOf(userId));
+                                MDC.put(LOG_COMMAND_TYPE, DELETE.getValue());
+                                MDC.put(LOG_COMMAND_STATE, DISH_NAME.getValue());
+                                MDC.put(LOG_DISH_NAME, dishName);
+                                logger.info("User: {} deleted {} dish", userId, dishName);
+                                MDC.clear();
+
                                 dbDriver.deleteUserContext(
-                                    new UserContextDeleteOptions(
-                                        userId
-                                    )
+                                    new UserContextDeleteOptions(userId)
                                 );
                             }
                         );
                         sendSilently(BotMessages.DISH_WAS_DELETED_WITH_SUCCESS, update);
+
+                        MDC.put(LOG_USER_ID, String.valueOf(userId));
+                        logger.info("User: {} ended DeleteDishCommand", userId);
+                        MDC.clear();
+
                     } catch(NotFoundDishException e) {
                         sendSilently(BotMessages.THIS_DISH_NAME_IS_NOT_FROM_LIST, update);
                     } catch(Exception e) {
                         sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
-                        System.out.println("Ошибка : " + e.getMessage());
+                        logger.error(e.getMessage());
                     }
                 },
                 Flag.TEXT,
