@@ -15,8 +15,13 @@ import models.db.schemas.postgres.PostgresRecipeSchema;
 import static models.exceptions.db.sqlops.ExceptionMessages.INGREDIENT_RESULT_SET_NOT_FOUND;
 import static models.exceptions.db.sqlops.ExceptionMessages.RECIPE_NOT_FOUND;
 import models.exceptions.db.sqlops.NotFoundDishException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DishDTO {
+    @NonNull
+    private final static Logger logger = LoggerFactory.getLogger(DishDTO.class);
+
     @NonNull
     private final String name;
 
@@ -33,12 +38,14 @@ public class DishDTO {
             final ResultSet recipeResultSet = selectDishStatement.getResultSet();
         ) {
             if (!recipeResultSet.next()) {
+                logger.error(RECIPE_NOT_FOUND);
                 throw new NotFoundDishException(RECIPE_NOT_FOUND);
             }
             name = recipeResultSet.getString(PostgresRecipeSchema.DISH_NAME);
             recipe = recipeResultSet.getString(PostgresRecipeSchema.RECIPE);
         }
         if (!selectDishStatement.getMoreResults()) {
+            logger.error(INGREDIENT_RESULT_SET_NOT_FOUND);
             throw new NotFoundDishException(INGREDIENT_RESULT_SET_NOT_FOUND);
         }
         try (
@@ -49,11 +56,12 @@ public class DishDTO {
                 final String ingredient = dishIngredientResultSet.getString(PostgresIngredientSchema.INGREDIENT);
                 ingredientListBuffer.add(ingredient);
             }
-            if (ingredientListBuffer.size() == 0) {
+            if (ingredientListBuffer.isEmpty()) {
                 ingredientList = null;
                 return;
             }
             ingredientList = Collections.unmodifiableList(ingredientListBuffer);
+            logger.debug("DishDTO has been initialized");
         }
     }
 
@@ -67,6 +75,7 @@ public class DishDTO {
                 ? ingredientList
                 : Collections.unmodifiableList(ingredientList);
         this.recipe = recipe;
+        logger.debug("DishDTO has been initialized");
     }
 
     @NonNull

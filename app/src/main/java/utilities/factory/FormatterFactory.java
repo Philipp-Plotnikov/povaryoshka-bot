@@ -2,10 +2,16 @@ package utilities.factory;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import utilities.CoreUtilities;
 import utilities.IngredientsFormatter;
 
 
 final public class FormatterFactory {
+    @NonNull
+    private final static Logger logger = LoggerFactory.getLogger(FormatterFactory.class);
+
     @Nullable
     private static IIngredientsFormatter ingredientsFormatter;
 
@@ -13,6 +19,7 @@ final public class FormatterFactory {
     public static IIngredientsFormatter createIngredientsFormat() {
         if (ingredientsFormatter == null) {
             ingredientsFormatter = new IngredientsFormatter();
+            logger.debug("Created ingredientsFormatter");
         }
         return ingredientsFormatter;
     }

@@ -9,12 +9,18 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import models.commands.CommandStates;
 import models.commands.MultiStateCommandTypes;
 import models.exceptions.db.sqlops.NotFoundUserContextException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import telegram.bot.PovaryoshkaBot;
 
 import static models.db.schemas.postgres.PostgresUserContextSchema.COMMAND_STATE;
 import static models.db.schemas.postgres.PostgresUserContextSchema.DISH_NAME;
 import static models.db.schemas.postgres.PostgresUserContextSchema.MULTI_STATE_COMMAND_TYPE;
 
 public class UserContextDTO {
+    @NonNull
+    private final static Logger logger = LoggerFactory.getLogger(UserContextDTO.class);
+
     @NonNull
     private final MultiStateCommandTypes multiStateCommandType;
     
@@ -28,6 +34,7 @@ public class UserContextDTO {
                                                                                 NotFoundUserContextException
     {
         if (!userContextResultSet.next()) {
+            logger.error("userContextResultSet is empty");
             throw new NotFoundUserContextException("");
         }
         multiStateCommandType = MultiStateCommandTypes.valueOf(
@@ -37,6 +44,7 @@ public class UserContextDTO {
             userContextResultSet.getString(COMMAND_STATE).toUpperCase()
         );
         dishName = userContextResultSet.getString(DISH_NAME);
+        logger.debug("UserContextDTO has been initialized");
     }
 
     @NonNull

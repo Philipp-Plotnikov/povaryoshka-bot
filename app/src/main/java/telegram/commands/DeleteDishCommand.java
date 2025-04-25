@@ -12,7 +12,6 @@ import org.telegram.telegrambots.abilitybots.api.objects.Ability;
 import org.telegram.telegrambots.abilitybots.api.objects.Flag;
 
 import static models.commands.CommandStates.DISH_NAME;
-import static models.commands.CommandStates.FEEDBACK_UPDATE;
 import static models.commands.MultiStateCommandTypes.*;
 import static models.logger.LoggerFields.*;
 import static models.logger.LoggerFields.LOG_DISH_NAME;

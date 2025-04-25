@@ -20,7 +20,7 @@ final public class PovaryoshkaBot extends AbilityBot {
     private final long creatorId;
 
     @NonNull
-    private final Logger logger = LoggerFactory.getLogger(PovaryoshkaBot.class);
+    private final static Logger logger = LoggerFactory.getLogger(PovaryoshkaBot.class);
 
     @NonNull
     private final IDbDriver dbDriver;
@@ -53,6 +53,7 @@ final public class PovaryoshkaBot extends AbilityBot {
         addExtensions(commandMap.values());
         addExtensions(replyMap.values());
         onRegister();
+        logger.info("Command List has been initialized");
     }
 
     @NonNull

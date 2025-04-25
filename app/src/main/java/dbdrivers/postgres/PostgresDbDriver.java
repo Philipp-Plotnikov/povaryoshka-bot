@@ -43,9 +43,14 @@ import models.dtos.DishDTO;
 import models.dtos.UserContextDTO;
 import models.exceptions.db.sqlops.NotFoundDishException;
 import models.exceptions.db.sqlops.NotFoundUserContextException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 final public class PostgresDbDriver implements IDbDriver {
+    @NonNull
+    private final static Logger logger = LoggerFactory.getLogger(PostgresDbDriver.class);
+
     @NonNull
     private final PostgresDbDriverOptions postgresDbDriverOptions;
 
@@ -55,6 +60,7 @@ final public class PostgresDbDriver implements IDbDriver {
     {
         postgresDbDriverOptions = options;
         connect();
+        logger.debug("PostgresDbDriver has been initialized");
     }
 
     private void connect() throws SQLException
@@ -62,6 +68,7 @@ final public class PostgresDbDriver implements IDbDriver {
         Properties connectionProperties = new Properties();
         setConnectionProperties(connectionProperties);
         connection = DriverManager.getConnection(postgresDbDriverOptions.getDbUrl(), connectionProperties);
+        logger.debug("connect");
     }
 
     private void setConnectionProperties(@NonNull final Properties connectionProperties)
@@ -69,6 +76,7 @@ final public class PostgresDbDriver implements IDbDriver {
         connectionProperties.setProperty(USER, postgresDbDriverOptions.getDbUsername());
         connectionProperties.setProperty(PASSWORD, postgresDbDriverOptions.getDbPassword());
         connectionProperties.setProperty(CURRENT_SCHEMA, postgresDbDriverOptions.getDbSchema());
+        logger.debug("set connection properties");
     }
 
     @Override
@@ -78,6 +86,7 @@ final public class PostgresDbDriver implements IDbDriver {
             runInitScripts();
             runAlterScripts();
         });
+        logger.debug("setup");
     }
 
     @Override
@@ -85,9 +94,11 @@ final public class PostgresDbDriver implements IDbDriver {
                                                                                           Exception
     {
         if (postgresDbDriverOptions.getIsDistributedDatabase()) {
+            logger.error("Distributed database is not supported yet");
             throw new Exception("Distributed database is not supported yet");
         }
         executeAsOnePhaseTransaction(sqlStatementBatch);
+        logger.debug("executeAsTransaction");
     }
 
     private void executeAsOnePhaseTransaction(@NonNull ISQLStatementBatch sqlStatementBatch) throws SQLException,
@@ -107,6 +118,7 @@ final public class PostgresDbDriver implements IDbDriver {
             throw e;
         } finally {
             connection.setAutoCommit(true);
+            logger.debug("executeAsOnePhaseTransaction");
         }
     }
 
@@ -131,6 +143,7 @@ final public class PostgresDbDriver implements IDbDriver {
         } catch (NotFoundDishException e) {
             dishDTO = null;
         }
+        logger.debug("selectDish");
         return dishDTO;
     }
 
@@ -144,6 +157,7 @@ final public class PostgresDbDriver implements IDbDriver {
         final PreparedStatement selectRecipePreparedStatement = connection.prepareStatement(recipeSelect);
         selectRecipePreparedStatement.setLong(1, selectOptions.userId());
         selectRecipePreparedStatement.setString(2, selectOptions.dishName());
+        logger.debug("getSelectPreparedRecipeStatement");
         return selectRecipePreparedStatement;
     }
 
@@ -157,6 +171,7 @@ final public class PostgresDbDriver implements IDbDriver {
         final PreparedStatement selectDishIngredientListPreparedStatement = connection.prepareStatement(dishIngredientListSelect);
         selectDishIngredientListPreparedStatement.setLong(1, selectOptions.userId());
         selectDishIngredientListPreparedStatement.setString(2, selectOptions.dishName());
+        logger.debug("getSelectPreparedDishIngredientListStatement");
         return selectDishIngredientListPreparedStatement;
     }
 
@@ -187,6 +202,7 @@ final public class PostgresDbDriver implements IDbDriver {
         if (dishList.size() == 0) {
             return null;
         }
+        logger.debug("selectDishList");
         return Collections.unmodifiableList(dishList);
     }
 
@@ -205,6 +221,7 @@ final public class PostgresDbDriver implements IDbDriver {
         if (ingredientList.size() == 0) {
             return null;
         }
+        logger.debug("getDishIngredientList");
         return Collections.unmodifiableList(ingredientList);
     }
 
@@ -217,6 +234,7 @@ final public class PostgresDbDriver implements IDbDriver {
         );
         final PreparedStatement selectRecipePreparedStatement = connection.prepareStatement(recipeSelect);
         selectRecipePreparedStatement.setLong(1, selectOptions.userId());
+        logger.debug("getSelectPreparedRecipeListStatement");
         return selectRecipePreparedStatement;
     }
 
@@ -229,6 +247,7 @@ final public class PostgresDbDriver implements IDbDriver {
         );
         final PreparedStatement selectIngredientListPreparedStatement = connection.prepareStatement(ingredientListSelect);
         selectIngredientListPreparedStatement.setLong(1, selectOptions.userId());
+        logger.debug("getSelectPreparedIngredientListStatement");
         return selectIngredientListPreparedStatement;
     }
 
@@ -238,6 +257,7 @@ final public class PostgresDbDriver implements IDbDriver {
         executeAsTransaction(() -> {
             internalInsertDish(insertOptions);
         });
+        logger.debug("insertDish");
     }
 
     private void internalInsertDish(@NonNull final DishInsertOptions insertOptions) throws SQLException
@@ -257,6 +277,7 @@ final public class PostgresDbDriver implements IDbDriver {
             }
             dishStatement.executeBatch();
         }
+        logger.debug("internalInsertDish");
     }
 
     @NonNull
@@ -273,6 +294,7 @@ final public class PostgresDbDriver implements IDbDriver {
         insertRecipePreparedStatement.setLong(1, insertOptions.userId());
         insertRecipePreparedStatement.setString(2, insertOptions.dishName());
         insertRecipePreparedStatement.setString(3, insertOptions.recipe());
+        logger.debug("getInsertPreparedRecipeStatement");
         return insertRecipePreparedStatement;
     }
 
@@ -289,6 +311,7 @@ final public class PostgresDbDriver implements IDbDriver {
         final PreparedStatement insertIngredientPreparedStatement = connection.prepareStatement(ingredientInsert);
         insertIngredientPreparedStatement.setLong(1, insertOptions.userId());
         insertIngredientPreparedStatement.setString(2, insertOptions.dishName());
+        logger.debug("getInsertPreparedIngredientStatement");
         return insertIngredientPreparedStatement;
     }
 
@@ -296,6 +319,7 @@ final public class PostgresDbDriver implements IDbDriver {
     public void deleteDish(@NonNull final DishDeleteOptions deleteOptions) throws SQLException
     {
         deleteRecipe(deleteOptions);
+        logger.debug("deleteDish");
     }
 
     private void deleteRecipe(@NonNull final DishDeleteOptions deleteOptions) throws SQLException
@@ -305,9 +329,11 @@ final public class PostgresDbDriver implements IDbDriver {
         ) {
             int deletedRowAmount = deleteRecipePreparedStatement.executeUpdate();
             if (deletedRowAmount == 0) {
+                logger.error("deletedRowAmount is 0");
                 throw new NotFoundDishException("");
             }
         }
+        logger.debug("deleteRecipe");
     }
 
     @NonNull
@@ -320,6 +346,7 @@ final public class PostgresDbDriver implements IDbDriver {
         final PreparedStatement deleteRecipePreparedStatement = connection.prepareStatement(recipeDelete);
         deleteRecipePreparedStatement.setLong(1, deleteOptions.userId());
         deleteRecipePreparedStatement.setString(2, deleteOptions.dishName());
+        logger.debug("getDeletePreparedRecipeStatement");
         return deleteRecipePreparedStatement;
     }
 
@@ -329,6 +356,7 @@ final public class PostgresDbDriver implements IDbDriver {
         executeAsTransaction(() -> {
             internalUpdateDish(updateOptions);
         });
+        logger.debug("updateDish");
     }
 
     private void internalUpdateDish(@NonNull final DishUpdateOptions updateOptions) throws SQLException
@@ -356,6 +384,7 @@ final public class PostgresDbDriver implements IDbDriver {
             }
             dishStatement.executeBatch();
         }
+        logger.debug("internalUpdateDish");
     }
 
     @NonNull
@@ -369,6 +398,7 @@ final public class PostgresDbDriver implements IDbDriver {
         updateRecipePreparedStatement.setString(1, updateOptions.recipe());
         updateRecipePreparedStatement.setLong(2, updateOptions.userId());
         updateRecipePreparedStatement.setString(3, updateOptions.dishName());
+        logger.debug("getUpdatePreparedRecipeStatement");
         return updateRecipePreparedStatement;
     }
 
@@ -378,6 +408,7 @@ final public class PostgresDbDriver implements IDbDriver {
         executeAsTransaction(() -> {
             internalUpdateDishName(updateOptions);
         });
+        logger.debug("updateDishName");
     }
 
     private void internalUpdateDishName(@NonNull final DishUpdateOptions updateOptions) throws SQLException
@@ -387,6 +418,7 @@ final public class PostgresDbDriver implements IDbDriver {
         ) {
             updateDishNamePreparedStatement.executeUpdate();
         }
+        logger.debug("internalUpdateDishName");
     }
 
     @NonNull
@@ -399,6 +431,7 @@ final public class PostgresDbDriver implements IDbDriver {
         updateDishNamePreparedStatement.setString(1, updateOptions.newDishName());
         updateDishNamePreparedStatement.setLong(2, updateOptions.userId());
         updateDishNamePreparedStatement.setString(3, updateOptions.dishName());
+        logger.debug("getUpdatePreparedDishNameStatement");
         return updateDishNamePreparedStatement;
     }
 
@@ -408,6 +441,7 @@ final public class PostgresDbDriver implements IDbDriver {
         executeAsTransaction(() -> {
             internalUpdateDishIngredientList(updateOptions);
         });
+        logger.debug("updateDishIngredientList");
     }
 
     private void internalUpdateDishIngredientList(@NonNull final DishUpdateOptions updateOptions) throws SQLException
@@ -433,6 +467,7 @@ final public class PostgresDbDriver implements IDbDriver {
             }
             dishStatement.executeBatch();
         }
+        logger.debug("internalUpdateDishIngredientList");
     }
 
     @NonNull
@@ -445,6 +480,7 @@ final public class PostgresDbDriver implements IDbDriver {
         final PreparedStatement deleteIngredientPreparedStatement = connection.prepareStatement(ingredientDelete);
         deleteIngredientPreparedStatement.setLong(1, updateOptions.userId());
         deleteIngredientPreparedStatement.setString(2, updateOptions.dishName());
+        logger.debug("getDeletePreparedIngredientStatement");
         return deleteIngredientPreparedStatement;
     }
 
@@ -452,6 +488,7 @@ final public class PostgresDbDriver implements IDbDriver {
     public void updateDishRecipe(@NonNull final DishUpdateOptions updateOptions) throws SQLException
     {
         internalUpdateDishRecipe(updateOptions);
+        logger.debug("updateDishRecipe");
     }
 
     private void internalUpdateDishRecipe(@NonNull final DishUpdateOptions updateOptions) throws SQLException
@@ -461,6 +498,7 @@ final public class PostgresDbDriver implements IDbDriver {
         ) {
             updateRecipePreparedStatement.executeUpdate();
         }
+        logger.debug("internalUpdateDishRecipe");
     }
 
     @Override
@@ -474,8 +512,10 @@ final public class PostgresDbDriver implements IDbDriver {
         ) {
             userContextDTO = new UserContextDTO(userContextResultSet);
         } catch (NotFoundUserContextException e) {
+            logger.error(e.getMessage());
             userContextDTO = null;
         }
+        logger.debug("selectUserContext");
         return userContextDTO;
     }
 
@@ -488,6 +528,7 @@ final public class PostgresDbDriver implements IDbDriver {
         );
         final PreparedStatement selectUserContextPreparedStatement = connection.prepareStatement(userContextSelect);
         selectUserContextPreparedStatement.setLong(1, selectOptions.userId());
+        logger.debug("getSelectPreparedUserContextStatement");
         return selectUserContextPreparedStatement;
     }
 
@@ -498,6 +539,7 @@ final public class PostgresDbDriver implements IDbDriver {
         ) {
             insertUserContextPreparedStatement.executeUpdate();
         }
+        logger.debug("insertUserContext");
     }
 
     @NonNull
@@ -516,6 +558,7 @@ final public class PostgresDbDriver implements IDbDriver {
         insertUserContextPreparedStatement.setString(2, insertOptions.multiStateCommandType().getValue());
         insertUserContextPreparedStatement.setString(3, insertOptions.commandState().getValue());
         insertUserContextPreparedStatement.setString(4, insertOptions.dishName());
+        logger.debug("getInsertPreparedUserContextStatement");
         return insertUserContextPreparedStatement;
     }
 
@@ -527,6 +570,7 @@ final public class PostgresDbDriver implements IDbDriver {
         ) {
             deleteUserContextPreparedStatement.executeUpdate();
         }
+        logger.debug("deleteUserContext");
     }
 
     @NonNull
@@ -538,6 +582,7 @@ final public class PostgresDbDriver implements IDbDriver {
         );
         final PreparedStatement deleteUserContextPreparedStatement = connection.prepareStatement(userContextDelete);
         deleteUserContextPreparedStatement.setLong(1, deleteOptions.userId());
+        logger.debug("getDeletePreparedUserContextStatement");
         return deleteUserContextPreparedStatement;
     }
 
@@ -549,6 +594,7 @@ final public class PostgresDbDriver implements IDbDriver {
         ) {
             updateUserContextPreparedStatement.executeUpdate();
         }
+        logger.debug("updateUserContext");
     }
 
     @NonNull
@@ -562,6 +608,7 @@ final public class PostgresDbDriver implements IDbDriver {
         updateUserContextPreparedStatement.setString(1, updateOptions.commandState().getValue());
         updateUserContextPreparedStatement.setString(2, updateOptions.dishName());
         updateUserContextPreparedStatement.setLong(3, updateOptions.userId());
+        logger.debug("getUpdatePreparedUserContextStatement");
         return updateUserContextPreparedStatement;
     }
 
@@ -573,6 +620,7 @@ final public class PostgresDbDriver implements IDbDriver {
         ) {
             updateUserContextCommandStatePreparedStatement.executeUpdate();
         }
+        logger.debug("updateUserContextCommandState");
     }
 
     @NonNull
@@ -585,6 +633,7 @@ final public class PostgresDbDriver implements IDbDriver {
         final PreparedStatement updateUserContextPreparedStatement = connection.prepareStatement(userContextUpdate);
         updateUserContextPreparedStatement.setString(1, updateOptions.commandState().getValue());
         updateUserContextPreparedStatement.setLong(2, updateOptions.userId());
+        logger.debug("getUpdatePreparedUserContextCommandStateStatement");
         return updateUserContextPreparedStatement;
     }
 
@@ -596,6 +645,7 @@ final public class PostgresDbDriver implements IDbDriver {
         ) {
             insertFeedbackPreparedStatement.execute();
         }
+        logger.debug("insertFeedback");
     }
 
     @NonNull
@@ -610,6 +660,7 @@ final public class PostgresDbDriver implements IDbDriver {
         final PreparedStatement insertFeedbackPreparedStatement = connection.prepareStatement(feedbackInsert);
         insertFeedbackPreparedStatement.setLong(1, insertOptions.userId());
         insertFeedbackPreparedStatement.setString(2, insertOptions.feedback());
+        logger.debug("getInsertPreparedFeedbackStatement");
         return insertFeedbackPreparedStatement;
     }
 
@@ -617,16 +668,19 @@ final public class PostgresDbDriver implements IDbDriver {
     public void close() throws SQLException
     {
         connection.close();
+        logger.debug("close connection");
     }
 
     private void runInitScripts() throws SQLException, IOException
     {
         runScript(postgresDbDriverOptions.getInitSQLScriptPath());
+        logger.debug("runInitScripts");
     }
 
     private void runAlterScripts() throws SQLException, IOException
     {
         runScript(postgresDbDriverOptions.getAlterSQLScriptPath());
+        logger.debug("runAlterScripts");
     }
 
     private void runScript(@NonNull final String filePath) throws SQLException, IOException
@@ -641,5 +695,6 @@ final public class PostgresDbDriver implements IDbDriver {
             scriptRunner.setSendFullScript(true);
             scriptRunner.runScript(bufferedReader);
         }
+        logger.debug("runScript");
     }
 }

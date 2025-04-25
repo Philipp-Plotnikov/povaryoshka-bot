@@ -1,34 +1,35 @@
 package core.factory;
 
-import java.sql.SQLException;
-import java.util.Map;
-
-import core.Main;
+import dbdrivers.IDbDriver;
+import dbdrivers.factory.DbDriverFactoryProducer;
+import dbdrivers.factory.IDbDriverFactory;
+import models.commands.CommandTypes;
+import models.db.DbTypes;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.abilitybots.api.util.AbilityExtension;
+import telegram.bot.PovaryoshkaBot;
+import telegram.commands.factory.CommandFactoryProducer;
+import telegram.commands.factory.ICommandFactory;
+import telegram.replies.factory.IReplyFactory;
+import telegram.replies.factory.ReplyFactory;
 
-import dbdrivers.IDbDriver;
-import dbdrivers.factory.IDbDriverFactory;
-import dbdrivers.factory.DbDriverFactoryProducer;
+import java.sql.SQLException;
+import java.util.Map;
 
 import static utilities.CommonsUtilities.getDbType;
 import static utilities.CoreUtilities.getCommandType;
-import models.commands.CommandTypes;
-import models.db.DbTypes;
-import telegram.bot.PovaryoshkaBot;
-import telegram.commands.factory.ICommandFactory;
-import telegram.commands.factory.CommandFactoryProducer;
-import telegram.replies.factory.IReplyFactory;
-import telegram.replies.factory.ReplyFactory;
 
 
 final public class FacadeFactory {
     private final IDbDriverFactory dbDriverFactory;
     private final ICommandFactory commandFactory;
     private final IReplyFactory replyFactory;
+
+    @NonNull
+    private final Logger logger = LoggerFactory.getLogger(FacadeFactory.class);
 
     public FacadeFactory() throws Exception {
         final CommandTypes commandType = getCommandType();
@@ -38,6 +39,7 @@ final public class FacadeFactory {
         dbDriverFactory = dbDriverFactoryProducer.produceDbDriverFactory(dbType);
         commandFactory = commandFactoryProducer.produceCommandFactory(commandType);
         replyFactory = new ReplyFactory();
+        logger.debug("FacadeFactory has been initialized");
     }
 
     public IDbDriver getDbDriver() throws SQLException {
