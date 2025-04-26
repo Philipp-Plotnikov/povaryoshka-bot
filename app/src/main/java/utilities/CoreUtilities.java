@@ -21,9 +21,7 @@ import telegram.bot.PovaryoshkaBot;
 
 final public class CoreUtilities {
     public static void loadEnvFileToSystemProperties() {
-        Dotenv dotenv = Dotenv.configure().systemProperties().load();
-        System.setProperty("MAX_BUFFER_COUNT", dotenv.get("MAX_BUFFER_COUNT"));
-        System.setProperty("FLUSH_INTERVAL_SEC", dotenv.get("FLUSH_INTERVAL_SEC"));
+        Dotenv.configure().systemProperties().load();
     }
 
     @NonNull
