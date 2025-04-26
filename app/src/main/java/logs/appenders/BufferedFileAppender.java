@@ -4,10 +4,12 @@ import ch.qos.logback.core.FileAppender;
 import ch.qos.logback.core.spi.DeferredProcessingAware;
 import ch.qos.logback.core.util.ExecutorServiceUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 
@@ -21,27 +23,46 @@ public class BufferedFileAppender<E> extends FileAppender<E> {
     @NonNull
     private ScheduledExecutorService scheduler;
 
+    @Nullable
+    private ScheduledFuture<?> scheduledFlush;
+
     @Override
     public void start() {
         super.start();
         scheduler = ExecutorServiceUtil.newScheduledExecutorService();
-        scheduler.scheduleAtFixedRate(
-                this::safeFlush,
-                flushIntervalSec,
+        scheduleNextFlush();
+    }
+
+    private void scheduleNextFlush() {
+        if (scheduledFlush != null) {
+            scheduledFlush.cancel(false);
+        }
+        scheduledFlush = scheduler.schedule(
+                this::safeFlushIfNotEmpty,
                 flushIntervalSec,
                 TimeUnit.SECONDS
         );
     }
 
+    private void safeFlushIfNotEmpty() {
+        synchronized (buffer) {
+            if (!buffer.isEmpty()) {
+                safeFlush();
+            }
+        }
+        scheduleNextFlush();
+    }
+
     @Override
     public void stop() {
         try {
-            if (scheduler != null) {
-                scheduler.shutdown();
-                if (!scheduler.awaitTermination(5, TimeUnit.SECONDS)) {
-                    addError("Scheduler did not terminate gracefully, forcing shutdown");
-                    scheduler.shutdownNow();
-                }
+            if (scheduledFlush != null) {
+                scheduledFlush.cancel(false);
+            }
+            scheduler.shutdown();
+            if (!scheduler.awaitTermination(5, TimeUnit.SECONDS)) {
+                addError("Scheduler did not terminate gracefully, forcing shutdown");
+                scheduler.shutdownNow();
             }
             safeFlush();
         } catch (InterruptedException e) {
@@ -66,6 +87,7 @@ public class BufferedFileAppender<E> extends FileAppender<E> {
             buffer.add(event);
             if (buffer.size() >= maxBufferCount) {
                 safeFlush();
+                scheduleNextFlush();
             }
         }
     }

@@ -33,7 +33,7 @@ final public class DefaultReply extends AbstractReply {
                 .action(ctx -> {
                     final Update update = ctx.update();
                     sendSilently(BotMessages.DEFAULT_REPLY_MESSAGE, update);
-                    logger.warn("User {} wrote wrong expression", ctx.user().getId());
+                    logger.info("User {} wrote wrong expression", ctx.user().getId());
                 })
                 .build();
     }

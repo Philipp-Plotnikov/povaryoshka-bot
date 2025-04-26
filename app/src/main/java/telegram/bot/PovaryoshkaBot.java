@@ -44,7 +44,7 @@ final public class PovaryoshkaBot extends AbilityBot {
         facadeFactory = new FacadeFactory();
         dbDriver = facadeFactory.getDbDriver();
         initCommandList();
-        logger.info("PovaryoshkaBot has started working");
+        logger.info("PovaryoshkaBot started to work");
     }
 
     public void initCommandList() {

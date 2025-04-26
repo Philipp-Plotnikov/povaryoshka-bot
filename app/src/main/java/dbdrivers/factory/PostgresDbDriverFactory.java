@@ -15,13 +15,13 @@ import utilities.PostgresDbDriverUtilities;
 
 final public class PostgresDbDriverFactory implements IDbDriverFactory {
     @NonNull
-    private final static Logger logger = LoggerFactory.getLogger(PostgresDbDriver.class);
+    private final static Logger logger = LoggerFactory.getLogger(PostgresDbDriverFactory.class);
 
     @Override
     @NonNull
     public IDbDriver createDbDriver() throws SQLException {
         final PostgresDbDriverOptions postgresDbDriverOptions = PostgresDbDriverUtilities.getPostgresDbDriverOptions();
-        logger.debug("Created DbDriver");
+        logger.debug("PostgresDbDriver was created");
         return new PostgresDbDriver(postgresDbDriverOptions);
     }
 }

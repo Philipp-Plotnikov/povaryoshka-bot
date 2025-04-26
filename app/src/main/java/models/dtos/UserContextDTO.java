@@ -34,7 +34,6 @@ public class UserContextDTO {
                                                                                 NotFoundUserContextException
     {
         if (!userContextResultSet.next()) {
-            logger.error("userContextResultSet is empty");
             throw new NotFoundUserContextException("");
         }
         multiStateCommandType = MultiStateCommandTypes.valueOf(

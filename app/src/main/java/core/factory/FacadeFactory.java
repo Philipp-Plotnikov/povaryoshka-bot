@@ -39,7 +39,7 @@ final public class FacadeFactory {
         dbDriverFactory = dbDriverFactoryProducer.produceDbDriverFactory(dbType);
         commandFactory = commandFactoryProducer.produceCommandFactory(commandType);
         replyFactory = new ReplyFactory();
-        logger.debug("FacadeFactory has been initialized");
+        logger.debug("FacadeFactory was initialized");
     }
 
     public IDbDriver getDbDriver() throws SQLException {

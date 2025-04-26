@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 
 final public class CommonsUtilities {
     @NonNull
-    private final static Logger logger = LoggerFactory.getLogger(CoreUtilities.class);
+    private final static Logger logger = LoggerFactory.getLogger(CommonsUtilities.class);
 
     @NonNull
     public static DbTypes getDbType() {

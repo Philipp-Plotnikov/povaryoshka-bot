@@ -1,7 +1,6 @@
 package core;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.slf4j.Logger;
+
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
 
@@ -15,7 +14,6 @@ public class Main {
 
     public static void main(String[] args) {
         loadEnvFileToSystemProperties();
-        @NonNull final Logger logger = LoggerFactory.getLogger(Main.class);
         try (
             TelegramBotsLongPollingApplication botsApplication = new TelegramBotsLongPollingApplication();
         ) {
@@ -25,7 +23,7 @@ public class Main {
             botsApplication.registerBot(botToken, povaryoshkaBot);
             Thread.currentThread().join();
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            LoggerFactory.getLogger(Main.class).error(String.valueOf(e));
         }
     }
 }

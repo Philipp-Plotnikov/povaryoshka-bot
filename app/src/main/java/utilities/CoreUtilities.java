@@ -20,12 +20,10 @@ import telegram.bot.PovaryoshkaBot;
 
 
 final public class CoreUtilities {
-    @NonNull
-    private final static Logger logger = LoggerFactory.getLogger(CoreUtilities.class);
-
     public static void loadEnvFileToSystemProperties() {
-        Dotenv.configure().systemProperties().load();
-        logger.debug("Loaded Environment File-To-System Properties");
+        Dotenv dotenv = Dotenv.configure().systemProperties().load();
+        System.setProperty("MAX_BUFFER_COUNT", dotenv.get("MAX_BUFFER_COUNT"));
+        System.setProperty("FLUSH_INTERVAL_SEC", dotenv.get("FLUSH_INTERVAL_SEC"));
     }
 
     @NonNull
@@ -34,14 +32,12 @@ final public class CoreUtilities {
         final String botUsername = System.getProperty(BOT_USERNAME);
         final long creatorId = Long.parseLong(System.getProperty(CREATOR_ID));
         final TelegramClient telegramClient = new OkHttpTelegramClient(botToken);
-        logger.debug("Got PovaryoshkaBot");
         return new PovaryoshkaBot(telegramClient, botUsername, creatorId);
     }
 
     @NonNull
     public static CommandTypes getCommandType() {
         final String commandType = System.getProperty(COMMAND_TYPE).toUpperCase();
-        logger.debug("Got CommandType");
         return CommandTypes.valueOf(commandType);
     }
 }

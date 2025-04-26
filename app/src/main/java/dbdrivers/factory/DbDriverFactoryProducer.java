@@ -26,7 +26,7 @@ final public class DbDriverFactoryProducer {
     private Map<@NonNull DbTypes, @Nullable IDbDriverFactoryGenerator> produceDbDriverFactoryGeneratorMap() {
         final EnumMap<@NonNull DbTypes, @Nullable IDbDriverFactoryGenerator> localDbDriverFactoryGeneratorMap = new EnumMap<>(DbTypes.class);
         localDbDriverFactoryGeneratorMap.put(DbTypes.POSTGRES, () -> new PostgresDbDriverFactory());
-        logger.debug("DbDriverFactoryGeneratorMap has been initialized");
+        logger.debug("DbDriverFactoryGeneratorMap was initialized");
         return Collections.unmodifiableMap(localDbDriverFactoryGeneratorMap);
     }
 
@@ -41,7 +41,7 @@ final public class DbDriverFactoryProducer {
             logger.error("dbDriverFactoryGenerator of dbType {} is null", dbType.name());
             throw new Exception(String.format("dbDriverFactoryGenerator of dbType '%s' is null", dbType.name()));
         }
-        logger.debug("Got DbDriverFactory");
+        logger.debug("DbDriverFactory was created");
         return dbDriverFactoryGenerator.generate();
     }
 }
