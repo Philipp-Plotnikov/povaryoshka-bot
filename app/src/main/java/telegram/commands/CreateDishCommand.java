@@ -77,7 +77,7 @@ final public class CreateDishCommand extends AbstractCommand {
                                     null
                             )
                     );
-                    logger.info("CreateDishCommand was invoked", userId);
+                    logger.info("CreateDishCommand was invoked");
                     try {
                         sendSilently(BotMessages.WRITE_DISH_NAME, update);
                         dbDriver.insertUserContext(
@@ -88,7 +88,7 @@ final public class CreateDishCommand extends AbstractCommand {
                                 null
                             )
                         );
-                        logger.info("UserContext was inserted in CreateDishCommand", userId);
+                        logger.info("UserContext was inserted in CreateDishCommand");
                     } catch (SQLException e) {
                         sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
                         logger.error(String.valueOf(e));

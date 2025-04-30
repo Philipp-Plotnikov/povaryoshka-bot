@@ -91,15 +91,15 @@ final public class GetDishCommand extends AbstractCommand {
                         final DishDTO selectedDish = dbDriver.selectDish(
                             new DishSelectOptions(userId, dishName)
                         );
-                        LoggerUtilities.fillInLoggerFields(
-                                new RequestContext(
-                                        userId,
-                                        selectedDish.getName(),
-                                        GET.getValue(),
-                                        null
-                                )
-                        );
                         if (selectedDish == null) {
+                            LoggerUtilities.fillInLoggerFields(
+                                    new RequestContext(
+                                            userId,
+                                            selectedDish.getName(),
+                                            GET.getValue(),
+                                            null
+                                    )
+                            );
                             sendSilently(BotMessages.THIS_DISH_NAME_IS_NOT_FROM_LIST, update);
                             return;
                         }
