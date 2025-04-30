@@ -2,6 +2,7 @@ package telegram.commands;
 
 import models.commands.ICommandStateHandler;
 import models.commands.CommandStates;
+import models.commons.RequestContext;
 import models.db.sqlops.dish.DishSelectOptions;
 import models.db.sqlops.dish.DishUpdateOptions;
 import models.db.sqlops.usercontext.UserContextDeleteOptions;
@@ -21,6 +22,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import language.ru.BotMessages;
 import language.ru.UserMessages;
 import telegram.bot.PovaryoshkaBot;
+import utilities.LoggerUtilities;
 
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -68,10 +70,15 @@ final public class UpdateDishCommand extends AbstractCommand {
             .action(ctx -> {
                 final Update update = ctx.update();
                 final long userId = ctx.user().getId();
-
-                MDC.put(LOG_USER_ID, String.valueOf(userId));
-                logger.info("User: {} used UpdateDishCommand", userId);
-
+                LoggerUtilities.fillInLoggerFields(
+                        new RequestContext(
+                                userId,
+                                null,
+                                UPDATE.getValue(),
+                                null
+                        )
+                );
+                logger.info("UpdateDishCommand was invoked");
                 try {
                     final String message = getUserDishList(ctx);
                     if (message == null) {
@@ -88,26 +95,29 @@ final public class UpdateDishCommand extends AbstractCommand {
                             null
                         )
                     );
-
-                    MDC.put(LOG_COMMAND_TYPE, UPDATE.getValue());
-                    MDC.put(LOG_COMMAND_STATE, DISH_NAME.getValue());
-                    MDC.put(LOG_DISH_NAME, null);
-                    logger.info("User: {} inserted context in UpdateDishCommand", userId);
-                    MDC.clear();
-
+                    logger.info("UserContext was inserted in DeleteDishCommand");
                 } catch(SQLException e) {
                     sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
-                    logger.error(e.getMessage());
+                    logger.error(String.valueOf(e));
+                } finally {
+                    LoggerUtilities.clearLoggerField();
                 }
             })
             .reply((action, update) -> {
                 try {
+                    final long userId = update.getMessage().getFrom().getId();
                     final UserContextDTO userContextDTO = dbDriver.selectUserContext(
-                        new UserContextSelectOptions(
-                            update.getMessage().getFrom().getId()
-                        )
+                        new UserContextSelectOptions(userId)
                     );
                     if (userContextDTO != null) {
+                        LoggerUtilities.fillInLoggerFields(
+                                new RequestContext(
+                                        userId,
+                                        userContextDTO.getDishName(),
+                                        userContextDTO.getMultiStateCommandTypes().getValue(),
+                                        userContextDTO.getCommandState().getValue()
+                                )
+                        );
                         final CommandStates commandState = userContextDTO.getCommandState();
                         final ICommandStateHandler commandStateHandler = stateHandlersMap.get(commandState);
                         if (commandStateHandler == null) {
@@ -117,8 +127,10 @@ final public class UpdateDishCommand extends AbstractCommand {
                     }
                     } catch(Exception e) {
                         sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
-                        logger.error(e.getMessage());
-                    }
+                    logger.error(String.valueOf(e));
+                    } finally {
+                    LoggerUtilities.clearLoggerField();
+                }
                 },
                 Flag.TEXT,
                 isSpecifiedContext(UPDATE)
@@ -141,18 +153,11 @@ final public class UpdateDishCommand extends AbstractCommand {
                     dishName
                 )
             );
-
-            MDC.put(LOG_USER_ID, String.valueOf(userId));
-            MDC.put(LOG_COMMAND_TYPE, UPDATE.getValue());
-            MDC.put(LOG_COMMAND_STATE, DISH_NAME_UPDATE_CONFIRM.getValue());
-            MDC.put(LOG_DISH_NAME, dishName);
-            logger.info("User: {} updated context: {}", userId, DISH_NAME_UPDATE_CONFIRM.getValue());
-            MDC.clear();
-
             sendSilently(BotMessages.CONFIRM_DISH_NAME_UPDATE, update);
+            logger.info("Confirmation of the name change");
         } catch (Exception e) {
             sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
-            logger.error(e.getMessage());
+            logger.error(String.valueOf(e));
         }
     }
 
@@ -160,7 +165,6 @@ final public class UpdateDishCommand extends AbstractCommand {
         try {
             final long userId = update.getMessage().getFrom().getId();
             final String userMessage = update.getMessage().getText().trim();
-            final String dishName = userContextDTO.getDishName();
             if (userMessage.equalsIgnoreCase(UserMessages.NO)) {
                 dbDriver.updateUserContextCommandState(
                     new UserContextUpdateOptions(
@@ -169,14 +173,7 @@ final public class UpdateDishCommand extends AbstractCommand {
                         null
                     )
                 );
-
-                MDC.put(LOG_USER_ID, String.valueOf(userId));
-                MDC.put(LOG_COMMAND_TYPE, UPDATE.getValue());
-                MDC.put(LOG_COMMAND_STATE, INGREDIENTS_UPDATE_CONFIRM.getValue());
-                MDC.put(LOG_DISH_NAME, dishName);
-                logger.info("User: {} updated command state: {}", userId, INGREDIENTS_UPDATE_CONFIRM.getValue());
-                MDC.clear();
-
+                logger.info("Name change rejected");
                 sendSilently(BotMessages.DISH_NAME_IS_NOT_UPDATED, update);
                 sendSilently(BotMessages.CONFIRM_INGREDIENTS_UPDATE, update);
                 return;
@@ -189,21 +186,14 @@ final public class UpdateDishCommand extends AbstractCommand {
                         null
                     )
                 );
-
-                MDC.put(LOG_USER_ID, String.valueOf(userId));
-                MDC.put(LOG_COMMAND_TYPE, UPDATE.getValue());
-                MDC.put(LOG_COMMAND_STATE, DISH_NAME_UPDATE.getValue());
-                MDC.put(LOG_DISH_NAME, dishName);
-                logger.info("User: {} updated command state: {}", userId, DISH_NAME_UPDATE.getValue());
-                MDC.clear();
-
+                logger.info("Name change accepted");
                 sendSilently(BotMessages.INPUT_NEW_DISH_NAME, update);
                 return;
             }
             sendSilently(BotMessages.ENTER_YES_OR_NO, update);
         } catch (Exception e) {
             sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
-            logger.error(e.getMessage());
+            logger.error(String.valueOf(e));
         }
     }
 
@@ -223,14 +213,6 @@ final public class UpdateDishCommand extends AbstractCommand {
                             null
                         )
                     );
-
-                    MDC.put(LOG_USER_ID, String.valueOf(userId));
-                    MDC.put(LOG_COMMAND_TYPE, UPDATE.getValue());
-                    MDC.put(LOG_COMMAND_STATE, DISH_NAME_UPDATE.getValue());
-                    MDC.put(LOG_DISH_NAME, newDishName);
-                    logger.info("User: {} updated dish name: {} -> {}", userId, dishName, newDishName);
-                    MDC.clear();
-
                     dbDriver.updateUserContext(
                         new UserContextUpdateOptions(
                             userId,
@@ -238,20 +220,13 @@ final public class UpdateDishCommand extends AbstractCommand {
                             newDishName
                         )
                     );
-
-                    MDC.put(LOG_USER_ID, String.valueOf(userId));
-                    MDC.put(LOG_COMMAND_TYPE, UPDATE.getValue());
-                    MDC.put(LOG_COMMAND_STATE, INGREDIENTS_UPDATE_CONFIRM.getValue());
-                    MDC.put(LOG_DISH_NAME, newDishName);
-                    logger.info("User: {} updated context: {}", userId, INGREDIENTS_UPDATE_CONFIRM.getValue());
-                    MDC.clear();
-
                 }
             );
             sendSilently(BotMessages.CONFIRM_INGREDIENTS_UPDATE, update);
+            logger.info("Confirmation of the ingredients change");
         } catch (Exception e) {
             sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
-            logger.error(e.getMessage());
+            logger.error(String.valueOf(e));
         }
     }
 
@@ -266,7 +241,6 @@ final public class UpdateDishCommand extends AbstractCommand {
         try {
             final long userId = update.getMessage().getFrom().getId();
             final String userMessage = update.getMessage().getText().trim();
-            final String dishName = userContextDTO.getDishName();
             if (userMessage.equalsIgnoreCase(UserMessages.NO)) {
                 dbDriver.updateUserContextCommandState(
                     new UserContextUpdateOptions(
@@ -275,14 +249,7 @@ final public class UpdateDishCommand extends AbstractCommand {
                         null
                     )
                 );
-
-                MDC.put(LOG_USER_ID, String.valueOf(userId));
-                MDC.put(LOG_COMMAND_TYPE, UPDATE.getValue());
-                MDC.put(LOG_COMMAND_STATE, RECIPE_UPDATE_CONFIRM.getValue());
-                MDC.put(LOG_DISH_NAME, dishName);
-                logger.info("User: {} updated command state: {}", userId, RECIPE_UPDATE_CONFIRM.getValue());
-                MDC.clear();
-
+                logger.info("Ingredients change rejected");
                 sendSilently(BotMessages.INGREDIENTS_ARE_NOT_UPDATED, update);
                 sendSilently(BotMessages.CONFIRM_RECIPE_UPDATE, update);
                 return;
@@ -295,21 +262,14 @@ final public class UpdateDishCommand extends AbstractCommand {
                         null
                     )
                 );
-
-                MDC.put(LOG_USER_ID, String.valueOf(userId));
-                MDC.put(LOG_COMMAND_TYPE, UPDATE.getValue());
-                MDC.put(LOG_COMMAND_STATE, INGREDIENTS_UPDATE.getValue());
-                MDC.put(LOG_DISH_NAME, dishName);
-                logger.info("User: {} updated command state: {}", userId, INGREDIENTS_UPDATE.getValue());
-                MDC.clear();
-
+                logger.info("Ingredients change accepted");
                 sendSilently(BotMessages.INPUT_NEW_INGREDIENTS, update);
                 return;
             }
             sendSilently(BotMessages.ENTER_YES_OR_NO, update);
         } catch (Exception e) {
             sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
-            logger.error(e.getMessage());
+            logger.error(String.valueOf(e));
         }
     }
 
@@ -331,14 +291,6 @@ final public class UpdateDishCommand extends AbstractCommand {
                             null
                         )
                     );
-
-                    MDC.put(LOG_USER_ID, String.valueOf(userId));
-                    MDC.put(LOG_COMMAND_TYPE, UPDATE.getValue());
-                    MDC.put(LOG_COMMAND_STATE, INGREDIENTS_UPDATE.getValue());
-                    MDC.put(LOG_DISH_NAME, dishName);
-                    logger.info("User: {} updated ingredients for {} dish", userId, dishName);
-                    MDC.clear();
-
                     dbDriver.updateUserContextCommandState(
                         new UserContextUpdateOptions(
                             userId,
@@ -346,20 +298,13 @@ final public class UpdateDishCommand extends AbstractCommand {
                             null
                         )
                     );
-
-                    MDC.put(LOG_USER_ID, String.valueOf(userId));
-                    MDC.put(LOG_COMMAND_TYPE, UPDATE.getValue());
-                    MDC.put(LOG_COMMAND_STATE, RECIPE_UPDATE_CONFIRM.getValue());
-                    MDC.put(LOG_DISH_NAME, dishName);
-                    logger.info("User: {} updated command state: {}", userId, RECIPE_UPDATE_CONFIRM.getValue());
-                    MDC.clear();
-
                 }
             );
             sendSilently(BotMessages.CONFIRM_RECIPE_UPDATE, update);
+            logger.info("Confirmation of the recipe change");
         } catch (Exception e) {
             sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
-            logger.error(e.getMessage());
+            logger.error(String.valueOf(e));
         }
     }
 
@@ -371,13 +316,10 @@ final public class UpdateDishCommand extends AbstractCommand {
                 dbDriver.deleteUserContext(
                     new UserContextDeleteOptions(userId)
                 );
+                logger.info("Recipe change rejected");
                 sendSilently(BotMessages.RECIPE_IS_NOT_UPDATED, update);
                 sendSilently(BotMessages.DISH_WAS_UPDATED_WITH_SUCCESS, update);
-
-                MDC.put(LOG_USER_ID, String.valueOf(userId));
-                logger.info("User: {} ended UpdateDishCommand", userId);
-                MDC.clear();
-
+                logger.info("Dish was updated successfully");
                 return;
             }
             if (userMessage.equalsIgnoreCase(UserMessages.YES)){
@@ -388,21 +330,14 @@ final public class UpdateDishCommand extends AbstractCommand {
                         null
                     )
                 );
-
-                MDC.put(LOG_USER_ID, String.valueOf(userId));
-                MDC.put(LOG_COMMAND_TYPE, UPDATE.getValue());
-                MDC.put(LOG_COMMAND_STATE, RECIPE_UPDATE.getValue());
-                MDC.put(LOG_DISH_NAME, userContextDTO.getDishName());
-                logger.info("User: {} updated command state: {}", userId, RECIPE_UPDATE.getValue());
-                MDC.clear();
-
+                logger.info("Name change accepted");
                 sendSilently(BotMessages.INPUT_NEW_RECIPE, update);
                 return;
             }
             sendSilently(BotMessages.ENTER_YES_OR_NO, update);
         } catch (Exception e) {
             sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
-            logger.error(e.getMessage());
+            logger.error(String.valueOf(e));
         }
     }
 
@@ -422,28 +357,16 @@ final public class UpdateDishCommand extends AbstractCommand {
                             recipe
                         )
                     );
-
-                    MDC.put(LOG_USER_ID, String.valueOf(userId));
-                    MDC.put(LOG_COMMAND_TYPE, UPDATE.getValue());
-                    MDC.put(LOG_COMMAND_STATE, RECIPE_UPDATE.getValue());
-                    MDC.put(LOG_DISH_NAME, dishName);
-                    logger.info("User: {} updated recipe for {} dish", userId, dishName);
-                    MDC.clear();
-
                     dbDriver.deleteUserContext(
                          new UserContextDeleteOptions(userId)
                     );
                 }
             );
             sendSilently(BotMessages.DISH_WAS_UPDATED_WITH_SUCCESS, update);
-
-            MDC.put(LOG_USER_ID, String.valueOf(userId));
-            logger.info("User: {} ended UpdateDishCommand", userId);
-            MDC.clear();
-
+            logger.info("Dish was updated successfully");
         } catch (Exception e) {
             sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
-            logger.error(e.getMessage());
+            logger.error(String.valueOf(e));
         }
     }
 }

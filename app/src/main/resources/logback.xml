@@ -1,7 +1,7 @@
 <configuration>
     <shutdownHook class="ch.qos.logback.core.hook.DefaultShutdownHook"/>
 
-    <appender name="json" class="logs.appenders.BufferedFileAppender">
+    <appender name="json" class="logger.appenders.BufferedFileAppender">
 
         <file>server.json</file>
         <flushIntervalSec>${FLUSH_INTERVAL_SEC}</flushIntervalSec>

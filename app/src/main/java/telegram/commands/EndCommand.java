@@ -1,15 +1,14 @@
 package telegram.commands;
 
+import models.commons.RequestContext;
 import models.db.sqlops.usercontext.UserContextDeleteOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 import org.telegram.telegrambots.abilitybots.api.objects.Ability;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import language.ru.BotMessages;
 
-import static models.logger.LoggerFields.LOG_USER_ID;
 import static org.telegram.telegrambots.abilitybots.api.objects.Locality.ALL;
 import static org.telegram.telegrambots.abilitybots.api.objects.Privacy.PUBLIC;
 
@@ -17,6 +16,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 import static models.commands.CommandConfig.END_COMMAND_SETTINGS;
 import telegram.bot.PovaryoshkaBot;
+import utilities.LoggerUtilities;
 
 
 final public class EndCommand extends AbstractCommand {
@@ -37,21 +37,26 @@ final public class EndCommand extends AbstractCommand {
             .action(ctx -> {
                 final Update update = ctx.update();
                 final long userId = ctx.user().getId();
-
+                LoggerUtilities.fillInLoggerFields(
+                        new RequestContext(
+                                userId,
+                                null,
+                                null,
+                                null
+                        )
+                );
                 sendSilently(BotMessages.COMMAND_WAS_TERMINATED, update);
                 try {
                     dbDriver.deleteUserContext(
                         new UserContextDeleteOptions(userId)
                     );
-
-                    MDC.put(LOG_USER_ID, String.valueOf(userId));
-                    logger.info("User: {} used EndCommand", userId);
-                    MDC.clear();
-
+                logger.info("EndCommand was invoked");
                 } catch (Exception e) {
                     sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
-                    logger.error(e.getMessage());
-                };
+                    logger.error(String.valueOf(e));
+                } finally {
+                    LoggerUtilities.clearLoggerField();
+                }
             })
             .build();
     }

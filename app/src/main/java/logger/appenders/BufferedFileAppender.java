@@ -1,4 +1,4 @@
-package logs.appenders;
+package logger.appenders;
 
 import ch.qos.logback.core.FileAppender;
 import ch.qos.logback.core.spi.DeferredProcessingAware;
@@ -14,8 +14,8 @@ import java.util.concurrent.TimeUnit;
 
 
 public class BufferedFileAppender<E> extends FileAppender<E> {
-    private int flushIntervalSec = 10;
-    private int maxBufferCount = 1000;
+    private int flushIntervalSec;
+    private int maxBufferCount;
 
     @NonNull
     private final List<E> buffer = new ArrayList<>();
@@ -96,7 +96,6 @@ public class BufferedFileAppender<E> extends FileAppender<E> {
         if (!isStarted()) {
             return;
         }
-
         List<E> copy;
         synchronized (buffer) {
             if (buffer.isEmpty()) {
@@ -105,7 +104,6 @@ public class BufferedFileAppender<E> extends FileAppender<E> {
             copy = new ArrayList<>(buffer);
             buffer.clear();
         }
-
         try {
             for (E event : copy) {
                 super.append(event);

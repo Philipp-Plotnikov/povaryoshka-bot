@@ -50,6 +50,8 @@ jobs:
           echo BOT_USERNAME="PovaryoshkaBot" >> app/.env
           echo CREATOR_ID="1111" >> app/.env
           echo LANGUAGE="ru" >> app/.env
+          echo MAX_BUFFER_COUNT="1000" >> app/.env
+          echo FLUSH_INTERVAL_SEC="10" >> app/.env
 
       - name: Build code
         run: |

@@ -43,17 +43,17 @@ final public class PovaryoshkaBot extends AbilityBot {
         this.creatorId = creatorId;
         facadeFactory = new FacadeFactory();
         dbDriver = facadeFactory.getDbDriver();
-        initCommandList();
+        initCommandMap();
         logger.info("PovaryoshkaBot started to work");
     }
 
-    public void initCommandList() {
+    public void initCommandMap() {
         commandMap = facadeFactory.createCommandMap(this);
         replyMap = facadeFactory.createReplyMap(this);
         addExtensions(commandMap.values());
         addExtensions(replyMap.values());
         onRegister();
-        logger.info("Command List has been initialized");
+        logger.info("CommandMap was initialized");
     }
 
     @NonNull
