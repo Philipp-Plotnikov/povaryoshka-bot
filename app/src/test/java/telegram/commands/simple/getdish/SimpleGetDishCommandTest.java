@@ -73,10 +73,10 @@ public class SimpleGetDishCommandTest{
     @Test
     public void getDishTest() throws Exception {
         if (bot == null) {
-            throw new Exception("In UpdateDishCommandTest: bot is null.");
+            throw new Exception("In GetDishCommandTest: bot is null.");
         }
         if (mockedDbConnection == null) {
-            throw new Exception("In UpdateDishCommandTest: mockedDbConnection is null.");
+            throw new Exception("In GetDishCommandTest: mockedDbConnection is null.");
         }
         final ISimpleTypedGetDishCommandTester simpleTypedGetDishCommandTester = getSimpleTypedGetDishCommandTester();
         simpleTypedGetDishCommandTester.getDishTest(bot, mockedDbConnection);
@@ -85,10 +85,10 @@ public class SimpleGetDishCommandTest{
     @Test
     public void getFormatDishInfoTest() throws Exception {
         if (bot == null) {
-            throw new Exception("In UpdateDishCommandTest: bot is null.");
+            throw new Exception("In GetDishCommandTest: bot is null.");
         }
         if (mockedDbConnection == null) {
-            throw new Exception("In UpdateDishCommandTest: mockedDbConnection is null.");
+            throw new Exception("In GetDishCommandTest: mockedDbConnection is null.");
         }
         final ISimpleTypedGetDishCommandTester simpleTypedGetDishCommandTester = getSimpleTypedGetDishCommandTester();
         simpleTypedGetDishCommandTester.getFormatDishInfoTest(bot, mockedDbConnection);

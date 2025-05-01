@@ -71,7 +71,7 @@ public class SimplePostgresGetDishCommandTester  implements ISimpleTypedGetDishC
         getDishCommand.getFormatDishInfo(dishDTO);
 
         // Assert
-        verify(bot.getSilent(), never()).send(BotMessages.NO_INFO, MessageMock.CHAT_ID);
+        verify(bot.getSilent(), never()).send(BotMessages.SOMETHING_WENT_WRONG, MessageMock.CHAT_ID);
     }
 
     @NonNull
