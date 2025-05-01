@@ -9,6 +9,7 @@ import telegram.bot.PovaryoshkaBot;
 import static models.system.EnvVars.TELEGRAM_BOT_API_TOKEN;
 import static utilities.CoreUtilities.getPovaryoshkaBot;
 
+
 public class Application {
     @NonNull
     private final static Logger logger = LoggerFactory.getLogger(Application.class);
@@ -17,11 +18,12 @@ public class Application {
         try (
             TelegramBotsLongPollingApplication botsApplication = new TelegramBotsLongPollingApplication();
         ) {
-            logger.info("PovaryoshkaBot is launching");
             final PovaryoshkaBot povaryoshkaBot = getPovaryoshkaBot();
             final String botToken = System.getProperty(TELEGRAM_BOT_API_TOKEN);
             povaryoshkaBot.getDbDriver().setup();
+            logger.info("DBDriver was setup");
             botsApplication.registerBot(botToken, povaryoshkaBot);
+            logger.info("PovaryoshkaBot is launching");
             Thread.currentThread().join();
         } catch (Exception e) {
             logger.error(String.valueOf(e));

@@ -24,7 +24,7 @@ public class ReplyFactory implements IReplyFactory {
                 DEFAULT_REPLY_SETTINGS.replyName(),
                 new DefaultReply(povaryoshkaBot)
         );
-        logger.debug("Created ReplyMap");
+        logger.debug("ReplyMap was created");
         return Collections.unmodifiableMap(replyMap);
     }
 }

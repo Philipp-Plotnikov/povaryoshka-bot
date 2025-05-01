@@ -22,6 +22,7 @@ import telegram.bot.PovaryoshkaBot;
 final public class CoreUtilities {
     public static void loadEnvFileToSystemProperties() {
         Dotenv.configure().systemProperties().load();
+        LoggerFactory.getLogger(CoreUtilities.class).info("System properties were loaded");
     }
 
     @NonNull

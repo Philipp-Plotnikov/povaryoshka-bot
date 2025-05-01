@@ -19,7 +19,7 @@ final public class FormatterFactory {
     public static IIngredientsFormatter createIngredientsFormat() {
         if (ingredientsFormatter == null) {
             ingredientsFormatter = new IngredientsFormatter();
-            logger.debug("Created ingredientsFormatter");
+            logger.debug("ingredientsFormatter was created");
         }
         return ingredientsFormatter;
     }

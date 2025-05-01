@@ -17,6 +17,7 @@ import static models.db.schemas.postgres.PostgresUserContextSchema.COMMAND_STATE
 import static models.db.schemas.postgres.PostgresUserContextSchema.DISH_NAME;
 import static models.db.schemas.postgres.PostgresUserContextSchema.MULTI_STATE_COMMAND_TYPE;
 
+
 public class UserContextDTO {
     @NonNull
     private final static Logger logger = LoggerFactory.getLogger(UserContextDTO.class);
@@ -43,7 +44,7 @@ public class UserContextDTO {
             userContextResultSet.getString(COMMAND_STATE).toUpperCase()
         );
         dishName = userContextResultSet.getString(DISH_NAME);
-        logger.debug("UserContextDTO has been initialized");
+        logger.debug("UserContextDTO was initialized");
     }
 
     @NonNull

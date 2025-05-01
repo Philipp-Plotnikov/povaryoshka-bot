@@ -25,6 +25,7 @@ import static utilities.CommonsUtilities.getDbType;
 import static utilities.CoreUtilities.getPovaryoshkaBot;
 import static utilities.CoreUtilities.loadEnvFileToSystemProperties;
 
+
 public class SimpleGetDishCommandTest{
     @NonNull
     private final DbTypes dbType = getDbType();

@@ -64,7 +64,7 @@ final public class SimpleCommandFactory implements ICommandFactory {
                 END_COMMAND_SETTINGS.commandName(),
                 new EndCommand(povaryoshkaBot)
         );
-        logger.debug("Created CommandMap");
+        logger.debug("CommandMap was created");
         return Collections.unmodifiableMap(simpleCommandMap);
     }
 }

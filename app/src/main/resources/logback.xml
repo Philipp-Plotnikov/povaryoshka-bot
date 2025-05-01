@@ -1,9 +1,9 @@
 <configuration>
     <shutdownHook class="ch.qos.logback.core.hook.DefaultShutdownHook"/>
 
-    <appender name="json" class="logger.appenders.BufferedFileAppender">
+    <appender name="file" class="logger.appenders.BufferedFileAppender">
 
-        <file>server.json</file>
+        <file>server.logs</file>
         <flushIntervalSec>${FLUSH_INTERVAL_SEC}</flushIntervalSec>
         <maxBufferCount>${MAX_BUFFER_COUNT}</maxBufferCount>
         <immediateFlush>false</immediateFlush>
@@ -41,7 +41,7 @@
     <logger name="org.telegram.telegrambots" level="OFF"/>
 
     <root level="INFO">
-        <appender-ref ref="json"/>
+        <appender-ref ref="file"/>
         <appender-ref ref="console"/>
     </root>
 

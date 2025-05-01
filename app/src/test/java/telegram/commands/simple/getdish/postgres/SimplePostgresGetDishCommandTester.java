@@ -23,6 +23,7 @@ import static org.mockito.Mockito.never;
 import static utilities.CommandUtilities.*;
 import static utilities.CommonUtilities.*;
 
+
 public class SimplePostgresGetDishCommandTester  implements ISimpleTypedGetDishCommandTester {
     @Override
     public void getDishTest(@NonNull PovaryoshkaBot bot, @NonNull Connection mockedDbConnection) throws SQLException, Exception {

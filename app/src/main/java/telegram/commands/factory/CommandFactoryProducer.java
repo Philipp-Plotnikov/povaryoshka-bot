@@ -44,7 +44,8 @@ final public class CommandFactoryProducer {
             logger.error("commandFactoryGenerator of commandType {} is null", commandType.name());
             throw new Exception(String.format("commandFactoryGenerator of commandType '%s' is null", commandType.name()));
         }
-        logger.debug("Created CommandFactory");
-        return commandFactoryGenerator.generate();
+        ICommandFactory generatedCommandFactory = commandFactoryGenerator.generate();
+        logger.debug("CommandFactory was created");
+        return generatedCommandFactory;
     }
 }
