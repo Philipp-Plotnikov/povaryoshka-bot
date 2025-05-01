@@ -125,7 +125,7 @@ final public class GetDishCommand extends AbstractCommand {
     }
 
     @NonNull
-    private String getFormatDishInfo(@NonNull DishDTO selectedDish) {
+    public String getFormatDishInfo(@NonNull DishDTO selectedDish) {
         final String formatIngredienListInfo = getFormatIngredientListInfo(selectedDish);
         final String formatRecipeInfo = getFormatRecipeInfo(selectedDish);
         final String formatDishInfo = String.format(

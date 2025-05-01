@@ -12,7 +12,6 @@ import static org.telegram.telegrambots.abilitybots.api.objects.Privacy.PUBLIC;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
 import telegram.bot.PovaryoshkaBot;
-import utilities.CoreUtilities;
 
 
 final public class DefaultReply extends AbstractReply {

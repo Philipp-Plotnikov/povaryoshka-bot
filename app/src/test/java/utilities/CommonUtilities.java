@@ -1,12 +1,17 @@
 package utilities;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.List;
 
+import models.dtos.DishDTO;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.telegram.telegrambots.abilitybots.api.objects.MessageContext;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
@@ -117,5 +122,16 @@ final public class CommonUtilities {
         when(ingredientListResultSet.next()).thenReturn(true, false);
         when(ingredientListResultSet.getString(PostgresIngredientSchema.INGREDIENT)).thenReturn(DishMock.INGREDIENT);
         return ingredientListResultSet;
+    }
+
+    @NonNull
+    public static DishDTO getDishDTOMock() throws SQLException {
+        final ResultSet recipeResultSet = getRecipeResultSetMock();
+        final ResultSet ingredientResultSet = getIngredientResultSetMock();
+        final Statement statementMock = mock(Statement.class);
+        when(statementMock.executeQuery(any())).thenReturn(recipeResultSet);
+        when(statementMock.getMoreResults()).thenReturn(true);
+        when(statementMock.getResultSet()).thenReturn(ingredientResultSet);
+        return new DishDTO(statementMock);
     }
 }
