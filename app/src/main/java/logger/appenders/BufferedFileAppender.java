@@ -12,15 +12,14 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-
 public class BufferedFileAppender<E> extends FileAppender<E> {
     private int flushIntervalSec;
-    private int maxBufferCount;
+    private int maxBufferSize;
 
     @NonNull
     private final List<E> buffer = new ArrayList<>();
 
-    @NonNull
+    @Nullable
     private ScheduledExecutorService scheduler;
 
     @Nullable
@@ -30,27 +29,20 @@ public class BufferedFileAppender<E> extends FileAppender<E> {
     public void start() {
         super.start();
         scheduler = ExecutorServiceUtil.newScheduledExecutorService();
-        scheduleNextFlush();
+        scheduleFlush();
     }
 
-    private void scheduleNextFlush() {
+    private void scheduleFlush() {
         if (scheduledFlush != null) {
             scheduledFlush.cancel(false);
         }
-        scheduledFlush = scheduler.schedule(
-                this::safeFlushIfNotEmpty,
-                flushIntervalSec,
-                TimeUnit.SECONDS
+        scheduledFlush = scheduler.schedule(() -> {
+            safeFlush();
+            scheduleFlush();
+        },
+            flushIntervalSec,
+            TimeUnit.SECONDS
         );
-    }
-
-    private void safeFlushIfNotEmpty() {
-        synchronized (buffer) {
-            if (!buffer.isEmpty()) {
-                safeFlush();
-            }
-        }
-        scheduleNextFlush();
     }
 
     @Override
@@ -85,9 +77,9 @@ public class BufferedFileAppender<E> extends FileAppender<E> {
 
         synchronized (buffer) {
             buffer.add(event);
-            if (buffer.size() >= maxBufferCount) {
+            if (buffer.size() >= maxBufferSize) {
                 safeFlush();
-                scheduleNextFlush();
+                scheduleFlush();
             }
         }
     }
@@ -114,17 +106,17 @@ public class BufferedFileAppender<E> extends FileAppender<E> {
         }
     }
 
-    public void setFlushIntervalSec(int flushIntervalSec) {
-        if (flushIntervalSec <= 0) {
+    public void setFlushIntervalSec(int intervalSec) {
+        if (intervalSec <= 0) {
             throw new IllegalArgumentException("flushIntervalSec must be positive");
         }
-        this.flushIntervalSec = flushIntervalSec;
+        flushIntervalSec = intervalSec;
     }
 
-    public void setMaxBufferCount(int maxBufferCount) {
-        if (maxBufferCount <= 0) {
+    public void setMaxBufferSize(int bufferSize) {
+        if (bufferSize <= 0) {
             throw new IllegalArgumentException("maxBufferCount must be positive");
         }
-        this.maxBufferCount = maxBufferCount;
+        maxBufferSize = bufferSize;
     }
 }

@@ -5,7 +5,7 @@
 
         <file>server.logs</file>
         <flushIntervalSec>${FLUSH_INTERVAL_SEC}</flushIntervalSec>
-        <maxBufferCount>${MAX_BUFFER_COUNT}</maxBufferCount>
+        <maxBufferSize>${MAX_BUFFER_SIZE}</maxBufferSize>
         <immediateFlush>false</immediateFlush>
 
         <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">

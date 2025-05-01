@@ -123,15 +123,4 @@ final public class CommonUtilities {
         when(ingredientListResultSet.getString(PostgresIngredientSchema.INGREDIENT)).thenReturn(DishMock.INGREDIENT);
         return ingredientListResultSet;
     }
-
-    @NonNull
-    public static DishDTO getDishDTOMock() throws SQLException {
-        final ResultSet recipeResultSet = getRecipeResultSetMock();
-        final ResultSet ingredientResultSet = getIngredientResultSetMock();
-        final Statement statementMock = mock(Statement.class);
-        when(statementMock.executeQuery(any())).thenReturn(recipeResultSet);
-        when(statementMock.getMoreResults()).thenReturn(true);
-        when(statementMock.getResultSet()).thenReturn(ingredientResultSet);
-        return new DishDTO(statementMock);
-    }
 }

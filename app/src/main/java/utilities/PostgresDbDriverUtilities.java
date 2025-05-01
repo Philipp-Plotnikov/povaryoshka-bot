@@ -34,7 +34,7 @@ final public class PostgresDbDriverUtilities {
             System.getProperty(ALTER_SQL_SCRIPT_PATH),
             System.getProperty(IS_DISTRIBUTED_DATABASE)
         );
-        logger.debug("Got PostgresDbDriverOptions");
+        logger.debug("PostgresDbDriverOptions were retrieved");
         return postgresDbDriverOptions;
     }
 }

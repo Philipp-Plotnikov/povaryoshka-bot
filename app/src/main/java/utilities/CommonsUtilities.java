@@ -15,7 +15,7 @@ final public class CommonsUtilities {
 
     @NonNull
     public static DbTypes getDbType() {
-        logger.debug("Got DbType");
+        logger.debug("DB_TYPE was retrieved");
         return DbTypes.valueOf(System.getProperty(DB_TYPE).toUpperCase());
     }
 }
