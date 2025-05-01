@@ -3,10 +3,7 @@ package utilities;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.telegram.telegrambots.abilitybots.api.util.AbilityExtension;
 
-import telegram.commands.CreateDishCommand;
-import telegram.commands.DeleteDishCommand;
-import telegram.commands.GetDishCommand;
-import telegram.commands.UpdateDishCommand;
+import telegram.commands.*;
 
 
 final public class CommandUtilities {
@@ -24,5 +21,9 @@ final public class CommandUtilities {
 
     public static boolean isDeleteDishCommand(@NonNull AbilityExtension untypedCommand) {
         return untypedCommand != null && (untypedCommand instanceof DeleteDishCommand);
+    }
+
+    public static boolean isEndCommand(@NonNull AbilityExtension untypedCommand) {
+        return untypedCommand != null && (untypedCommand instanceof EndCommand);
     }
 }
