@@ -6,10 +6,15 @@ import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 
+import models.commons.RequestContext;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.abilitybots.api.objects.Ability;
 import org.telegram.telegrambots.abilitybots.api.objects.Flag;
 
+import static models.commands.CommandStates.*;
+import static models.commands.MultiStateCommandTypes.*;
 import static org.telegram.telegrambots.abilitybots.api.objects.Locality.ALL;
 import static org.telegram.telegrambots.abilitybots.api.objects.Privacy.PUBLIC;
 
@@ -18,10 +23,6 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import language.ru.BotMessages;
 
 import static models.commands.CommandConfig.CREATE_DISH_COMMAND_SETTINGS;
-import static models.commands.CommandStates.DISH_NAME_UPDATE;
-import static models.commands.CommandStates.INGREDIENTS_UPDATE;
-import static models.commands.CommandStates.RECIPE_UPDATE;
-import static models.commands.MultiStateCommandTypes.CREATE;
 
 import models.commands.ICommandStateHandler;
 import models.commands.CommandStates;
@@ -35,6 +36,7 @@ import models.db.sqlops.usercontext.UserContextUpdateOptions;
 import models.dtos.DishDTO;
 import models.dtos.UserContextDTO;
 import telegram.bot.PovaryoshkaBot;
+import utilities.LoggerUtilities;
 import utilities.factory.FormatterFactory;
 import utilities.factory.IIngredientsFormatter;
 
@@ -42,6 +44,9 @@ import utilities.factory.IIngredientsFormatter;
 final public class CreateDishCommand extends AbstractCommand {
     @NonNull
     private final EnumMap<@NonNull CommandStates, ICommandStateHandler> stateHandlersMap = new EnumMap<>(CommandStates.class);
+
+    @NonNull
+    private final Logger logger = LoggerFactory.getLogger(CreateDishCommand.class);
 
     public CreateDishCommand(@NonNull final PovaryoshkaBot povaryoshkaBot) {
         super(povaryoshkaBot);
@@ -63,28 +68,49 @@ final public class CreateDishCommand extends AbstractCommand {
                 .locality(ALL)
                 .action(ctx -> {
                     final Update update = ctx.update();
+                    final long userId = ctx.user().getId();
+                    LoggerUtilities.fillInLoggerFields(
+                            new RequestContext(
+                                    userId,
+                                    null,
+                                    CREATE.getValue(),
+                                    null
+                            )
+                    );
+                    logger.info("CreateDishCommand was invoked");
                     try {
                         sendSilently(BotMessages.WRITE_DISH_NAME, update);
                         dbDriver.insertUserContext(
                             new UserContextInsertOptions(
-                                ctx.user().getId(),
+                                userId,
                                 CREATE,
                                 DISH_NAME_UPDATE,
                                 null
                             )
                         );
+                        logger.info("UserContext was inserted in CreateDishCommand");
                     } catch (SQLException e) {
                         sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
+                        logger.error(String.valueOf(e));
+                    } finally {
+                        LoggerUtilities.clearLoggerField();
                     }
                 })
                 .reply((action, update) -> {
                             try {
+                                long userId = update.getMessage().getFrom().getId();
                                 final UserContextDTO userContextDTO = dbDriver.selectUserContext(
-                                    new UserContextSelectOptions(
-                                        update.getMessage().getFrom().getId()
-                                    )
+                                    new UserContextSelectOptions(userId)
                                 );
                                 if (userContextDTO != null) {
+                                    LoggerUtilities.fillInLoggerFields(
+                                            new RequestContext(
+                                                    userId,
+                                                    userContextDTO.getDishName(),
+                                                    userContextDTO.getMultiStateCommandTypes().getValue(),
+                                                    userContextDTO.getCommandState().getValue()
+                                            )
+                                    );
                                     final CommandStates commandState = userContextDTO.getCommandState();
                                     final ICommandStateHandler commandStateHandler = stateHandlersMap.get(commandState);
                                     if (commandStateHandler == null) {
@@ -94,6 +120,9 @@ final public class CreateDishCommand extends AbstractCommand {
                                 }
                             } catch (Exception e) {
                                 sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
+                                logger.error(String.valueOf(e));
+                            } finally {
+                                LoggerUtilities.clearLoggerField();
                             }
                         },
                         Flag.TEXT,
@@ -106,11 +135,11 @@ final public class CreateDishCommand extends AbstractCommand {
         @NonNull final Update update,
         @NonNull final UserContextDTO userContextDTO
     ) {
+        final long userId = update.getMessage().getFrom().getId();
+        final String dishName = update.getMessage().getText().trim();
         try {
             dbDriver.executeAsTransaction(
                     () -> {
-                        final long userId = update.getMessage().getFrom().getId();
-                        final String dishName = update.getMessage().getText().trim();
                         dbDriver.insertDish(
                             new DishInsertOptions(
                                 userId,
@@ -128,10 +157,11 @@ final public class CreateDishCommand extends AbstractCommand {
                         );
                     }
             );
+            logger.info("Dish name was chosen");
             sendSilently(BotMessages.WRITE_INGREDIENTS, update);
         } catch (Exception e) {
             sendSilently(BotMessages.DISH_ALREADY_EXISTS, update);
-            System.out.println(e);
+            logger.error(String.valueOf(e));
         }
     }
 
@@ -143,10 +173,10 @@ final public class CreateDishCommand extends AbstractCommand {
             final String ingredients = update.getMessage().getText().trim();
             final IIngredientsFormatter ingredientsFormatter = FormatterFactory.createIngredientsFormat();
             final List<String> ingredientList = Collections.unmodifiableList(ingredientsFormatter.formatInput(ingredients));
+            final long userId = update.getMessage().getFrom().getId();
+            final String userDishName = userContextDTO.getDishName();
             dbDriver.executeAsTransaction(
                     () -> {
-                        final long userId = update.getMessage().getFrom().getId();
-                        final String userDishName = userContextDTO.getDishName();
                         if (userDishName == null) {
                             throw new Exception("in handleIngredientsUpdateState userDishName is null");
                         }
@@ -168,10 +198,11 @@ final public class CreateDishCommand extends AbstractCommand {
                         );
                     }
             );
+            logger.info("Ingredients were added");
             sendSilently(BotMessages.WRITE_RECIPE, update);
         } catch (Exception e) {
             sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
-            System.out.println(e);
+            logger.error(String.valueOf(e));
         }
     }
 
@@ -179,31 +210,34 @@ final public class CreateDishCommand extends AbstractCommand {
         @NonNull final Update update,
         @NonNull final UserContextDTO userContextDTO
     ) {
+        final long userId = update.getMessage().getFrom().getId();
+        final String dishName = userContextDTO.getDishName();
         try {
-            final long userId = update.getMessage().getFrom().getId();
             final DishDTO dishDTO = dbDriver.selectDish(
-                new DishSelectOptions(userId, userContextDTO.getDishName())
+                new DishSelectOptions(userId, dishName)
             );
             dbDriver.executeAsTransaction(
                     () -> {
                         dbDriver.updateDish(
                                 new DishUpdateOptions(
                                 userId,
-                                userContextDTO.getDishName(),
+                                dishName,
                                 null,
                                 dishDTO.getIngredientList(),
                                 update.getMessage().getText().trim()
                             )
                         );
+                        logger.info("Recipe was added");
                         dbDriver.deleteUserContext(
                             new UserContextDeleteOptions(userId)
                         );
                     }
             );
             sendSilently(BotMessages.DISH_WAS_CREATED_WITH_SUCCESS, update);
+            logger.info("New dish was created successfully");
         } catch (Exception e) {
             sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
-            System.out.println(e);
+            logger.error(String.valueOf(e));
         }
     }
 }

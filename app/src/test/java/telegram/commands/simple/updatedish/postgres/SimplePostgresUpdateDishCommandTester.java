@@ -302,19 +302,97 @@ final public class SimplePostgresUpdateDishCommandTester implements ISimpleTyped
     public void handleRecipeUpdateConfirmStateYesTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
-    ) {}
+    ) throws NotFoundUserContextException, SQLException, Exception {
+        // Arrange
+        final Update update = getUpdateMock(UserMessages.YES);
+        final PreparedStatement updateUserContextCommandStatePreparedStatement = mock(PreparedStatement.class);
+        final UserContextDTO userContextDTO = getUserContextDTOMock(
+            MultiStateCommandTypes.UPDATE,
+            CommandStates.RECIPE_UPDATE_CONFIRM,
+            DishMock.DISH_NAME
+        );
+        when(mockedDbConnection.prepareStatement(any())).thenReturn(updateUserContextCommandStatePreparedStatement);
+        
+        // Act
+        final UpdateDishCommand updateDishCommand = getUpdateDishCommand(bot);
+        updateDishCommand.handleRecipeUpdateConfirmState(update, userContextDTO);
+    
+        // Assert
+        verify(bot.getSilent(), times(1)).send(BotMessages.INPUT_NEW_RECIPE, MessageMock.CHAT_ID);
+    }
 
     @Override
     public void handleRecipeUpdateConfirmStateNoTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
-    ) {}
+    ) throws NotFoundUserContextException, SQLException, Exception {
+        // Arrange
+        final Update update = getUpdateMock(UserMessages.NO);
+        final PreparedStatement updateUserContextCommandStatePreparedStatement = mock(PreparedStatement.class);
+        final UserContextDTO userContextDTO = getUserContextDTOMock(
+            MultiStateCommandTypes.UPDATE,
+            CommandStates.RECIPE_UPDATE_CONFIRM,
+            DishMock.DISH_NAME
+        );
+        when(mockedDbConnection.prepareStatement(any())).thenReturn(updateUserContextCommandStatePreparedStatement);
+        
+        // Act
+        final UpdateDishCommand updateDishCommand = getUpdateDishCommand(bot);
+        updateDishCommand.handleRecipeUpdateConfirmState(update, userContextDTO);
+    
+        // Assert
+        verify(bot.getSilent(), times(1)).send(BotMessages.DISH_WAS_UPDATED_WITH_SUCCESS, MessageMock.CHAT_ID);
+    }
+
+    @Override
+    public void handleRecipeUpdateConfirmStateInvalidTextTest(
+        @NonNull final PovaryoshkaBot bot,
+        @NonNull final Connection mockedDbConnection
+    ) throws NotFoundUserContextException, SQLException, Exception {
+        // Arrange
+        final Update update = getUpdateMock();
+        final PreparedStatement updateUserContextCommandStatePreparedStatement = mock(PreparedStatement.class);
+        final UserContextDTO userContextDTO = getUserContextDTOMock(
+            MultiStateCommandTypes.UPDATE,
+            CommandStates.RECIPE_UPDATE_CONFIRM,
+            DishMock.DISH_NAME
+        );
+        when(mockedDbConnection.prepareStatement(any())).thenReturn(updateUserContextCommandStatePreparedStatement);
+        
+        // Act
+        final UpdateDishCommand updateDishCommand = getUpdateDishCommand(bot);
+        updateDishCommand.handleRecipeUpdateConfirmState(update, userContextDTO);
+    
+        // Assert
+        verify(bot.getSilent(), times(1)).send(BotMessages.ENTER_YES_OR_NO, MessageMock.CHAT_ID);
+    }
 
     @Override
     public void handleRecipeUpdateStateTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
-    ) {}
+    ) throws NotFoundUserContextException, SQLException, Exception {
+        // Arrange
+        final Update update = getUpdateMock();
+        final PreparedStatement updateRecipePreparedStatement = mock(PreparedStatement.class);
+        final PreparedStatement deleteUserContextPreparedStatement = mock(PreparedStatement.class);
+        final UserContextDTO userContextDTO = getUserContextDTOMock(
+            MultiStateCommandTypes.UPDATE,
+            CommandStates.RECIPE_UPDATE,
+            DishMock.DISH_NAME
+        );
+        when(mockedDbConnection.prepareStatement(any())).thenReturn(
+            updateRecipePreparedStatement,
+            deleteUserContextPreparedStatement
+        );
+
+        // Act
+        final UpdateDishCommand updateDishCommand = getUpdateDishCommand(bot);
+        updateDishCommand.handleRecipeUpdateState(update, userContextDTO);
+
+        // Assert
+        verify(bot.getSilent(), never()).send(BotMessages.SOMETHING_WENT_WRONG, MessageMock.CHAT_ID);
+    }
 
     @NonNull
     private UpdateDishCommand getUpdateDishCommand(@NonNull final PovaryoshkaBot bot) throws Exception {

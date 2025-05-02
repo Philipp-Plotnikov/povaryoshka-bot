@@ -5,6 +5,8 @@ import java.util.Map;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.abilitybots.api.bot.AbilityBot;
 import org.telegram.telegrambots.abilitybots.api.sender.SilentSender;
 import org.telegram.telegrambots.abilitybots.api.util.AbilityExtension;
@@ -16,6 +18,9 @@ import dbdrivers.IDbDriver;
 
 final public class PovaryoshkaBot extends AbilityBot {
     private final long creatorId;
+
+    @NonNull
+    private final static Logger logger = LoggerFactory.getLogger(PovaryoshkaBot.class);
 
     @NonNull
     private final IDbDriver dbDriver;
@@ -38,15 +43,17 @@ final public class PovaryoshkaBot extends AbilityBot {
         this.creatorId = creatorId;
         facadeFactory = new FacadeFactory();
         dbDriver = facadeFactory.getDbDriver();
-        initCommandList();
+        initCommandMap();
+        logger.info("PovaryoshkaBot started to work");
     }
 
-    public void initCommandList() {
+    public void initCommandMap() {
         commandMap = facadeFactory.createCommandMap(this);
         replyMap = facadeFactory.createReplyMap(this);
         addExtensions(commandMap.values());
         addExtensions(replyMap.values());
         onRegister();
+        logger.info("CommandMap was initialized");
     }
 
     @NonNull

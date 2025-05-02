@@ -14,6 +14,8 @@ import java.util.Map;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.abilitybots.api.util.AbilityExtension;
 
 import telegram.bot.PovaryoshkaBot;
@@ -24,9 +26,13 @@ import telegram.commands.FeedbackCommand;
 import telegram.commands.GetDishCommand;
 import telegram.commands.UpdateDishCommand;
 import telegram.commands.StartCommand;
+import telegram.replies.DefaultReply;
 
 
 final public class SimpleCommandFactory implements ICommandFactory {
+    @NonNull
+    private final static Logger logger = LoggerFactory.getLogger(SimpleCommandFactory.class);
+
     @NonNull
     public Map<String, @Nullable AbilityExtension> createCommandMap(@NonNull final PovaryoshkaBot povaryoshkaBot) {
         final HashMap<String, AbilityExtension> simpleCommandMap = new HashMap<>();
@@ -58,6 +64,7 @@ final public class SimpleCommandFactory implements ICommandFactory {
                 END_COMMAND_SETTINGS.commandName(),
                 new EndCommand(povaryoshkaBot)
         );
+        logger.debug("CommandMap was created");
         return Collections.unmodifiableMap(simpleCommandMap);
     }
 }

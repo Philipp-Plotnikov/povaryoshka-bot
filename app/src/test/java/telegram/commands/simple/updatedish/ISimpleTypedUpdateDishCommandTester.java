@@ -63,15 +63,20 @@ public interface ISimpleTypedUpdateDishCommandTester {
     void handleRecipeUpdateConfirmStateYesTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
-    );
+    ) throws NotFoundUserContextException, SQLException, Exception;
 
     void handleRecipeUpdateConfirmStateNoTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
-    );
+    ) throws NotFoundUserContextException, SQLException, Exception;
+
+    void handleRecipeUpdateConfirmStateInvalidTextTest(
+        @NonNull final PovaryoshkaBot bot,
+        @NonNull final Connection mockedDbConnection
+    ) throws NotFoundUserContextException, SQLException, Exception;
 
     void handleRecipeUpdateStateTest(
         @NonNull final PovaryoshkaBot bot,
         @NonNull final Connection mockedDbConnection
-    );
+    ) throws NotFoundUserContextException, SQLException, Exception;
 }

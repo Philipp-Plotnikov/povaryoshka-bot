@@ -38,6 +38,8 @@ dependencies {
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.16'
     // https://mvnrepository.com/artifact/ch.qos.logback/logback-classic
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.5.16'
+    // https://mvnrepository.com/artifact/net.logstash.logback/logstash-logback-encoder
+    implementation("net.logstash.logback:logstash-logback-encoder:8.1")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.

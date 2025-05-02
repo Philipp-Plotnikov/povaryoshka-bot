@@ -1,16 +1,19 @@
 package telegram.commands;
 
+import models.commons.RequestContext;
 import models.commons.SendOptions;
 import models.db.sqlops.dish.DishSelectOptions;
 import models.db.sqlops.usercontext.UserContextDeleteOptions;
 import models.db.sqlops.usercontext.UserContextInsertOptions;
 import models.dtos.DishDTO;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.abilitybots.api.objects.Ability;
 import org.telegram.telegrambots.abilitybots.api.objects.Flag;
 
 import static models.commands.CommandStates.DISH_NAME;
-import static models.commands.MultiStateCommandTypes.GET;
+import static models.commands.MultiStateCommandTypes.*;
 import static org.telegram.telegrambots.abilitybots.api.objects.Locality.ALL;
 import static org.telegram.telegrambots.abilitybots.api.objects.Privacy.PUBLIC;
 
@@ -22,6 +25,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 
 import language.ru.BotMessages;
 import telegram.bot.PovaryoshkaBot;
+import utilities.LoggerUtilities;
 import utilities.factory.FormatterFactory;
 import utilities.factory.IIngredientsFormatter;
 
@@ -30,6 +34,8 @@ import java.util.List;
 
 
 final public class GetDishCommand extends AbstractCommand {
+    @NonNull
+    private final Logger logger = LoggerFactory.getLogger(GetDishCommand.class);
 
     public GetDishCommand(@NonNull final PovaryoshkaBot povaryoshkaBot) {
         super(povaryoshkaBot);
@@ -44,6 +50,16 @@ final public class GetDishCommand extends AbstractCommand {
             .locality(ALL)
             .action(ctx -> {
                 final Update update = ctx.update();
+                final long userId = ctx.user().getId();
+                LoggerUtilities.fillInLoggerFields(
+                        new RequestContext(
+                                userId,
+                                null,
+                                GET.getValue(),
+                                null
+                        )
+                );
+                logger.info("GetDishCommand was invoked");
                 try {
                     final String message = getUserDishList(ctx);
                     if (message == null) {
@@ -54,15 +70,18 @@ final public class GetDishCommand extends AbstractCommand {
                     sendSilently(BotMessages.WRITE_DISH_NAME_FROM_LIST_TO_GET, update);
                     dbDriver.insertUserContext(
                             new UserContextInsertOptions(
-                                    ctx.user().getId(),
+                                    userId,
                                     GET,
                                     DISH_NAME,
                                     null
                             )
                     );
+                    logger.info("UserContext was inserted in DeleteDishCommand");
                 } catch(SQLException e) {
                     sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
-                    System.out.println("Ошибка при вставке: " + e.getMessage());
+                    logger.error(e.getMessage());
+                } finally {
+                    LoggerUtilities.clearLoggerField();
                 }
             })
             .reply((action, update) -> {
@@ -71,6 +90,14 @@ final public class GetDishCommand extends AbstractCommand {
                         final String dishName = update.getMessage().getText().trim();
                         final DishDTO selectedDish = dbDriver.selectDish(
                             new DishSelectOptions(userId, dishName)
+                        );
+                        LoggerUtilities.fillInLoggerFields(
+                                new RequestContext(
+                                        userId,
+                                        dishName,
+                                        GET.getValue(),
+                                        null
+                                )
                         );
                         if (selectedDish == null) {
                             sendSilently(BotMessages.THIS_DISH_NAME_IS_NOT_FROM_LIST, update);
@@ -83,9 +110,12 @@ final public class GetDishCommand extends AbstractCommand {
                         dbDriver.deleteUserContext(
                             new UserContextDeleteOptions(userId)
                         );
+                        logger.info("GetDishCommand was finished successfully");
                     } catch(Exception e) {
                         sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
-                        System.out.println("Ошибка : " + e.getMessage());
+                        logger.error(e.getMessage());
+                    } finally {
+                        LoggerUtilities.clearLoggerField();
                     }
                 },
                 Flag.TEXT,
@@ -95,7 +125,7 @@ final public class GetDishCommand extends AbstractCommand {
     }
 
     @NonNull
-    private String getFormatDishInfo(@NonNull DishDTO selectedDish) {
+    public String getFormatDishInfo(@NonNull DishDTO selectedDish) {
         final String formatIngredienListInfo = getFormatIngredientListInfo(selectedDish);
         final String formatRecipeInfo = getFormatRecipeInfo(selectedDish);
         final String formatDishInfo = String.format(

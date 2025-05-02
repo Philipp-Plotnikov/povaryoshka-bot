@@ -8,14 +8,20 @@ import java.sql.SQLException;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import models.db.drivers.postgres.PostgresDbDriverOptions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import utilities.PostgresDbDriverUtilities;
 
 
 final public class PostgresDbDriverFactory implements IDbDriverFactory {
+    @NonNull
+    private final static Logger logger = LoggerFactory.getLogger(PostgresDbDriverFactory.class);
+
     @Override
     @NonNull
     public IDbDriver createDbDriver() throws SQLException {
         final PostgresDbDriverOptions postgresDbDriverOptions = PostgresDbDriverUtilities.getPostgresDbDriverOptions();
+        logger.debug("PostgresDbDriver was created");
         return new PostgresDbDriver(postgresDbDriverOptions);
     }
 }

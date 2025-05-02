@@ -2,6 +2,7 @@ package telegram.commands;
 
 import models.commands.ICommandStateHandler;
 import models.commands.CommandStates;
+import models.commons.RequestContext;
 import models.db.sqlops.dish.DishSelectOptions;
 import models.db.sqlops.dish.DishUpdateOptions;
 import models.db.sqlops.usercontext.UserContextDeleteOptions;
@@ -11,6 +12,8 @@ import models.db.sqlops.usercontext.UserContextUpdateOptions;
 import models.dtos.DishDTO;
 import models.dtos.UserContextDTO;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.abilitybots.api.objects.Ability;
 import org.telegram.telegrambots.abilitybots.api.objects.Flag;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -18,6 +21,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import language.ru.BotMessages;
 import language.ru.UserMessages;
 import telegram.bot.PovaryoshkaBot;
+import utilities.LoggerUtilities;
 
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -35,6 +39,9 @@ import static org.telegram.telegrambots.abilitybots.api.objects.Privacy.PUBLIC;
 final public class UpdateDishCommand extends AbstractCommand {
     @NonNull
     private final EnumMap<@NonNull CommandStates, ICommandStateHandler> stateHandlersMap = new EnumMap<>(CommandStates.class);
+
+    @NonNull
+    private final Logger logger = LoggerFactory.getLogger(UpdateDishCommand.class);
 
     public UpdateDishCommand(@NonNull final PovaryoshkaBot povaryoshkaBot) {
         super(povaryoshkaBot);
@@ -60,6 +67,16 @@ final public class UpdateDishCommand extends AbstractCommand {
             .locality(ALL)
             .action(ctx -> {
                 final Update update = ctx.update();
+                final long userId = ctx.user().getId();
+                LoggerUtilities.fillInLoggerFields(
+                        new RequestContext(
+                                userId,
+                                null,
+                                UPDATE.getValue(),
+                                null
+                        )
+                );
+                logger.info("UpdateDishCommand was invoked");
                 try {
                     final String message = getUserDishList(ctx);
                     if (message == null) {
@@ -70,25 +87,35 @@ final public class UpdateDishCommand extends AbstractCommand {
                     sendSilently(BotMessages.WRITE_DISH_NAME_FROM_LIST_TO_UPDATE, update);
                     dbDriver.insertUserContext(
                         new UserContextInsertOptions(
-                            ctx.user().getId(),
+                            userId,
                             UPDATE,
                             DISH_NAME,
                             null
                         )
                     );
+                    logger.info("UserContext was inserted in DeleteDishCommand");
                 } catch(SQLException e) {
                     sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
-                    System.out.println("Ошибка при вставке: " + e.getMessage());
+                    logger.error(String.valueOf(e));
+                } finally {
+                    LoggerUtilities.clearLoggerField();
                 }
             })
             .reply((action, update) -> {
                 try {
+                    final long userId = update.getMessage().getFrom().getId();
                     final UserContextDTO userContextDTO = dbDriver.selectUserContext(
-                        new UserContextSelectOptions(
-                            update.getMessage().getFrom().getId()
-                        )
+                        new UserContextSelectOptions(userId)
                     );
                     if (userContextDTO != null) {
+                        LoggerUtilities.fillInLoggerFields(
+                                new RequestContext(
+                                        userId,
+                                        userContextDTO.getDishName(),
+                                        userContextDTO.getMultiStateCommandTypes().getValue(),
+                                        userContextDTO.getCommandState().getValue()
+                                )
+                        );
                         final CommandStates commandState = userContextDTO.getCommandState();
                         final ICommandStateHandler commandStateHandler = stateHandlersMap.get(commandState);
                         if (commandStateHandler == null) {
@@ -98,8 +125,10 @@ final public class UpdateDishCommand extends AbstractCommand {
                     }
                     } catch(Exception e) {
                         sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
-                        System.out.println("Ошибка обновления блюда: " + e.getMessage());
-                    }
+                    logger.error(String.valueOf(e));
+                    } finally {
+                    LoggerUtilities.clearLoggerField();
+                }
                 },
                 Flag.TEXT,
                 isSpecifiedContext(UPDATE)
@@ -123,9 +152,10 @@ final public class UpdateDishCommand extends AbstractCommand {
                 )
             );
             sendSilently(BotMessages.CONFIRM_DISH_NAME_UPDATE, update);
+            logger.info("Confirmation of the name change");
         } catch (Exception e) {
             sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
-            System.out.println(e);
+            logger.error(String.valueOf(e));
         }
     }
 
@@ -141,6 +171,7 @@ final public class UpdateDishCommand extends AbstractCommand {
                         null
                     )
                 );
+                logger.info("Name change rejected");
                 sendSilently(BotMessages.DISH_NAME_IS_NOT_UPDATED, update);
                 sendSilently(BotMessages.CONFIRM_INGREDIENTS_UPDATE, update);
                 return;
@@ -153,13 +184,14 @@ final public class UpdateDishCommand extends AbstractCommand {
                         null
                     )
                 );
+                logger.info("Name change accepted");
                 sendSilently(BotMessages.INPUT_NEW_DISH_NAME, update);
                 return;
             }
             sendSilently(BotMessages.ENTER_YES_OR_NO, update);
         } catch (Exception e) {
             sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
-            System.out.println(e);
+            logger.error(String.valueOf(e));
         }
     }
 
@@ -167,12 +199,13 @@ final public class UpdateDishCommand extends AbstractCommand {
         try {
             final long userId = update.getMessage().getFrom().getId();
             final String newDishName = update.getMessage().getText().trim();
+            final String dishName = userContextDTO.getDishName();
             dbDriver.executeAsTransaction(
                 () -> {
                     dbDriver.updateDishName(
                         new DishUpdateOptions(
                             userId,
-                            userContextDTO.getDishName(),
+                            dishName,
                             newDishName,
                             null,
                             null
@@ -188,9 +221,10 @@ final public class UpdateDishCommand extends AbstractCommand {
                 }
             );
             sendSilently(BotMessages.CONFIRM_INGREDIENTS_UPDATE, update);
+            logger.info("Confirmation of the ingredients change");
         } catch (Exception e) {
             sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
-            System.out.println(e);
+            logger.error(String.valueOf(e));
         }
     }
 
@@ -213,6 +247,7 @@ final public class UpdateDishCommand extends AbstractCommand {
                         null
                     )
                 );
+                logger.info("Ingredients change rejected");
                 sendSilently(BotMessages.INGREDIENTS_ARE_NOT_UPDATED, update);
                 sendSilently(BotMessages.CONFIRM_RECIPE_UPDATE, update);
                 return;
@@ -225,13 +260,14 @@ final public class UpdateDishCommand extends AbstractCommand {
                         null
                     )
                 );
+                logger.info("Ingredients change accepted");
                 sendSilently(BotMessages.INPUT_NEW_INGREDIENTS, update);
                 return;
             }
             sendSilently(BotMessages.ENTER_YES_OR_NO, update);
         } catch (Exception e) {
             sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
-            System.out.println(e);
+            logger.error(String.valueOf(e));
         }
     }
 
@@ -241,12 +277,13 @@ final public class UpdateDishCommand extends AbstractCommand {
             final List<String> ingredientList = Collections.unmodifiableList(
                 Arrays.asList(update.getMessage().getText().trim().split(", "))
             );
+            final String dishName = userContextDTO.getDishName();
             dbDriver.executeAsTransaction(
                 () -> {
                     dbDriver.updateDishIngredientList(
                         new DishUpdateOptions(
                             userId,
-                            userContextDTO.getDishName(),
+                            dishName,
                             null,
                             ingredientList,
                             null
@@ -262,9 +299,10 @@ final public class UpdateDishCommand extends AbstractCommand {
                 }
             );
             sendSilently(BotMessages.CONFIRM_RECIPE_UPDATE, update);
+            logger.info("Confirmation of the recipe change");
         } catch (Exception e) {
             sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
-            System.out.println(e);
+            logger.error(String.valueOf(e));
         }
     }
 
@@ -276,8 +314,10 @@ final public class UpdateDishCommand extends AbstractCommand {
                 dbDriver.deleteUserContext(
                     new UserContextDeleteOptions(userId)
                 );
+                logger.info("Recipe change rejected");
                 sendSilently(BotMessages.RECIPE_IS_NOT_UPDATED, update);
                 sendSilently(BotMessages.DISH_WAS_UPDATED_WITH_SUCCESS, update);
+                logger.info("Dish was updated successfully");
                 return;
             }
             if (userMessage.equalsIgnoreCase(UserMessages.YES)){
@@ -288,13 +328,14 @@ final public class UpdateDishCommand extends AbstractCommand {
                         null
                     )
                 );
+                logger.info("Name change accepted");
                 sendSilently(BotMessages.INPUT_NEW_RECIPE, update);
                 return;
             }
             sendSilently(BotMessages.ENTER_YES_OR_NO, update);
         } catch (Exception e) {
             sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
-            System.out.println(e);
+            logger.error(String.valueOf(e));
         }
     }
 
@@ -302,12 +343,13 @@ final public class UpdateDishCommand extends AbstractCommand {
         try {
             final long userId = update.getMessage().getFrom().getId();
             final String recipe = update.getMessage().getText().trim();
+            final String dishName = userContextDTO.getDishName();
             dbDriver.executeAsTransaction(
                 () -> {
                     dbDriver.updateDishRecipe(
                         new DishUpdateOptions(
                             userId,
-                            userContextDTO.getDishName(),
+                            dishName,
                             null,
                             null,
                             recipe
@@ -319,9 +361,10 @@ final public class UpdateDishCommand extends AbstractCommand {
                 }
             );
             sendSilently(BotMessages.DISH_WAS_UPDATED_WITH_SUCCESS, update);
+            logger.info("Dish was updated successfully");
         } catch (Exception e) {
             sendSilently(BotMessages.SOMETHING_WENT_WRONG, update);
-            System.out.println(e);
+            logger.error(String.valueOf(e));
         }
     }
 }

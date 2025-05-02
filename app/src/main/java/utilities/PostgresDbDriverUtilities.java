@@ -13,9 +13,14 @@ import static models.system.EnvVars.IS_DISTRIBUTED_DATABASE;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import models.db.drivers.postgres.PostgresDbDriverOptions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 final public class PostgresDbDriverUtilities {
+    @NonNull
+    private final static Logger logger = LoggerFactory.getLogger(PostgresDbDriverUtilities.class);
+
     @NonNull
     public static PostgresDbDriverOptions getPostgresDbDriverOptions() {
         final PostgresDbDriverOptions postgresDbDriverOptions = new PostgresDbDriverOptions(
@@ -29,6 +34,7 @@ final public class PostgresDbDriverUtilities {
             System.getProperty(ALTER_SQL_SCRIPT_PATH),
             System.getProperty(IS_DISTRIBUTED_DATABASE)
         );
+        logger.debug("PostgresDbDriverOptions were retrieved");
         return postgresDbDriverOptions;
     }
 }

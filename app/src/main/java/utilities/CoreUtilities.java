@@ -3,6 +3,8 @@ package utilities;
 import java.sql.SQLException;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
@@ -20,6 +22,7 @@ import telegram.bot.PovaryoshkaBot;
 final public class CoreUtilities {
     public static void loadEnvFileToSystemProperties() {
         Dotenv.configure().systemProperties().load();
+        LoggerFactory.getLogger(CoreUtilities.class).info("System properties were loaded");
     }
 
     @NonNull
