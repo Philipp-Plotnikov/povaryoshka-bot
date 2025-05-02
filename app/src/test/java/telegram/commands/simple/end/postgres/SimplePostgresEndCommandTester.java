@@ -46,7 +46,7 @@ public class SimplePostgresEndCommandTester implements ISimpleTypedEndCommandTes
         }
         final AbilityExtension untypedCommand = commandMap.get(END_COMMAND_SETTINGS.commandName());
         if (!isEndCommand(untypedCommand)) {
-            throw new Exception("In SimplePostgresDishCommandTester deleteDishCommand is null or is not of expected type");
+            throw new Exception("In SimplePostgresDishCommandTester endDishCommand is null or is not of expected type");
         }
         return (EndCommand)untypedCommand;
     }

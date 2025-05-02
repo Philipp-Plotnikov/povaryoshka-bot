@@ -26,4 +26,8 @@ final public class CommandUtilities {
     public static boolean isEndCommand(@NonNull AbilityExtension untypedCommand) {
         return untypedCommand != null && (untypedCommand instanceof EndCommand);
     }
+
+    public static boolean isFeedbackCommand(@NonNull AbilityExtension untypedCommand) {
+        return untypedCommand != null && (untypedCommand instanceof FeedbackCommand);
+    }
 }
