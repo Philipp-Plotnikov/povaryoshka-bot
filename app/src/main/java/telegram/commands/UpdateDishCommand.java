@@ -14,7 +14,6 @@ import models.dtos.UserContextDTO;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 import org.telegram.telegrambots.abilitybots.api.objects.Ability;
 import org.telegram.telegrambots.abilitybots.api.objects.Flag;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -33,7 +32,6 @@ import java.util.List;
 import static models.commands.CommandConfig.UPDATE_DISH_COMMAND_SETTINGS;
 import static models.commands.CommandStates.*;
 import static models.commands.MultiStateCommandTypes.*;
-import static models.logger.LoggerFields.*;
 import static org.telegram.telegrambots.abilitybots.api.objects.Locality.ALL;
 import static org.telegram.telegrambots.abilitybots.api.objects.Privacy.PUBLIC;
 

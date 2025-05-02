@@ -6,9 +6,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.telegram.telegrambots.abilitybots.api.objects.MessageContext;
 import org.telegram.telegrambots.abilitybots.api.util.AbilityExtension;
 import telegram.bot.PovaryoshkaBot;
-import telegram.commands.DeleteDishCommand;
 import telegram.commands.EndCommand;
-import telegram.commands.GetDishCommand;
 import telegram.commands.simple.end.ISimpleTypedEndCommandTester;
 
 import java.sql.Connection;

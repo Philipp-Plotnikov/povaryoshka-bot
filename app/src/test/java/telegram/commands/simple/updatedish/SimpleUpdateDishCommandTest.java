@@ -193,6 +193,18 @@ final public class SimpleUpdateDishCommandTest {
     }
 
     @Test
+    public void handleRecipeUpdateConfirmStateInvalidTextTest() throws Exception {
+        if (bot == null) {
+            throw new Exception("In UpdateDishCommandTest: bot is null.");
+        }
+        if (mockedDbConnection == null) {
+            throw new Exception("In UpdateDishCommandTest: mockedDbConnection is null.");
+        }
+        final ISimpleTypedUpdateDishCommandTester simpleTypedUpdateDishCommandTester = getSimpleTypedUpdateDishCommandTester();
+        simpleTypedUpdateDishCommandTester.handleRecipeUpdateConfirmStateInvalidTextTest(bot, mockedDbConnection);
+    }
+
+    @Test
     public void handleRecipeUpdateStateTest() throws Exception {
         if (bot == null) {
             throw new Exception("In UpdateDishCommandTest: bot is null.");

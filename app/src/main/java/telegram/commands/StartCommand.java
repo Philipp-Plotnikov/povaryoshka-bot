@@ -5,7 +5,6 @@ import models.commons.RequestContext;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 import org.telegram.telegrambots.abilitybots.api.objects.Ability;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import telegram.bot.PovaryoshkaBot;
