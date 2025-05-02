@@ -37,9 +37,9 @@ public class BufferedFileAppender<E> extends FileAppender<E> {
             scheduledFlush.cancel(false);
         }
         scheduledFlush = scheduler.schedule(() -> {
-            safeFlush();
-            scheduleFlush();
-        },
+                safeFlush();
+                scheduleFlush();
+            },
             flushIntervalSec,
             TimeUnit.SECONDS
         );

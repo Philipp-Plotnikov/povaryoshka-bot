@@ -11,7 +11,6 @@ import models.commands.ICommandFactoryGenerator;
 import models.commands.CommandTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import telegram.replies.DefaultReply;
 
 
 final public class CommandFactoryProducer {
@@ -29,7 +28,7 @@ final public class CommandFactoryProducer {
     private Map<@NonNull CommandTypes, @Nullable ICommandFactoryGenerator> produceCommandFactoryGeneratorMap() {
         final EnumMap<@NonNull CommandTypes, @Nullable ICommandFactoryGenerator> localCommandFactoryGeneratorMap = new EnumMap<>(CommandTypes.class);
         localCommandFactoryGeneratorMap.put(CommandTypes.SIMPLE, () -> new SimpleCommandFactory());
-        logger.debug("Created CommandFactoryGeneratorMap");
+        logger.debug("CommandFactoryGeneratorMap was created");
         return Collections.unmodifiableMap(localCommandFactoryGeneratorMap);
     }
 

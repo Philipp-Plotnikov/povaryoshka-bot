@@ -23,7 +23,7 @@ public class Application {
             povaryoshkaBot.getDbDriver().setup();
             logger.info("DBDriver was setup");
             botsApplication.registerBot(botToken, povaryoshkaBot);
-            logger.info("PovaryoshkaBot is launching");
+            logger.info("PovaryoshkaBot was launched");
             Thread.currentThread().join();
         } catch (Exception e) {
             logger.error(String.valueOf(e));
